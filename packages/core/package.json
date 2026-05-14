@@ -57,8 +57,13 @@
     "@types/react-dom": "^19",
     "typescript": "^5"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichiMauch/vibe-cms-platform.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/MichiMauch/vibe-cms-platform#readme",
   "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   }
 }
