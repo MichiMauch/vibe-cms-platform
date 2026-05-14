@@ -1,0 +1,52 @@
+{
+  "seo": {
+    "title": "{{BRAND}} — {{TAGLINE}}",
+    "description": "{{DESCRIPTION}}",
+    "ogTitle": "{{BRAND}}",
+    "ogDescription": "{{DESCRIPTION}}",
+    "ogImage": "",
+    "keywords": "{{KEYWORDS}}"
+  },
+  "chatbot": { "isEnabled": false, "botName": "{{BRAND}}-Assistent", "welcomeMessage": "Hallo!" },
+  "sections": [
+    {
+      "id": "__hero",
+      "type": "Hero",
+      "data": {
+        "eyebrow": "{{EVENT_DATE}}",
+        "title": "{{HERO_TITLE}}",
+        "subtitle": "{{HERO_SUBTITLE}}",
+        "ctaPrimary": "Jetzt anmelden",
+        "ctaSecondary": "Programm ansehen"
+      }
+    },
+    {
+      "id": "__features",
+      "type": "Features",
+      "data": {
+        "title": "Highlights",
+        "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
+        "items": [
+          { "icon": "Sparkles", "title": "{{F1_TITLE}}", "description": "{{F1_DESC}}" },
+          { "icon": "Zap",      "title": "{{F2_TITLE}}", "description": "{{F2_DESC}}" },
+          { "icon": "ShieldCheck", "title": "{{F3_TITLE}}", "description": "{{F3_DESC}}" }
+        ]
+      }
+    },
+    {
+      "id": "__cta",
+      "type": "CallToAction",
+      "data": {
+        "title": "{{CTA_TITLE}}",
+        "subtitle": "{{CTA_SUBTITLE}}",
+        "ctaPrimary": "Ticket sichern",
+        "ctaSecondary": "Mehr Infos"
+      }
+    },
+    {
+      "id": "__footer",
+      "type": "Footer",
+      "data": { "copyright": "© 2026 {{BRAND}}", "tagline": "{{TAGLINE}}" }
+    }
+  ]
+}

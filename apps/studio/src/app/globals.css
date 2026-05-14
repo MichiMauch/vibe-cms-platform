@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* Pick up class names used by @vibe-cms/core (Blocks, Editors, Manager, …).
+ * Both paths resolve to the same files; we list both because npm workspace
+ * hoisting can place the symlink at either location depending on hoist rules.
+ */
+@source "../../../../packages/core/src/**/*.{ts,tsx}";
+@source "../../../../node_modules/@vibe-cms/core/src/**/*.{ts,tsx}";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+[contenteditable="true"]:focus {
+  outline-offset: 4px;
+}
+
+[data-rich] a {
+  color: rgb(37 99 235);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+}
+[data-rich] a:hover {
+  color: rgb(29 78 216);
+}
+[data-rich] strong { font-weight: 600; }
+[data-rich] em { font-style: italic; }
+[data-rich] p { margin: 0; }
+[data-rich] p + p { margin-top: 0.5rem; }
+
+.tippy-box {
+  background: transparent;
+}

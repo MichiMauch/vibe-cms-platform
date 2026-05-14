@@ -1,0 +1,36 @@
+{
+  "seo": {
+    "title": "{{BRAND}} — {{TAGLINE}}",
+    "description": "{{DESCRIPTION}}",
+    "ogTitle": "{{BRAND}}",
+    "ogDescription": "{{DESCRIPTION}}",
+    "ogImage": "",
+    "keywords": "{{KEYWORDS}}"
+  },
+  "chatbot": {
+    "isEnabled": false,
+    "botName": "{{BRAND}}-Assistent",
+    "welcomeMessage": "Hallo! Wie kann ich helfen?"
+  },
+  "sections": [
+    {
+      "id": "__hero",
+      "type": "Hero",
+      "data": {
+        "eyebrow": "{{BRAND}}",
+        "title": "{{HERO_TITLE}}",
+        "subtitle": "{{HERO_SUBTITLE}}",
+        "ctaPrimary": "Loslegen",
+        "ctaSecondary": "Mehr erfahren"
+      }
+    },
+    {
+      "id": "__footer",
+      "type": "Footer",
+      "data": {
+        "copyright": "© 2026 {{BRAND}}",
+        "tagline": "{{TAGLINE}}"
+      }
+    }
+  ]
+}

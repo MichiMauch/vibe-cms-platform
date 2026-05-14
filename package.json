@@ -1,0 +1,26 @@
+{
+  "name": "vibe-cms-platform",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/studio",
+    "build": "npm run build --workspaces --if-present",
+    "build:studio": "npm run build --workspace=apps/studio",
+    "setup": "node scripts/setup.mjs",
+    "lint": "npm run lint --workspaces --if-present",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

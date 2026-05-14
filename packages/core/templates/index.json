@@ -1,0 +1,24 @@
+{
+  "templates": [
+    {
+      "id": "blank",
+      "label": "Blank",
+      "description": "Minimaler Start: Hero + Footer. Du baust den Rest selbst zusammen."
+    },
+    {
+      "id": "saas",
+      "label": "SaaS / Produkt",
+      "description": "Hero, drei Features, Pricing, CTA, Footer. Klassische Produktseite."
+    },
+    {
+      "id": "agentur",
+      "label": "Agentur / Studio",
+      "description": "Hero, Features, Team, Testimonial, CTA, Footer."
+    },
+    {
+      "id": "event",
+      "label": "Event / Launch",
+      "description": "Hero, Highlights, CTA, Footer. Für Launches und Termine."
+    }
+  ]
+}
