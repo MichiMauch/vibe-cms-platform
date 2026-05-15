@@ -1,26 +1,38 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { LocaleProvider } from "@vibe-cms-platform/core/components";
-import { LanguageSwitcher } from "@vibe-cms-platform/core/components";
-import { Chatbot } from "@vibe-cms-platform/core/components";
-import { listLocales, localeExists } from "@vibe-cms-platform/core/i18n/server";
-import { readContent } from "@vibe-cms-platform/core/lib/server";
+import { LocaleProvider, LanguageSwitcher, Chatbot } from "@vibe-cms-platform/core/components";
+import { resolveTenant, isAdminHost } from "@/lib/platform/registry";
+import { listSiteLocales, readSiteContent, siteLocaleExists } from "@/lib/platform/site-content";
 
 export const dynamic = "force-dynamic";
 
 type Params = { locale: string };
+type SearchParams = { site?: string };
 
 export default async function LocaleLayout({
   children,
   params,
+  searchParams,
 }: {
   children: React.ReactNode;
   params: Promise<Params>;
+  searchParams?: Promise<SearchParams>;
 }) {
-  const { locale } = await params;
-  if (!(await localeExists(locale))) notFound();
+  const h = await headers();
+  const host = h.get("host") ?? "";
+  if (isAdminHost(host)) {
+    return <>{children}</>;
+  }
 
-  const locales = await listLocales();
-  const content = await readContent(locale);
+  const sp = (await searchParams) ?? {};
+  const slug = await resolveTenant({ host, override: sp.site });
+  if (!slug) notFound();
+
+  const { locale } = await params;
+  if (!(await siteLocaleExists(slug, locale))) notFound();
+
+  const locales = await listSiteLocales(slug);
+  const content = await readSiteContent(slug, locale);
 
   return (
     <LocaleProvider value={locale}>

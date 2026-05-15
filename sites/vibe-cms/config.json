@@ -1,0 +1,10 @@
+{
+  "brand": "Vibe-CMS Demo",
+  "template": "saas",
+  "domains": [
+    "vibe-cms.pages.mauch.rocks",
+    "localhost:3000",
+    "localhost:3002"
+  ],
+  "createdAt": "2026-05-15T00:00:00.000Z"
+}
