@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import { LocaleProvider } from "@vibe-cms/core/components";
-import { LanguageSwitcher } from "@vibe-cms/core/components";
-import { Chatbot } from "@vibe-cms/core/components";
-import { listLocales, localeExists } from "@vibe-cms/core/i18n/server";
-import { readContent } from "@vibe-cms/core/lib/server";
+import { LocaleProvider } from "@vibe-cms-platform/core/components";
+import { LanguageSwitcher } from "@vibe-cms-platform/core/components";
+import { Chatbot } from "@vibe-cms-platform/core/components";
+import { listLocales, localeExists } from "@vibe-cms-platform/core/i18n/server";
+import { readContent } from "@vibe-cms-platform/core/lib/server";
 
 export const dynamic = "force-dynamic";
 

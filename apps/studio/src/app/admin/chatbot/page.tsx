@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, MessageCircle } from "lucide-react";
-import { readContent } from "@vibe-cms/core/lib/server";
-import { listLocales, localeExists } from "@vibe-cms/core/i18n/server";
-import { DEFAULT_LOCALE, LOCALE_REGEX } from "@vibe-cms/core/i18n";
-import { ChatbotForm } from "@vibe-cms/core/components/chatbot";
-import { SeoLocaleSwitcher } from "@vibe-cms/core/components/seo";
+import { readContent } from "@vibe-cms-platform/core/lib/server";
+import { listLocales, localeExists } from "@vibe-cms-platform/core/i18n/server";
+import { DEFAULT_LOCALE, LOCALE_REGEX } from "@vibe-cms-platform/core/i18n";
+import { ChatbotForm } from "@vibe-cms-platform/core/components/chatbot";
+import { SeoLocaleSwitcher } from "@vibe-cms-platform/core/components/seo";
 
 export const dynamic = "force-dynamic";
 

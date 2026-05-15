@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { EditModeProvider } from "@vibe-cms/core/editors";
-import { EditModeIndicator } from "@vibe-cms/core/editors";
+import { EditModeProvider } from "@vibe-cms-platform/core/editors";
+import { EditModeIndicator } from "@vibe-cms-platform/core/editors";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

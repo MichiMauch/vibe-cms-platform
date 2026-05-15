@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
-/* Pick up class names used by @vibe-cms/core (Blocks, Editors, Manager, …).
+/* Pick up class names used by @vibe-cms-platform/core (Blocks, Editors, Manager, …).
  * Both paths resolve to the same files; we list both because npm workspace
  * hoisting can place the symlink at either location depending on hoist rules.
  */
 @source "../../../../packages/core/src/**/*.{ts,tsx}";
-@source "../../../../node_modules/@vibe-cms/core/src/**/*.{ts,tsx}";
+@source "../../../../node_modules/@vibe-cms-platform/core/src/**/*.{ts,tsx}";
 
 :root {
   --background: #ffffff;

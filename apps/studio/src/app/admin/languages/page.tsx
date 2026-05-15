@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Languages } from "lucide-react";
-import { DEFAULT_LOCALE } from "@vibe-cms/core/i18n";
-import { listLocales } from "@vibe-cms/core/i18n/server";
-import { LanguagesAdmin } from "@vibe-cms/core/components";
+import { DEFAULT_LOCALE } from "@vibe-cms-platform/core/i18n";
+import { listLocales } from "@vibe-cms-platform/core/i18n/server";
+import { LanguagesAdmin } from "@vibe-cms-platform/core/components";
 
 export const dynamic = "force-dynamic";
 

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { readContent } from "@vibe-cms/core/lib/server";
-import { localeExists } from "@vibe-cms/core/i18n/server";
-import { BlockRenderer } from "@vibe-cms/core/renderer";
-import { BlockManager } from "@vibe-cms/core/manager";
+import { readContent } from "@vibe-cms-platform/core/lib/server";
+import { localeExists } from "@vibe-cms-platform/core/i18n/server";
+import { BlockRenderer } from "@vibe-cms-platform/core/renderer";
+import { BlockManager } from "@vibe-cms-platform/core/manager";
 
 export const dynamic = "force-dynamic";
 
