@@ -97,6 +97,14 @@
       }
     },
     {
+      "id": "be2645fd-7afa-4e58-9810-879f848a7e62",
+      "type": "Footer",
+      "data": {
+        "copyright": "© 2026 Deine Marke",
+        "tagline": "Made with love."
+      }
+    },
+    {
       "id": "__footer",
       "type": "Footer",
       "data": {
