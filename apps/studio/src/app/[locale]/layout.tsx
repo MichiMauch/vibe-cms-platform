@@ -1,8 +1,14 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { LocaleProvider, LanguageSwitcher, Chatbot } from "@vibe-cms-platform/core/components";
+import {
+  LocaleProvider,
+  LanguageSwitcher,
+  Chatbot,
+  SmartActionButton,
+} from "@vibe-cms-platform/core/components";
 import { resolveTenant, isAdminHost } from "@/lib/platform/registry";
 import { listSiteLocales, readSiteContent, siteLocaleExists } from "@/lib/platform/site-content";
+import { readSession, canEditSlug } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -34,11 +40,22 @@ export default async function LocaleLayout({
   const locales = await listSiteLocales(slug);
   const content = await readSiteContent(slug, locale);
 
+  // Show the floating admin toolbar only when the visitor is logged in and
+  // authorised to edit this tenant. Session cookie is scoped to the parent
+  // domain (.mauch.rocks) so it travels from studio.mauch.rocks here.
+  const session = await readSession();
+  const canEdit = !!session && canEditSlug(session, slug);
+  const adminBase = (process.env.PUBLIC_URL ?? "").replace(/\/$/, "");
+  const editUrl = adminBase
+    ? `${adminBase}/admin/edit?slug=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`
+    : `/admin/edit?slug=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`;
+
   return (
     <LocaleProvider value={locale}>
       <LanguageSwitcher locales={locales} current={locale} />
       {children}
       <Chatbot config={content.chatbot} locale={locale} />
+      {canEdit && session && <SmartActionButton editUrl={editUrl} email={session.sub} />}
     </LocaleProvider>
   );
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { consumeMagicToken, issueSessionCookie } from "@/lib/auth";
+import { consumeMagicToken, issueSessionCookie, deriveCookieDomain } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,11 @@ export async function GET(req: Request) {
   if (!payload) {
     return NextResponse.redirect(new URL("/admin/login?error=invalid-token", origin));
   }
-  await issueSessionCookie(payload, { secure: origin.startsWith("https://") });
+  const hostname = new URL(origin).hostname;
+  await issueSessionCookie(payload, {
+    secure: origin.startsWith("https://"),
+    domain: deriveCookieDomain(hostname),
+  });
   // Master users land in master overview, regular customers in their editor.
   const dest = payload.master ? "/admin/master/sites" : "/admin/edit";
   return NextResponse.redirect(new URL(dest, origin));

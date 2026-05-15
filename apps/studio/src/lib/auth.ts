@@ -105,9 +105,23 @@ export async function consumeMagicToken(token: string): Promise<SessionPayload |
   return verifyToken(token, "magic");
 }
 
+/** Pick a cookie Domain attribute so the session works across all subdomains
+ * of the registrable parent (e.g. .mauch.rocks → studio.mauch.rocks AND
+ * netnode.pages.mauch.rocks share the cookie). Returns undefined for
+ * localhost / IPs, where browsers don't honor cross-subdomain cookies.
+ */
+export function deriveCookieDomain(hostname: string): string | undefined {
+  if (!hostname || hostname === "localhost" || /^[\d.]+$/.test(hostname)) return undefined;
+  // *.localhost (e.g. netnode.localhost) — keep scope to the current host.
+  if (hostname.endsWith(".localhost")) return undefined;
+  const parts = hostname.split(".");
+  if (parts.length < 2) return undefined;
+  return "." + parts.slice(-2).join(".");
+}
+
 export async function issueSessionCookie(
   payload: SessionPayload,
-  opts: { secure?: boolean } = {},
+  opts: { secure?: boolean; domain?: string } = {},
 ): Promise<void> {
   const token = await signToken(payload, "session", SESSION_TTL_SEC);
   const c = await cookies();
@@ -121,6 +135,7 @@ export async function issueSessionCookie(
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SEC,
+    ...(opts.domain ? { domain: opts.domain } : {}),
   });
 }
 
@@ -131,9 +146,17 @@ export async function readSession(): Promise<SessionPayload | null> {
   return verifyToken(token, "session");
 }
 
-export async function clearSession(): Promise<void> {
+export async function clearSession(opts: { domain?: string } = {}): Promise<void> {
   const c = await cookies();
-  c.delete(SESSION_COOKIE);
+  // Browsers only delete a cookie when the clear-Set-Cookie matches the
+  // original Domain attribute. Mirror what we set in issueSessionCookie.
+  c.set(SESSION_COOKIE, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+    ...(opts.domain ? { domain: opts.domain } : {}),
+  });
 }
 
 /** Authorisation helper: does this session payload allow editing the given slug? */
