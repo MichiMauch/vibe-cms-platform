@@ -10,9 +10,6 @@ import {
   ArrowDown,
   Trash2,
   Plus,
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
   Heading1,
   Sparkles as SparklesIcon,
   Users,
@@ -24,6 +21,7 @@ import {
 } from "lucide-react";
 import { useEditMode } from "../editors/EditModeProvider";
 import { useSaveContent } from "../editors/EditScopeProvider";
+import { useSaveStatus } from "../editors/SaveStatusProvider";
 import type { BlockType, Section } from "../types/content";
 import { BLOCK_LABELS, BLOCK_DESCRIPTIONS, createDefaultBlock } from "../blocks/registry";
 
@@ -39,28 +37,21 @@ const TYPE_ICONS: Record<BlockType, LucideIcon> = {
 
 type Props = { sections: Section[]; locale: string };
 
-type Status = "idle" | "saving" | "saved" | "error";
-
 export function BlockManager({ sections: initial, locale }: Props) {
   const { editMode } = useEditMode();
   const router = useRouter();
   const save = useSaveContent();
+  const saveStatus = useSaveStatus();
   const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [sections, setSections] = useState(initial);
-  const [status, setStatus] = useState<Status>("idle");
-  const [error, setError] = useState<string | null>(null);
   const addMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const isSaving = (saveStatus?.status.inFlight ?? 0) > 0;
 
   useEffect(() => {
     setSections(initial);
   }, [initial]);
-
-  useEffect(() => {
-    if (status !== "saved") return;
-    const t = setTimeout(() => setStatus("idle"), 1500);
-    return () => clearTimeout(t);
-  }, [status]);
 
   useEffect(() => {
     if (!showAdd) return;
@@ -74,23 +65,30 @@ export function BlockManager({ sections: initial, locale }: Props) {
   if (!editMode) return null;
 
   async function saveSections(next: Section[]) {
-    setStatus("saving");
-    setError(null);
+    // Save-Feedback (Spinner / Check / Error) läuft via SaveStatusProvider
+    // im Header. Hier kümmern wir uns nur um das domänenspezifische Rollback
+    // bei Fehlern: das optimistic-set des nächsten Section-Arrays muss
+    // zurückgenommen werden, falls der Save scheitert.
+    let res: Response | null = null;
     try {
-      const res = await save({ path: "sections", value: next, locale });
+      res = await save({ path: "sections", value: next, locale });
+    } catch {
+      setSections(initial);
+      return;
+    }
+    if (!res.ok) {
+      setSections(initial);
+      return;
+    }
+    try {
       const json = await res.json();
-      if (res.ok && json.ok) {
+      if (json && json.ok) {
         setSections(next);
-        setStatus("saved");
         router.refresh();
       } else {
-        setStatus("error");
-        setError(json.error ?? "Speichern fehlgeschlagen");
         setSections(initial);
       }
-    } catch (err) {
-      setStatus("error");
-      setError(err instanceof Error ? err.message : "Speichern fehlgeschlagen");
+    } catch {
       setSections(initial);
     }
   }
@@ -157,26 +155,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
               <p className="mt-1 text-xs text-slate-500">
                 Reihenfolge ändern, hinzufügen, löschen.
               </p>
-              <div className="mt-2 flex items-center gap-2 text-xs">
-                {status === "saving" && (
-                  <span className="inline-flex items-center gap-1 text-slate-500">
-                    <Loader2 className="h-3 w-3 animate-spin" /> Speichert
-                  </span>
-                )}
-                {status === "saved" && (
-                  <span className="inline-flex items-center gap-1 text-emerald-600">
-                    <CheckCircle2 className="h-3 w-3" /> Gespeichert
-                  </span>
-                )}
-                {status === "error" && (
-                  <span className="inline-flex items-center gap-1 text-red-600">
-                    <AlertCircle className="h-3 w-3" /> {error ?? "Fehler"}
-                  </span>
-                )}
-                {status === "idle" && (
-                  <span className="text-slate-400">{sections.length} Blöcke</span>
-                )}
-              </div>
+              <div className="mt-2 text-xs text-slate-400">{sections.length} Blöcke</div>
             </header>
 
             <ul className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5">
@@ -210,7 +189,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
                         <button
                           type="button"
                           onClick={() => move(i, -1)}
-                          disabled={i === 0 || status === "saving"}
+                          disabled={i === 0 || isSaving}
                           className="inline-flex h-7 w-7 items-center justify-center rounded text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
                           aria-label="Nach oben"
                           title="Nach oben"
@@ -220,7 +199,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
                         <button
                           type="button"
                           onClick={() => move(i, 1)}
-                          disabled={i === sections.length - 1 || status === "saving"}
+                          disabled={i === sections.length - 1 || isSaving}
                           className="inline-flex h-7 w-7 items-center justify-center rounded text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
                           aria-label="Nach unten"
                           title="Nach unten"
@@ -230,7 +209,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
                         <button
                           type="button"
                           onClick={() => remove(i)}
-                          disabled={status === "saving"}
+                          disabled={isSaving}
                           className="inline-flex h-7 w-7 items-center justify-center rounded text-slate-400 hover:bg-red-50 hover:text-red-600 transition"
                           aria-label="Löschen"
                           title="Löschen"
@@ -248,7 +227,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
               <button
                 type="button"
                 onClick={() => setShowAdd((v) => !v)}
-                disabled={status === "saving"}
+                disabled={isSaving}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
               >
                 <Plus className="h-4 w-4" />

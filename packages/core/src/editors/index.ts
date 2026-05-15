@@ -11,3 +11,8 @@ export {
   useAIRewrite,
   type EditScope,
 } from "./EditScopeProvider";
+export {
+  SaveStatusProvider,
+  SaveStatusIndicator,
+  useSaveStatus,
+} from "./SaveStatusProvider";

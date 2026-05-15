@@ -48,19 +48,24 @@ export function EditableImage({ path, src, alt, className, rounded = "full" }: P
           if (!asset) return;
           setSaving(true);
           setError(null);
+          // Save errors are surfaced by SaveStatusProvider via the wrapper
+          // around useSaveContent — we only need the local overlay spinner
+          // while the upload+save runs.
+          let res: Response | null = null;
           try {
-            const res = await save({ path, value: asset.secure_url, locale });
-            const json = await res.json();
-            if (res.ok && json.ok) {
-              setCurrentSrc(asset.secure_url);
-            } else {
-              setError(json.error ?? "Speichern fehlgeschlagen");
-            }
-          } catch (err) {
-            setError(err instanceof Error ? err.message : "Speichern fehlgeschlagen");
-          } finally {
-            setSaving(false);
+            res = await save({ path, value: asset.secure_url, locale });
+          } catch {
+            // wrapper already dispatched a fail event
           }
+          if (res?.ok) {
+            try {
+              const json = await res.json();
+              if (json && json.ok) setCurrentSrc(asset.secure_url);
+            } catch {
+              // ignore — wrapper has parsed and dispatched already
+            }
+          }
+          setSaving(false);
         },
       },
     );

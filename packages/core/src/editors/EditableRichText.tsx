@@ -79,12 +79,14 @@ function EditorMount({
     onBlur: async ({ editor }) => {
       const html = normalize(editor.getHTML());
       if (html === initial) return;
+      // Errors are surfaced by SaveStatusProvider via useSaveContent's wrapper.
+      let res: Response;
       try {
-        const res = await save({ path, value: html, locale });
-        if (res.ok) onSaved(html);
+        res = await save({ path, value: html, locale });
       } catch {
-        // Silently fail; user can retry.
+        return;
       }
+      if (res.ok) onSaved(html);
     },
   });
 

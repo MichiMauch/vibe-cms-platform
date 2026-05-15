@@ -36,14 +36,16 @@ export function EditableText({ path, value, as: Tag = "span", className }: Props
   async function handleBlur() {
     const next = (ref.current?.innerText ?? "").replace(/\s+$/, "").replace(/^\s+/, "");
     if (next === savedValue) return;
+    // SaveStatusProvider (wrapping useSaveContent) surfaces network / API
+    // errors in the header indicator — we only need to gate local state on
+    // a successful response. Re-throw on rejection so the wrapper sees it.
+    let res: Response;
     try {
-      const res = await save({ path, value: next, locale });
-      if (res.ok) {
-        setSavedValue(next);
-      }
+      res = await save({ path, value: next, locale });
     } catch {
-      // Silently fail; user can retry.
+      return;
     }
+    if (res.ok) setSavedValue(next);
   }
 
   const editClasses = editMode

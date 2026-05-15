@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo } from "react";
+import { useSaveStatus } from "./SaveStatusProvider";
 
 export type EditScope = {
   /** Tenant slug — when set, included in every save body so the API can route
@@ -32,9 +33,14 @@ export function useEditScope(): EditScope {
   return useContext(Ctx);
 }
 
-/** Build a save fetch with the active scope merged in. Always returns a Promise<Response>. */
+/** Build a save fetch with the active scope merged in. Always returns a
+ * Promise<Response>. When a SaveStatusProvider sits above, the fetch is
+ * tracked (begin → success / fail, with committed-flag parsed) so a single
+ * indicator in the editor header reflects every save in the tree. Outside
+ * the provider the wrapper is a no-op and the call behaves like plain fetch. */
 export function useSaveContent() {
   const scope = useEditScope();
+  const status = useSaveStatus();
   return async function save(body: {
     path: string;
     value: unknown;
@@ -43,11 +49,12 @@ export function useSaveContent() {
   }): Promise<Response> {
     const url = scope.saveEndpoint ?? "/api/save-content";
     const fullBody = scope.slug ? { ...body, slug: scope.slug } : body;
-    return fetch(url, {
+    const p = fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fullBody),
     });
+    return status ? status.wrap(p) : p;
   };
 }
 
