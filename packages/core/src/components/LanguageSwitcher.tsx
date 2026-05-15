@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Check, ChevronDown, Globe, Settings2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Check, ChevronDown, Globe } from "lucide-react";
 import { localeName, localeFlag } from "../i18n/locales";
 
 type Props = {
@@ -12,8 +12,12 @@ type Props = {
 
 export function LanguageSwitcher({ locales, current }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
+
+  // Don't render the switcher when there's only one (or no) locale to choose
+  if (!locales || locales.length < 2) return null;
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -30,7 +34,10 @@ export function LanguageSwitcher({ locales, current }: Props) {
       setOpen(false);
       return;
     }
-    router.push(`/${code}`);
+    // Preserve the current query string (notably ?site=<slug> in dev) so the
+    // language switch doesn't fall back to DEV_DEFAULT_SITE.
+    const qs = searchParams?.toString();
+    router.push(`/${code}${qs ? `?${qs}` : ""}`);
     router.refresh();
     setOpen(false);
   }
@@ -75,13 +82,6 @@ export function LanguageSwitcher({ locales, current }: Props) {
               </li>
             ))}
           </ul>
-          <a
-            href="/admin/languages"
-            className="flex items-center gap-2 border-t border-slate-100 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 transition"
-          >
-            <Settings2 className="h-3.5 w-3.5" />
-            Sprachen verwalten
-          </a>
         </div>
       )}
     </div>
