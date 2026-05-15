@@ -1,0 +1,159 @@
+{
+  "seo": {
+    "title": "TEST 2 — andere Seite",
+    "description": "Eine schlanke Landingpage, deren Inhalte du mit Alt+E direkt im Browser bearbeitest. Kein Backend, keine Datenbank, nur eine content.json.",
+    "ogTitle": "TEST 2 — andere Seite",
+    "ogDescription": "Bearbeite deine Seite direkt im Browser. Kein Backend, keine Datenbank. Nur deine content.json — und Alt+E.",
+    "ogImage": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703196/cld-sample-3.jpg",
+    "keywords": "vibe-cms, next.js, inline editing, lightweight cms, content.json"
+  },
+  "chatbot": {
+    "isEnabled": true,
+    "botName": "Vibe-Assistent",
+    "welcomeMessage": "Hallo! Ich kenne diese Seite ganz genau. Was möchtest du wissen?"
+  },
+  "sections": [
+    {
+      "id": "7a8b1c2d-3e4f-4a5b-9c6d-7e8f9a0b1c2d",
+      "type": "Hero",
+      "data": {
+        "eyebrow": "Vibe-CMS",
+        "title": "Hier sollte ein anderer Title stehen.",
+        "subtitle": "Kein Backend, keine Datenbank. Nur deine content.json — und Alt+E.",
+        "ctaPrimary": "Jetzt starten",
+        "ctaSecondary": "Mehr erfahren"
+      }
+    },
+    {
+      "id": "8b9c2d3e-4f5a-4b6c-9d7e-8f9a0b1c2d3e",
+      "type": "Features",
+      "data": {
+        "title": "Drei Dinge, die Vibe-CMS einfach macht",
+        "subtitle": "<p>Schnell, schlank, und ohne Lock-in.</p>",
+        "items": [
+          {
+            "icon": "Sparkles",
+            "title": "Sofort editierbar",
+            "description": "Alt+E drücken, klicken, tippen, fertig. Keine Modals, kein Backend-Login."
+          },
+          {
+            "icon": "FileJson",
+            "title": "JSON als Quelle",
+            "description": "<p>Alle Inhalte <strong>leben</strong> in einer Datei. <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.sbb.ch\">Versioniert</a>, lesbar, <em>portabel</em>.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Null Setup",
+            "description": "Keine DB, kein CMS, kein Login. Nur dein Editor und der Browser."
+          }
+        ]
+      }
+    },
+    {
+      "id": "9c0d3e4f-5a6b-4c7d-9e8f-0a1b2c3d4e5f",
+      "type": "Team",
+      "data": {
+        "title": "Das Team hinter Vibe-CMS",
+        "subtitle": "<p>Drei Köpfe, ein Ziel: Editieren soll sich <strong>gut</strong> anfühlen.</p>",
+        "members": [
+          {
+            "name": "Lena Brunner",
+            "role": "Gründerin & Produkt",
+            "bio": "<p>Baut <strong>seit zehn Jahren</strong> Tools, die sich nicht im Weg stehen.</p>",
+            "image": "https://api.dicebear.com/9.x/personas/svg?seed=lena&backgroundColor=b6e3f4"
+          },
+          {
+            "name": "Tobias Keller",
+            "role": "Engineering",
+            "bio": "Findet, dass jede gute UI bei der Tastatur anfängt.",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778704099/michi-contact_mzknvf.png"
+          },
+          {
+            "name": "Sara Frei",
+            "role": "Design",
+            "bio": "Verliebt in Weissraum, Mikrointeraktionen und gute Typografie.",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703197/main-sample.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "0d1e4f5a-6b7c-4d8e-9f0a-1b2c3d4e5f6a",
+      "type": "Testimonial",
+      "data": {
+        "quote": "Endlich ein CMS, das sich nicht wie ein CMS anfühlt. Wir schreiben die Texte jetzt direkt auf der Seite — it's 100% pure fun.",
+        "author": "Michi Mauch",
+        "role": "Digital Consultant, NETNODE AG"
+      }
+    },
+    {
+      "id": "pricing-test-aaaa-bbbb-cccc-dddddddddddd",
+      "type": "Pricing",
+      "data": {
+        "title": "Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "plans": [
+          {
+            "icon": "Gem",
+            "name": "Basic",
+            "price": "Gratis",
+            "priceCaption": "Perfekt zum Starten",
+            "features": [
+              "1 Projekt",
+              "1 GB Speicher",
+              "Community-Support"
+            ],
+            "cta": "Jetzt testen",
+            "featured": false
+          },
+          {
+            "icon": "Rocket",
+            "name": "Standard",
+            "price": "CHF 18/Mt",
+            "priceCaption": "Für wachsende Teams",
+            "features": [
+              "10 Projekte",
+              "30 GB Speicher",
+              "E-Mail-Support",
+              "Eigene Domain"
+            ],
+            "cta": "Jetzt starten",
+            "featured": true
+          },
+          {
+            "icon": "Crown",
+            "name": "Pro",
+            "price": "CHF 49/Mt",
+            "priceCaption": "Für Profis & Agenturen",
+            "features": [
+              "Unbegrenzte Projekte",
+              "100 GB Speicher",
+              "Priorisierter Support",
+              "Team-Zugänge"
+            ],
+            "cta": "Pro werden",
+            "featured": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "1e2f5a6b-7c8d-4e9f-0a1b-2c3d4e5f6a7b",
+      "type": "CallToAction",
+      "data": {
+        "title": "Bereit, deine Seite zu vibe-en?",
+        "subtitle": "Schnapp dir dein content.json und leg los.",
+        "ctaPrimary": "Jetzt starten",
+        "ctaSecondary": "Demo ansehen"
+      }
+    },
+    {
+      "id": "2f3a6b7c-8d9e-4f0a-1b2c-3d4e5f6a7b8c",
+      "type": "Footer",
+      "data": {
+        "copyright": "© 2026 Vibe-CMS",
+        "tagline": "Gebaut mit Next.js und ein bisschen Vibe."
+      }
+    }
+  ]
+}
