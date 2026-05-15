@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Loader2, Upload, CheckCircle2 } from "lucide-react";
 import {
   ForceEditMode,
@@ -62,7 +62,11 @@ export function EditorClient({ slug, brand, locale, locales, liveUrl, content, p
                 </div>
                 <div className="flex items-center gap-3">
                   <SaveStatusIndicator />
-                  <PublishButton slug={slug} pendingLocales={pendingLocales} />
+                  <PublishButton
+                    slug={slug}
+                    initialPendingLocales={pendingLocales}
+                    currentLocale={locale}
+                  />
                   {liveUrl && (
                     <a
                       href={liveUrl}
@@ -87,17 +91,36 @@ export function EditorClient({ slug, brand, locale, locales, liveUrl, content, p
 
 type PublishState = "idle" | "publishing" | "done" | "error";
 
-function PublishButton({ slug, pendingLocales }: { slug: string; pendingLocales: string[] }) {
-  const router = useRouter();
+function PublishButton({
+  slug,
+  initialPendingLocales,
+  currentLocale,
+}: {
+  slug: string;
+  initialPendingLocales: string[];
+  currentLocale: string;
+}) {
   const saveStatus = useSaveStatus();
   const [state, setState] = useState<PublishState>("idle");
   const [error, setError] = useState<string | null>(null);
+  // Pending tracking. Initialised from the server's view; grown locally each
+  // time the SaveStatusProvider sees a draft save (so the user doesn't need
+  // to reload the page to discover the Publish button exists).
+  const [pendingSet, setPendingSet] = useState<Set<string>>(() => new Set(initialPendingLocales));
+  const lastSeenSavedAt = useRef<number | null>(null);
 
-  // Hide the button when there's nothing pending. After a successful publish
-  // we keep the "done" badge visible for a moment, then router.refresh()
-  // re-fetches pendingLocales=[] from the server and the parent re-renders
-  // without the button.
-  if (state === "idle" && pendingLocales.length === 0) return null;
+  const lastSavedAt = saveStatus?.status.lastSavedAt ?? null;
+  const warning = saveStatus?.status.warning ?? null;
+  useEffect(() => {
+    if (!lastSavedAt) return;
+    if (lastSavedAt === lastSeenSavedAt.current) return;
+    lastSeenSavedAt.current = lastSavedAt;
+    if (warning === "unpublished") {
+      setPendingSet((s) => (s.has(currentLocale) ? s : new Set([...s, currentLocale])));
+    }
+  }, [lastSavedAt, warning, currentLocale]);
+
+  if (state === "idle" && pendingSet.size === 0) return null;
 
   async function onPublish() {
     setState("publishing");
@@ -115,8 +138,8 @@ function PublishButton({ slug, pendingLocales }: { slug: string; pendingLocales:
         return;
       }
       setState("done");
+      setPendingSet(new Set());
       saveStatus?.clearWarning();
-      router.refresh();
       setTimeout(() => setState("idle"), 1500);
     } catch (err) {
       setState("error");
@@ -161,10 +184,10 @@ function PublishButton({ slug, pendingLocales }: { slug: string; pendingLocales:
       type="button"
       onClick={onPublish}
       className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800 transition"
-      title={`Unveröffentlichte Sprachen: ${pendingLocales.join(", ")}`}
+      title={`Unveröffentlichte Sprachen: ${[...pendingSet].join(", ")}`}
     >
       <Upload className="h-3.5 w-3.5" />
-      Publish · {pendingLocales.length}
+      Publish · {pendingSet.size}
     </button>
   );
 }
