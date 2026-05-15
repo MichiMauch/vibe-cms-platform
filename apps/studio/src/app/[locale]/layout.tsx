@@ -7,16 +7,13 @@ import { listSiteLocales, readSiteContent, siteLocaleExists } from "@/lib/platfo
 export const dynamic = "force-dynamic";
 
 type Params = { locale: string };
-type SearchParams = { site?: string };
 
 export default async function LocaleLayout({
   children,
   params,
-  searchParams,
 }: {
   children: React.ReactNode;
   params: Promise<Params>;
-  searchParams?: Promise<SearchParams>;
 }) {
   const h = await headers();
   const host = h.get("host") ?? "";
@@ -24,8 +21,11 @@ export default async function LocaleLayout({
     return <>{children}</>;
   }
 
-  const sp = (await searchParams) ?? {};
-  const slug = await resolveTenant({ host, override: sp.site });
+  // Layouts can't read searchParams (Next.js caveat: layouts don't rerender
+  // on navigation). Middleware mirrors ?site=<slug> into the x-vibe-site
+  // header in dev so we can resolve the tenant here.
+  const override = h.get("x-vibe-site") ?? undefined;
+  const slug = await resolveTenant({ host, override });
   if (!slug) notFound();
 
   const { locale } = await params;
