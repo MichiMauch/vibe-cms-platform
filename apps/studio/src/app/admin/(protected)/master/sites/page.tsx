@@ -60,17 +60,26 @@ export default async function MasterSitesPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                {s.config.domains.map((d) => (
-                  <a
-                    key={d}
-                    href={`https://${d.split(":")[0]}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-slate-700 hover:border-slate-400 transition"
-                  >
-                    <ExternalLink className="h-3 w-3" /> {d}
-                  </a>
-                ))}
+                <Link
+                  href={`/de?site=${encodeURIComponent(s.slug)}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-emerald-800 hover:border-emerald-400 transition"
+                >
+                  <ExternalLink className="h-3 w-3" /> Lokal ansehen
+                </Link>
+                {s.config.domains
+                  .filter((d) => !d.startsWith("localhost"))
+                  .map((d) => (
+                    <a
+                      key={d}
+                      href={`https://${d.split(":")[0]}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-slate-700 hover:border-slate-400 transition"
+                    >
+                      <ExternalLink className="h-3 w-3" /> {d}
+                    </a>
+                  ))}
                 <Link
                   href={`/admin/edit?site=${encodeURIComponent(s.slug)}`}
                   className="inline-flex items-center gap-1 rounded-full border border-blue-300 bg-blue-50 px-3 py-1.5 text-blue-800 hover:border-blue-400 transition"

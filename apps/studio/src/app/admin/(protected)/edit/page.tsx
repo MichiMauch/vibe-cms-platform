@@ -102,8 +102,13 @@ export default async function EditPage({
       : locales[0];
 
   const content = await readSiteContent(slug, locale);
+  const isDev = process.env.NODE_ENV !== "production";
   const liveDomain = site.config.domains.find((d) => !d.startsWith("localhost"));
-  const liveUrl = liveDomain ? `https://${liveDomain.split(":")[0]}/${locale}` : null;
+  const liveUrl = isDev
+    ? `/${locale}?site=${encodeURIComponent(slug)}`
+    : liveDomain
+      ? `https://${liveDomain.split(":")[0]}/${locale}`
+      : null;
 
   return (
     <EditorClient
