@@ -47,8 +47,8 @@ export default async function LocaleLayout({
   const canEdit = !!session && canEditSlug(session, slug);
   const adminBase = (process.env.PUBLIC_URL ?? "").replace(/\/$/, "");
   const editUrl = adminBase
-    ? `${adminBase}/admin/edit?slug=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`
-    : `/admin/edit?slug=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`;
+    ? `${adminBase}/admin/edit?site=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`
+    : `/admin/edit?site=${encodeURIComponent(slug)}&locale=${encodeURIComponent(locale)}`;
 
   return (
     <LocaleProvider value={locale}>
