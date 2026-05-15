@@ -2,7 +2,8 @@
   "brand": "NETNODE",
   "template": "agentur",
   "domains": [
-    "netnode.pages.mauch.rocks"
+    "netnode.pages.mauch.rocks",
+    "netnode.localhost:3000"
   ],
   "createdAt": "2026-05-15T10:46:34.953Z"
 }

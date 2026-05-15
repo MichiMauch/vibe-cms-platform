@@ -105,12 +105,19 @@ export async function consumeMagicToken(token: string): Promise<SessionPayload |
   return verifyToken(token, "magic");
 }
 
-export async function issueSessionCookie(payload: SessionPayload): Promise<void> {
+export async function issueSessionCookie(
+  payload: SessionPayload,
+  opts: { secure?: boolean } = {},
+): Promise<void> {
   const token = await signToken(payload, "session", SESSION_TTL_SEC);
   const c = await cookies();
+  // Caller decides `secure` based on the actual request protocol — using
+  // NODE_ENV here breaks local HTTPS-less Docker testing while the rest of
+  // the app runs in production mode.
+  const secure = opts.secure ?? process.env.NODE_ENV === "production";
   c.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SEC,
