@@ -4,7 +4,12 @@ import { notFound } from "next/navigation";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import { readSession, canEditSlug } from "@/lib/auth";
 import { listSites, getSite } from "@/lib/platform/registry";
-import { listSiteLocales, readSiteContent, siteLocaleExists } from "@/lib/platform/site-content";
+import {
+  listSiteLocales,
+  listSitePendingLocales,
+  readSiteContentWithDrafts,
+  siteLocaleExists,
+} from "@/lib/platform/site-content";
 import { EditorClient } from "./EditorClient";
 
 export const dynamic = "force-dynamic";
@@ -101,7 +106,8 @@ export default async function EditPage({
       ? DEFAULT_LOCALE
       : locales[0];
 
-  const content = await readSiteContent(slug, locale);
+  const content = await readSiteContentWithDrafts(slug, locale);
+  const pendingLocales = await listSitePendingLocales(slug);
   const isDev = process.env.NODE_ENV !== "production";
   const liveDomain = site.config.domains.find((d) => !d.startsWith("localhost"));
   const liveUrl = isDev
@@ -118,6 +124,7 @@ export default async function EditPage({
       locales={locales}
       liveUrl={liveUrl}
       content={content}
+      pendingLocales={pendingLocales}
     />
   );
 }

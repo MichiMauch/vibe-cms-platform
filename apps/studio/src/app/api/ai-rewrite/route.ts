@@ -1,13 +1,16 @@
 import "server-only";
-import fs from "node:fs/promises";
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { LOCALE_REGEX, localeName } from "@vibe-cms-platform/core/i18n";
 import { setByPath } from "@vibe-cms-platform/core/lib";
 import { readSession, canEditSlug } from "@/lib/auth";
-import { siteMessagePath, siteLocaleExists } from "@/lib/platform/site-content";
-import { createGitHubClient } from "@/lib/platform/github";
+import {
+  readSiteContentWithDrafts,
+  siteLocaleExists,
+  writeSiteDraft,
+} from "@/lib/platform/site-content";
 import { readEnv } from "@/lib/platform/env";
+import type { Content } from "@vibe-cms-platform/core/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -135,44 +138,12 @@ export async function POST(req: Request) {
     );
   }
 
-  // Persist the same way /api/save-content does: local FS + GitHub commit.
+  // Persist to draft (no GitHub commit — Publish does that).
   try {
-    const filePath = siteMessagePath(slug, locale);
-    const raw = await fs.readFile(filePath, "utf-8");
-    const content = JSON.parse(raw) as Record<string, unknown>;
+    const content = (await readSiteContentWithDrafts(slug, locale)) as unknown as Record<string, unknown>;
     setByPath(content, dotPath, newText);
-    const nextRaw = JSON.stringify(content, null, 2) + "\n";
-
-    try {
-      await fs.writeFile(filePath, nextRaw, "utf-8");
-    } catch {
-      // read-only env (e.g. CF Pages runtime) — skip; commit below is the truth.
-    }
-
-    const isDev = process.env.NODE_ENV !== "production";
-    if (!isDev || process.env.COMMIT_FROM_DEV === "true") {
-      try {
-        const gh = createGitHubClient({
-          token: env.github.token,
-          owner: env.github.owner,
-          repo: env.github.repo,
-          branch: env.github.branch,
-        });
-        await gh.putFile(
-          `sites/${slug}/messages/${locale}.json`,
-          nextRaw,
-          `chore(content): ai-rewrite ${slug}/${locale} ${dotPath} via ${session.sub}`,
-        );
-      } catch (err) {
-        return NextResponse.json({
-          ok: true,
-          text: newText,
-          commitError: err instanceof Error ? err.message : "commit failed",
-        });
-      }
-    }
-
-    return NextResponse.json({ ok: true, text: newText });
+    await writeSiteDraft(slug, locale, content as unknown as Content);
+    return NextResponse.json({ ok: true, draft: true, text: newText });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Save failed" },

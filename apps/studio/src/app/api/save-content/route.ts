@@ -1,16 +1,18 @@
 import "server-only";
-import fs from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { setByPath } from "@vibe-cms-platform/core/lib";
 import { LOCALE_REGEX } from "@vibe-cms-platform/core/i18n";
 import { readSession, canEditSlug } from "@/lib/auth";
-import { siteMessagePath, siteLocaleExists } from "@/lib/platform/site-content";
-import { createGitHubClient } from "@/lib/platform/github";
-import { readEnv } from "@/lib/platform/env";
+import {
+  readSiteContentWithDrafts,
+  siteLocaleExists,
+  writeSiteDraft,
+} from "@/lib/platform/site-content";
 import { clearDomainCache } from "@/lib/platform/registry";
+import type { Content } from "@vibe-cms-platform/core/types";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 const SLUG_RE = /^[a-z][a-z0-9-]{1,38}[a-z0-9]$/;
 
@@ -68,52 +70,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Locale not found: ${slug}/${locale}` }, { status: 404 });
   }
 
-  // Load → mutate → serialize
-  const filePath = siteMessagePath(slug, locale);
-  const raw = await fs.readFile(filePath, "utf-8");
-  const content = JSON.parse(raw) as Record<string, unknown>;
+  // Load (draft if exists, else published) → mutate → write back to draft.
+  // No GitHub commit here — that happens on explicit Publish.
+  const content = (await readSiteContentWithDrafts(slug, locale)) as unknown as Record<string, unknown>;
   setByPath(content, dotPath, value);
-  const nextRaw = JSON.stringify(content, null, 2) + "\n";
+  await writeSiteDraft(slug, locale, content as unknown as Content);
 
-  const isDev = process.env.NODE_ENV !== "production";
-
-  // 1) Local FS write — gives immediate feedback during local dev and means the
-  //    next read sees the change. In production this only matters for the
-  //    current process; the next CF build will pull the GitHub-committed copy.
-  try {
-    await fs.writeFile(filePath, nextRaw, "utf-8");
-  } catch {
-    // If running in a read-only environment (e.g., CF Pages runtime) skip the
-    // local write; the GitHub commit below is the source of truth.
-  }
-
-  // 2) GitHub commit — async, so the user sees the save complete and the
-  //    rebuild kicks off in parallel.
-  let commitError: string | null = null;
-  if (!isDev || process.env.COMMIT_FROM_DEV === "true") {
-    try {
-      const env = readEnv();
-      const gh = createGitHubClient({
-        token: env.github.token,
-        owner: env.github.owner,
-        repo: env.github.repo,
-        branch: env.github.branch,
-      });
-      const repoRelative = `sites/${slug}/messages/${locale}.json`;
-      const commitMessage = `chore(content): edit ${slug}/${locale} via ${session.sub}`;
-      await gh.putFile(repoRelative, nextRaw, commitMessage);
-    } catch (err) {
-      commitError = err instanceof Error ? err.message : "GitHub commit failed";
-    }
-  }
-
-  // Domain map could change if config.json edits in the future — clear cache.
+  // config.json edits could change the domain map, but that's never reached
+  // here in the draft flow (config is committed via /api/sites/create, not
+  // touched via save-content). Keep the cache-clear as a safety net.
   clearDomainCache();
 
   return NextResponse.json({
     ok: true,
-    committed: !commitError,
-    commitError,
-    devMode: isDev,
+    draft: true,
+    committed: false,
   });
 }

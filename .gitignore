@@ -10,3 +10,6 @@ dist/
 .turbo
 coverage/
 *.log
+
+# Unpublished editor drafts — committed to git only via /api/publish
+sites/*/.drafts/

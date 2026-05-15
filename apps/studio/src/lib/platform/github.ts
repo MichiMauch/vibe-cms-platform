@@ -1,6 +1,12 @@
 import "server-only";
 import { Octokit } from "octokit";
 
+export type PutFile = {
+  /** Repo-relative path, e.g. "sites/netnode/messages/de.json" */
+  path: string;
+  content: string;
+};
+
 export type GitHubClient = {
   /** Commit a single text file. Auto-detects whether the file already exists
    * (via SHA fetch) and updates or creates accordingly. Retries through the
@@ -9,6 +15,9 @@ export type GitHubClient = {
   putFile: (filePath: string, content: string, commitMessage: string) => Promise<void>;
   /** Same as putFile but accepts already-base64-encoded content. */
   putBase64File: (filePath: string, base64: string, commitMessage: string) => Promise<void>;
+  /** Commit multiple files in ONE commit via the Git Data API
+   * (createTree + createCommit + updateRef). Returns the new commit SHA. */
+  putFiles: (files: PutFile[], commitMessage: string) => Promise<string>;
 };
 
 export function createGitHubClient(opts: {
@@ -71,5 +80,73 @@ export function createGitHubClient(opts: {
     await putBase64File(filePath, base64, commitMessage);
   }
 
-  return { putFile, putBase64File };
+  async function putFiles(files: PutFile[], commitMessage: string): Promise<string> {
+    if (files.length === 0) throw new Error("putFiles: empty files array");
+
+    // 1. Resolve current branch HEAD commit + base tree.
+    const refRes = await octokit.request("GET /repos/{owner}/{repo}/git/ref/{ref}", {
+      owner,
+      repo,
+      ref: `heads/${branch}`,
+    });
+    const parentSha = refRes.data.object.sha;
+
+    const parentCommit = await octokit.request("GET /repos/{owner}/{repo}/git/commits/{commit_sha}", {
+      owner,
+      repo,
+      commit_sha: parentSha,
+    });
+    const baseTreeSha = parentCommit.data.tree.sha;
+
+    // 2. Upload each file as a blob, collect tree entries.
+    const treeEntries: Array<{
+      path: string;
+      mode: "100644";
+      type: "blob";
+      sha: string;
+    }> = [];
+    for (const f of files) {
+      const blob = await octokit.request("POST /repos/{owner}/{repo}/git/blobs", {
+        owner,
+        repo,
+        content: Buffer.from(f.content, "utf-8").toString("base64"),
+        encoding: "base64",
+      });
+      treeEntries.push({
+        path: f.path,
+        mode: "100644",
+        type: "blob",
+        sha: blob.data.sha,
+      });
+    }
+
+    // 3. Create a new tree based on the parent tree.
+    const tree = await octokit.request("POST /repos/{owner}/{repo}/git/trees", {
+      owner,
+      repo,
+      base_tree: baseTreeSha,
+      tree: treeEntries,
+    });
+
+    // 4. Create the commit.
+    const commit = await octokit.request("POST /repos/{owner}/{repo}/git/commits", {
+      owner,
+      repo,
+      message: commitMessage,
+      tree: tree.data.sha,
+      parents: [parentSha],
+    });
+
+    // 5. Fast-forward the branch ref.
+    await octokit.request("PATCH /repos/{owner}/{repo}/git/refs/{ref}", {
+      owner,
+      repo,
+      ref: `heads/${branch}`,
+      sha: commit.data.sha,
+    });
+
+    return commit.data.sha;
+  }
+
+  return { putFile, putBase64File, putFiles };
 }

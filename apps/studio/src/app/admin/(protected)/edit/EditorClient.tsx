@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Loader2, Upload, CheckCircle2 } from "lucide-react";
 import {
   ForceEditMode,
   EditScopeProvider,
   SaveStatusProvider,
   SaveStatusIndicator,
+  useSaveStatus,
 } from "@vibe-cms-platform/core/editors";
 import { LocaleProvider } from "@vibe-cms-platform/core/components";
 import { BlockRenderer } from "@vibe-cms-platform/core/renderer";
@@ -20,9 +22,10 @@ type Props = {
   locales: string[];
   liveUrl: string | null;
   content: Content;
+  pendingLocales: string[];
 };
 
-export function EditorClient({ slug, brand, locale, locales, liveUrl, content }: Props) {
+export function EditorClient({ slug, brand, locale, locales, liveUrl, content, pendingLocales }: Props) {
   const router = useRouter();
 
   function switchLocale(target: string) {
@@ -59,6 +62,7 @@ export function EditorClient({ slug, brand, locale, locales, liveUrl, content }:
                 </div>
                 <div className="flex items-center gap-3">
                   <SaveStatusIndicator />
+                  <PublishButton slug={slug} pendingLocales={pendingLocales} />
                   {liveUrl && (
                     <a
                       href={liveUrl}
@@ -78,5 +82,89 @@ export function EditorClient({ slug, brand, locale, locales, liveUrl, content }:
         </LocaleProvider>
       </SaveStatusProvider>
     </EditScopeProvider>
+  );
+}
+
+type PublishState = "idle" | "publishing" | "done" | "error";
+
+function PublishButton({ slug, pendingLocales }: { slug: string; pendingLocales: string[] }) {
+  const router = useRouter();
+  const saveStatus = useSaveStatus();
+  const [state, setState] = useState<PublishState>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  // Hide the button when there's nothing pending. After a successful publish
+  // we keep the "done" badge visible for a moment, then router.refresh()
+  // re-fetches pendingLocales=[] from the server and the parent re-renders
+  // without the button.
+  if (state === "idle" && pendingLocales.length === 0) return null;
+
+  async function onPublish() {
+    setState("publishing");
+    setError(null);
+    try {
+      const res = await fetch("/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setState("error");
+        setError(typeof json.error === "string" ? json.error : "Publish fehlgeschlagen");
+        return;
+      }
+      setState("done");
+      saveStatus?.clearWarning();
+      router.refresh();
+      setTimeout(() => setState("idle"), 1500);
+    } catch (err) {
+      setState("error");
+      setError(err instanceof Error ? err.message : "Publish fehlgeschlagen");
+    }
+  }
+
+  if (state === "publishing") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-xs text-white">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        Publish…
+      </span>
+    );
+  }
+
+  if (state === "done") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs text-white">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        Publiziert
+      </span>
+    );
+  }
+
+  if (state === "error") {
+    return (
+      <button
+        type="button"
+        onClick={onPublish}
+        className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-700"
+        title={error ?? "Fehler"}
+      >
+        <Upload className="h-3.5 w-3.5" />
+        Erneut publizieren
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onPublish}
+      className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800 transition"
+      title={`Unveröffentlichte Sprachen: ${pendingLocales.join(", ")}`}
+    >
+      <Upload className="h-3.5 w-3.5" />
+      Publish · {pendingLocales.length}
+    </button>
   );
 }

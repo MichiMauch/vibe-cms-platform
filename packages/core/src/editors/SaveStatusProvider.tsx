@@ -13,7 +13,7 @@ import {
 import { AlertCircle, AlertTriangle, CheckCircle2, Loader2, X } from "lucide-react";
 
 type State = "idle" | "saving" | "saved" | "error";
-type Warning = "github-sync-failed" | null;
+type Warning = "github-sync-failed" | "unpublished" | null;
 
 type SaveStatus = {
   state: State;
@@ -27,10 +27,11 @@ type InternalState = SaveStatus & { lastCompletedId: number };
 
 type Action =
   | { type: "begin"; id: number }
-  | { type: "succeed"; id: number; committed: boolean; at: number }
+  | { type: "succeed"; id: number; warning: Warning; at: number }
   | { type: "fail"; id: number; error: string }
   | { type: "clear" }
-  | { type: "dismiss-error" };
+  | { type: "dismiss-error" }
+  | { type: "clear-warning" };
 
 const initialState: InternalState = {
   state: "idle",
@@ -55,7 +56,7 @@ function reducer(s: InternalState, a: Action): InternalState {
         ...s,
         state: remaining > 0 ? "saving" : "saved",
         error: null,
-        warning: a.committed ? null : "github-sync-failed",
+        warning: a.warning,
         lastSavedAt: a.at,
         inFlight: remaining,
         lastCompletedId: a.id,
@@ -83,6 +84,10 @@ function reducer(s: InternalState, a: Action): InternalState {
       if (s.state !== "error") return s;
       return { ...s, state: "idle", error: null };
 
+    case "clear-warning":
+      if (s.warning === null) return s;
+      return { ...s, warning: null };
+
     default:
       return s;
   }
@@ -92,6 +97,9 @@ type Api = {
   status: SaveStatus;
   wrap: <T extends Response>(p: Promise<T>) => Promise<T>;
   dismissError: () => void;
+  /** Called after a successful Publish — clears the "unpublished" warning so
+   * the indicator no longer flags the now-published draft. */
+  clearWarning: () => void;
 };
 
 const SaveStatusCtx = createContext<Api | null>(null);
@@ -111,10 +119,14 @@ export function SaveStatusProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: "begin", id });
     try {
       const res = await p;
-      let committed = true;
+      let warning: Warning = null;
       try {
         const j = await res.clone().json();
-        if (j && typeof j.committed === "boolean") committed = j.committed;
+        if (j && j.draft === true) {
+          warning = "unpublished";
+        } else if (j && typeof j.committed === "boolean" && j.committed === false) {
+          warning = "github-sync-failed";
+        }
         if (!res.ok || (j && j.ok === false)) {
           const msg =
             (j && typeof j.error === "string" && j.error) ||
@@ -132,7 +144,7 @@ export function SaveStatusProvider({ children }: { children: React.ReactNode }) 
           return res;
         }
       }
-      dispatch({ type: "succeed", id, committed, at: Date.now() });
+      dispatch({ type: "succeed", id, warning, at: Date.now() });
       return res;
     } catch (err) {
       dispatch({
@@ -145,6 +157,7 @@ export function SaveStatusProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const dismissError = useCallback(() => dispatch({ type: "dismiss-error" }), []);
+  const clearWarning = useCallback(() => dispatch({ type: "clear-warning" }), []);
 
   const api = useMemo<Api>(
     () => ({
@@ -157,8 +170,9 @@ export function SaveStatusProvider({ children }: { children: React.ReactNode }) 
       },
       wrap,
       dismissError,
+      clearWarning,
     }),
-    [s.state, s.error, s.warning, s.lastSavedAt, s.inFlight, wrap, dismissError],
+    [s.state, s.error, s.warning, s.lastSavedAt, s.inFlight, wrap, dismissError, clearWarning],
   );
 
   return <SaveStatusCtx.Provider value={api}>{children}</SaveStatusCtx.Provider>;
@@ -241,6 +255,17 @@ export function SaveStatusIndicator() {
       ) : (
         <span className="text-slate-600">
           Gespeichert · {lastSavedAt ? formatAgo(now - lastSavedAt) : ""}
+        </span>
+      )}
+      {warning === "unpublished" && (
+        <span
+          title="Lokal als Entwurf gespeichert. Klick auf 'Publish', um zu veröffentlichen."
+          className="inline-flex items-center"
+        >
+          <AlertTriangle
+            className="h-3.5 w-3.5 text-amber-500"
+            aria-label="Unveröffentlicht"
+          />
         </span>
       )}
       {warning === "github-sync-failed" && (
