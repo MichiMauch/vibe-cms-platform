@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Image as ImageIcon, Loader2 } from "lucide-react";
 import { useEditMode } from "./EditModeProvider";
+import { useSaveContent } from "./EditScopeProvider";
 import { useLocale } from "../components/LocaleProvider";
 
 type Props = {
@@ -19,6 +20,7 @@ const API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
 export function EditableImage({ path, src, alt, className, rounded = "full" }: Props) {
   const { editMode } = useEditMode();
   const locale = useLocale();
+  const save = useSaveContent();
   const [currentSrc, setCurrentSrc] = useState(src);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +49,7 @@ export function EditableImage({ path, src, alt, className, rounded = "full" }: P
           setSaving(true);
           setError(null);
           try {
-            const res = await fetch("/api/save-content", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ path, value: asset.secure_url, locale }),
-            });
+            const res = await save({ path, value: asset.secure_url, locale });
             const json = await res.json();
             if (res.ok && json.ok) {
               setCurrentSrc(asset.secure_url);

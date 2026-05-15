@@ -23,6 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useEditMode } from "../editors/EditModeProvider";
+import { useSaveContent } from "../editors/EditScopeProvider";
 import type { BlockType, Section } from "../types/content";
 import { BLOCK_LABELS, BLOCK_DESCRIPTIONS, createDefaultBlock } from "../blocks/registry";
 
@@ -43,6 +44,7 @@ type Status = "idle" | "saving" | "saved" | "error";
 export function BlockManager({ sections: initial, locale }: Props) {
   const { editMode } = useEditMode();
   const router = useRouter();
+  const save = useSaveContent();
   const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [sections, setSections] = useState(initial);
@@ -75,11 +77,7 @@ export function BlockManager({ sections: initial, locale }: Props) {
     setStatus("saving");
     setError(null);
     try {
-      const res = await fetch("/api/save-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path: "sections", value: next, locale }),
-      });
+      const res = await save({ path: "sections", value: next, locale });
       const json = await res.json();
       if (res.ok && json.ok) {
         setSections(next);

@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, Link as LinkIcon, Unlink } from "lucide-react";
 import { useState } from "react";
 import { useEditMode } from "./EditModeProvider";
+import { useSaveContent } from "./EditScopeProvider";
 import { useLocale } from "../components/LocaleProvider";
 import { AIActionsOverlay } from "./AIActionsOverlay";
 
@@ -55,6 +56,7 @@ function EditorMount({
   onSaved: (html: string) => void;
 }) {
   const locale = useLocale();
+  const save = useSaveContent();
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -78,11 +80,7 @@ function EditorMount({
       const html = normalize(editor.getHTML());
       if (html === initial) return;
       try {
-        const res = await fetch("/api/save-content", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path, value: html, locale }),
-        });
+        const res = await save({ path, value: html, locale });
         if (res.ok) onSaved(html);
       } catch {
         // Silently fail; user can retry.

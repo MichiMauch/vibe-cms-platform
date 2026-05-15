@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useEditMode } from "./EditModeProvider";
+import { useAIRewrite } from "./EditScopeProvider";
 import { useLocale } from "../components/LocaleProvider";
 
 type Action = "improve" | "shorter" | "longer" | "formal" | "casual";
@@ -38,6 +39,7 @@ type Props = {
 export function AIActionsOverlay({ path, value, onUpdate }: Props) {
   const { editMode } = useEditMode();
   const locale = useLocale();
+  const aiRewrite = useAIRewrite();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<Action | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -65,11 +67,7 @@ export function AIActionsOverlay({ path, value, onUpdate }: Props) {
     setBusy(action);
     setError(null);
     try {
-      const res = await fetch("/api/ai-rewrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path, action, locale, text: value }),
-      });
+      const res = await aiRewrite({ path, action, locale, text: value });
       const json = await res.json();
       if (res.ok && json.ok && typeof json.text === "string") {
         onUpdate(json.text);

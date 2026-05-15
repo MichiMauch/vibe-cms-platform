@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Layers, FilePlus, Settings, MessageCircle, Languages, Pencil } from "lucide-react";
+import { LogOut, Layers, FilePlus, Pencil } from "lucide-react";
 import { readSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -22,15 +22,6 @@ export default async function ProtectedAdminLayout({
           <nav className="flex items-center gap-1 text-sm">
             <Link href="/admin/edit" className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-slate-700 hover:bg-slate-100 transition">
               <Pencil className="h-3.5 w-3.5" /> Edit
-            </Link>
-            <Link href="/admin/seo" className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-slate-700 hover:bg-slate-100 transition">
-              <Settings className="h-3.5 w-3.5" /> SEO
-            </Link>
-            <Link href="/admin/chatbot" className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-slate-700 hover:bg-slate-100 transition">
-              <MessageCircle className="h-3.5 w-3.5" /> Chatbot
-            </Link>
-            <Link href="/admin/languages" className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-slate-700 hover:bg-slate-100 transition">
-              <Languages className="h-3.5 w-3.5" /> Sprachen
             </Link>
             {session.master && (
               <>

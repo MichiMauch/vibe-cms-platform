@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useEditMode } from "./EditModeProvider";
+import { useSaveContent } from "./EditScopeProvider";
 import { useLocale } from "../components/LocaleProvider";
 import { AIActionsOverlay } from "./AIActionsOverlay";
 
@@ -17,6 +18,7 @@ const INLINE_TAGS = new Set(["span", "a", "code", "em", "strong", "small", "b", 
 export function EditableText({ path, value, as: Tag = "span", className }: Props) {
   const { editMode } = useEditMode();
   const locale = useLocale();
+  const save = useSaveContent();
   const ref = useRef<HTMLElement | null>(null);
   const [savedValue, setSavedValue] = useState(value);
 
@@ -35,11 +37,7 @@ export function EditableText({ path, value, as: Tag = "span", className }: Props
     const next = (ref.current?.innerText ?? "").replace(/\s+$/, "").replace(/^\s+/, "");
     if (next === savedValue) return;
     try {
-      const res = await fetch("/api/save-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path, value: next, locale }),
-      });
+      const res = await save({ path, value: next, locale });
       if (res.ok) {
         setSavedValue(next);
       }
