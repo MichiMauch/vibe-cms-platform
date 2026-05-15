@@ -3,9 +3,11 @@ import "server-only";
 const CF_API = "https://api.cloudflare.com/client/v4";
 
 export type CloudflareClient = {
-  createPagesProject: (slug: string, repoOwner: string, repoName: string) => Promise<{ subdomain: string }>;
+  /** Attach a custom domain to the (existing) Pages project. */
   addPagesDomain: (project: string, fqdn: string) => Promise<void>;
+  /** Create or update a CNAME record in the configured zone. */
   upsertCname: (name: string, target: string) => Promise<void>;
+  /** Fetch the latest deployment metadata for the project (for status UI). */
   getPagesLatestDeployment: (project: string) => Promise<{ url: string; status: string } | null>;
 };
 
@@ -35,47 +37,6 @@ export function createCloudflareClient(opts: {
   zoneId: string;
 }): CloudflareClient {
   const { accountId, apiToken, zoneId } = opts;
-
-  async function createPagesProject(slug: string, repoOwner: string, repoName: string) {
-    const body = {
-      name: slug,
-      production_branch: "main",
-      source: {
-        type: "github",
-        config: {
-          owner: repoOwner,
-          repo_name: repoName,
-          production_branch: "main",
-          pr_comments_enabled: false,
-          deployments_enabled: true,
-          production_deployment_enabled: true,
-        },
-      },
-      build_config: {
-        build_command: "npm run build",
-        destination_dir: ".next",
-        root_dir: "",
-      },
-    };
-    try {
-      const result = await cf<{ subdomain: string }>(
-        apiToken,
-        `/accounts/${accountId}/pages/projects`,
-        { method: "POST", body: JSON.stringify(body) },
-      );
-      return { subdomain: result.subdomain };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/Git installation|installation_id|not been installed/i.test(msg)) {
-        throw new Error(
-          "Cloudflare Pages can't reach your GitHub account. Install the Cloudflare " +
-            "Pages GitHub App once and grant it access to the new repo: " +
-            "https://github.com/apps/cloudflare-pages",
-        );
-      }
-      throw err;
-    }
-  }
 
   async function addPagesDomain(project: string, fqdn: string) {
     await cf(apiToken, `/accounts/${accountId}/pages/projects/${project}/domains`, {
@@ -121,5 +82,5 @@ export function createCloudflareClient(opts: {
     }
   }
 
-  return { createPagesProject, addPagesDomain, upsertCname, getPagesLatestDeployment };
+  return { addPagesDomain, upsertCname, getPagesLatestDeployment };
 }

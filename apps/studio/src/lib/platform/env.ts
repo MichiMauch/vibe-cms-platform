@@ -4,17 +4,28 @@ export type PlatformEnv = {
   github: {
     token: string;
     owner: string;
-    templateRepo: string;
+    repo: string;
+    branch: string;
   };
   cloudflare: {
     accountId: string;
     apiToken: string;
     zoneId: string;
     rootDomain: string;
+    projectName: string;
   };
   openai: {
     apiKey: string;
     model: string;
+  };
+  auth: {
+    jwtSecret: string;
+    publicUrl: string;
+    masterEmails: string[];
+  };
+  resend: {
+    apiKey: string;
+    fromEmail: string;
   };
 };
 
@@ -26,22 +37,40 @@ function required(name: string): string {
   return v.trim();
 }
 
+function optional(name: string, fallback: string): string {
+  return process.env[name]?.trim() || fallback;
+}
+
 export function readEnv(): PlatformEnv {
   return {
     github: {
       token: required("GITHUB_TOKEN"),
       owner: required("GITHUB_OWNER"),
-      templateRepo: required("GITHUB_TEMPLATE_REPO"),
+      repo: optional("GITHUB_REPO", "vibe-cms-platform"),
+      branch: optional("GITHUB_BRANCH", "main"),
     },
     cloudflare: {
       accountId: required("CLOUDFLARE_ACCOUNT_ID"),
       apiToken: required("CLOUDFLARE_API_TOKEN"),
       zoneId: required("CLOUDFLARE_ZONE_ID"),
       rootDomain: required("CLOUDFLARE_ROOT_DOMAIN"),
+      projectName: optional("CLOUDFLARE_PAGES_PROJECT", "vibe-cms-prod"),
     },
     openai: {
       apiKey: required("OPENAI_API_KEY"),
-      model: process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini",
+      model: optional("OPENAI_MODEL", "gpt-4o-mini"),
+    },
+    auth: {
+      jwtSecret: required("JWT_SECRET"),
+      publicUrl: required("PUBLIC_URL"),
+      masterEmails: required("MASTER_EMAILS")
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean),
+    },
+    resend: {
+      apiKey: required("RESEND_API_KEY"),
+      fromEmail: required("RESEND_FROM_EMAIL"),
     },
   };
 }

@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "description": "Vibe-CMS shared blocks, editor UI, renderer, helpers and templates.",
   "license": "UNLICENSED",
+  "private": true,
   "type": "module",
   "sideEffects": false,
   "files": [
