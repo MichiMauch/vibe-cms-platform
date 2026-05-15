@@ -125,6 +125,7 @@ export default async function EditPage({
       liveUrl={liveUrl}
       content={content}
       pendingLocales={pendingLocales}
+      email={session.sub}
     />
   );
 }

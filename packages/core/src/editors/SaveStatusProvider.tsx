@@ -197,9 +197,33 @@ function formatAgo(ms: number): string {
   return REL ? REL.format(-h, "hour") : `vor ${h} Std.`;
 }
 
-export function SaveStatusIndicator() {
+const VARIANTS = {
+  light: {
+    saving: "text-blue-700",
+    saved: "text-emerald-700",
+    savedIcon: "text-emerald-600",
+    idle: "text-slate-600",
+    error: "text-red-600",
+    errorIcon: "text-red-500",
+    errorBtnHover: "hover:bg-red-100",
+    warningIcon: "text-amber-500",
+  },
+  dark: {
+    saving: "text-blue-300",
+    saved: "text-emerald-300",
+    savedIcon: "text-emerald-400",
+    idle: "text-slate-300",
+    error: "text-red-300",
+    errorIcon: "text-red-200",
+    errorBtnHover: "hover:bg-white/10",
+    warningIcon: "text-amber-300",
+  },
+} as const;
+
+export function SaveStatusIndicator({ variant = "light" }: { variant?: "light" | "dark" } = {}) {
   const api = useSaveStatus();
   const [now, setNow] = useState(() => Date.now());
+  const colors = VARIANTS[variant];
 
   const lastSavedAt = api?.status.lastSavedAt ?? null;
   const state = api?.status.state ?? "idle";
@@ -219,7 +243,7 @@ export function SaveStatusIndicator() {
 
   if (state === "saving") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-blue-700">
+      <span className={`inline-flex items-center gap-1.5 text-xs ${colors.saving}`}>
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
         Speichert…
       </span>
@@ -228,7 +252,7 @@ export function SaveStatusIndicator() {
 
   if (state === "error") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-red-600">
+      <span className={`inline-flex items-center gap-1.5 text-xs ${colors.error}`}>
         <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
         <span className="truncate max-w-[180px]" title={error ?? ""}>
           {error ?? "Fehler"}
@@ -236,7 +260,7 @@ export function SaveStatusIndicator() {
         <button
           type="button"
           onClick={api.dismissError}
-          className="inline-flex h-4 w-4 items-center justify-center rounded text-red-500 hover:bg-red-100"
+          className={`inline-flex h-4 w-4 items-center justify-center rounded ${colors.errorIcon} ${colors.errorBtnHover}`}
           aria-label="Fehler ausblenden"
           title="Fehler ausblenden"
         >
@@ -249,11 +273,11 @@ export function SaveStatusIndicator() {
   // saved or idle (with lastSavedAt)
   return (
     <span className="inline-flex items-center gap-1.5 text-xs">
-      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+      <CheckCircle2 className={`h-3.5 w-3.5 ${colors.savedIcon}`} />
       {state === "saved" ? (
-        <span className="text-emerald-700">Gespeichert</span>
+        <span className={colors.saved}>Gespeichert</span>
       ) : (
-        <span className="text-slate-600">
+        <span className={colors.idle}>
           Gespeichert · {lastSavedAt ? formatAgo(now - lastSavedAt) : ""}
         </span>
       )}
@@ -263,7 +287,7 @@ export function SaveStatusIndicator() {
           className="inline-flex items-center"
         >
           <AlertTriangle
-            className="h-3.5 w-3.5 text-amber-500"
+            className={`h-3.5 w-3.5 ${colors.warningIcon}`}
             aria-label="Unveröffentlicht"
           />
         </span>
@@ -274,7 +298,7 @@ export function SaveStatusIndicator() {
           className="inline-flex items-center"
         >
           <AlertTriangle
-            className="h-3.5 w-3.5 text-amber-500"
+            className={`h-3.5 w-3.5 ${colors.warningIcon}`}
             aria-label="Sync zu GitHub fehlgeschlagen"
           />
         </span>
