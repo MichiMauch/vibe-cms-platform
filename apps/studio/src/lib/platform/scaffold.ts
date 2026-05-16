@@ -18,7 +18,8 @@ const SYSTEM_PROMPT = `You scaffold a Vibe-CMS landing page from a JSON template
 Rules:
 - Input is a template JSON skeleton with placeholders like {{BRAND}}, {{HERO_TITLE}}, {{F1_TITLE}}.
 - Replace every placeholder with concrete copy that fits the user's brief.
-- Keep the JSON structure exactly. Do NOT add/remove keys. Do NOT change "id" or "type" fields.
+- Keep the JSON structure exactly. Do NOT add/remove keys. Do NOT change "type" fields.
+- Top-level shape is { content: [{type,props}], root: { props: { seo, chatbot } }, zones }. Keep it.
 - Keep HTML inside subtitle/description/bio fields valid (<p>, <strong>, <em>, <a href>).
 - Use Swiss German conventions (ä/ö/ü, ss — never ß) for German output.
 - Keep brand names, technical names, and product nouns unchanged.

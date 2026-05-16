@@ -1,15 +1,11 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ForceEditMode,
-  EditScopeProvider,
-  SaveStatusProvider,
-} from "@vibe-cms-platform/core/editors";
+import { Puck, type Data } from "@puckeditor/core";
+import "@puckeditor/core/dist/index.css";
+import { buildPuckConfig, type PuckData } from "@vibe-cms-platform/core/puck";
 import { LocaleProvider, SmartActionButton } from "@vibe-cms-platform/core/components";
-import { BlockRenderer } from "@vibe-cms-platform/core/renderer";
-import { BlockManager } from "@vibe-cms-platform/core/manager";
-import type { Content } from "@vibe-cms-platform/core/types";
 
 type Props = {
   slug: string;
@@ -17,22 +13,17 @@ type Props = {
   locale: string;
   locales: string[];
   liveUrl: string | null;
-  content: Content;
-  pendingLocales: string[];
+  data: PuckData;
   email: string;
 };
 
-export function EditorClient({
-  slug,
-  brand,
-  locale,
-  locales,
-  liveUrl,
-  content,
-  pendingLocales,
-  email,
-}: Props) {
+export function EditorClient({ slug, brand, locale, locales, liveUrl, data, email }: Props) {
   const router = useRouter();
+  const config = useMemo(() => buildPuckConfig(slug), [slug]);
+
+  // Keep the source of truth for Publish here so the floating toolbar can
+  // post the latest tree without hopping through Puck's internal state API.
+  const [currentData, setCurrentData] = useState<PuckData>(data);
 
   function switchLocale(target: string) {
     if (target === locale) return;
@@ -41,28 +32,48 @@ export function EditorClient({
     router.push(url.pathname + url.search);
   }
 
+  async function publish(): Promise<{ ok: boolean; error?: string }> {
+    try {
+      const res = await fetch("/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, locale, data: currentData }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        return { ok: false, error: typeof json.error === "string" ? json.error : "Publish fehlgeschlagen" };
+      }
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : "Publish fehlgeschlagen" };
+    }
+  }
+
   return (
-    <EditScopeProvider value={{ slug, saveEndpoint: "/api/save-content", aiRewriteEndpoint: "/api/ai-rewrite" }}>
-      <SaveStatusProvider>
-        <LocaleProvider value={locale}>
-          <ForceEditMode>
-            <BlockRenderer sections={content.sections} />
-            <BlockManager sections={content.sections} locale={locale} />
-            <SmartActionButton
-              email={email}
-              editMode={{
-                publishSlug: slug,
-                initialPendingLocales: pendingLocales,
-                currentLocale: locale,
-                locales,
-                onSwitchLocale: switchLocale,
-                liveUrl,
-                siteLabel: `${brand} · ${slug}`,
-              }}
-            />
-          </ForceEditMode>
-        </LocaleProvider>
-      </SaveStatusProvider>
-    </EditScopeProvider>
+    <LocaleProvider value={locale}>
+      <Puck
+        config={config}
+        data={data as unknown as Data}
+        onChange={(d) => setCurrentData(d as unknown as PuckData)}
+        onPublish={() => {
+          // Publish is driven by the SmartActionButton; ignore Puck's own
+          // header publish action. (Puck still emits this when the user
+          // clicks its built-in Publish button — harmless no-op.)
+        }}
+      />
+      <SmartActionButton
+        email={email}
+        editMode={{
+          publishSlug: slug,
+          currentLocale: locale,
+          locales,
+          onSwitchLocale: switchLocale,
+          liveUrl,
+          siteLabel: `${brand} · ${slug}`,
+          publish,
+          initialPendingLocales: [],
+        }}
+      />
+    </LocaleProvider>
   );
 }

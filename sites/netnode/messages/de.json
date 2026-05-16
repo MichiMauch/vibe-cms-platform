@@ -1,22 +1,8 @@
 {
-  "seo": {
-    "title": "NETNODE — KI für Ihr Unternehmen",
-    "description": "Wir helfen Ihnen KI im Unternehmen sinnvoll und gewinnbringend zu nutzen.",
-    "ogTitle": "NETNODE",
-    "ogDescription": "Wir helfen Ihnen KI im Unternehmen sinnvoll und gewinnbringend zu nutzen.",
-    "ogImage": "",
-    "keywords": "KI, Unternehmen, NETNODE, Digitalisierung"
-  },
-  "chatbot": {
-    "isEnabled": false,
-    "botName": "NETNODE-Assistent",
-    "welcomeMessage": "Hallo!"
-  },
-  "sections": [
+  "content": [
     {
-      "id": "__hero",
       "type": "Hero",
-      "data": {
+      "props": {
         "eyebrow": "NETNODE",
         "title": "Servus bei NETNODE",
         "subtitle": "<p>Ihre Partnerin für innovative AI-Lösungen, die Ihr Unternehmen voranbringen.</p>",
@@ -25,9 +11,8 @@
       }
     },
     {
-      "id": "__features",
       "type": "Features",
-      "data": {
+      "props": {
         "title": "Unsere Dienstleistungen",
         "subtitle": "<p>Entdecken Sie, wie wir Ihnen helfen können, die Vorteile von KI zu nutzen.</p>",
         "items": [
@@ -50,9 +35,8 @@
       }
     },
     {
-      "id": "__team",
       "type": "Team",
-      "data": {
+      "props": {
         "title": "Das Team",
         "subtitle": "<p>Unser engagiertes Team von Experten steht Ihnen zur Seite.</p>",
         "members": [
@@ -78,18 +62,16 @@
       }
     },
     {
-      "id": "__testimonial",
       "type": "Testimonial",
-      "data": {
+      "props": {
         "quote": "NETNODE hat unser Unternehmen revolutioniert! Ihre Lösungen sind einfach unschlagbar.",
         "author": "Peter Schneider",
         "role": "CEO, Beispiel GmbH"
       }
     },
     {
-      "id": "__cta",
       "type": "CallToAction",
-      "data": {
+      "props": {
         "title": "Bereit für den nächsten Schritt?",
         "subtitle": "<p>Kontaktieren Sie uns, um mehr über unsere Dienstleistungen zu erfahren.</p>",
         "ctaPrimary": "Anfrage senden",
@@ -97,12 +79,36 @@
       }
     },
     {
-      "id": "__footer",
       "type": "Footer",
-      "data": {
+      "props": {
+        "copyright": "© 2026 Deine Marke",
+        "tagline": "Made with love."
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
         "copyright": "© 2026 NETNODE",
         "tagline": "KI für Ihr Unternehmen"
       }
     }
-  ]
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "NETNODE — KI für Ihr Unternehmen",
+        "description": "Wir helfen Ihnen KI im Unternehmen sinnvoll und gewinnbringend zu nutzen.",
+        "ogTitle": "NETNODE",
+        "ogDescription": "Wir helfen Ihnen KI im Unternehmen sinnvoll und gewinnbringend zu nutzen.",
+        "ogImage": "",
+        "keywords": "KI, Unternehmen, NETNODE, Digitalisierung"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "NETNODE-Assistent",
+        "welcomeMessage": "Hallo!"
+      }
+    }
+  },
+  "zones": {}
 }

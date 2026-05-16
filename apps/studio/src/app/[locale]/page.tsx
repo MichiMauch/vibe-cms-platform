@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { BlockRenderer } from "@vibe-cms-platform/core/renderer";
+import { Render } from "@puckeditor/core/rsc";
+import { buildPuckConfig } from "@vibe-cms-platform/core/puck";
 import { resolveTenant, isAdminHost } from "@/lib/platform/registry";
 import {
   readSiteContent,
@@ -37,13 +38,14 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!slug || !(await siteLocaleExists(slug, locale))) return {};
 
-  const { seo } = await readSiteContent(slug, locale);
-  const title = seo.title?.trim() || FALLBACK.title;
-  const description = seo.description?.trim() || FALLBACK.description;
-  const ogTitle = seo.ogTitle?.trim() || title;
-  const ogDescription = seo.ogDescription?.trim() || description;
-  const ogImage = seo.ogImage?.trim() || undefined;
-  const keywords = seo.keywords
+  const data = await readSiteContent(slug, locale);
+  const seo = data.root.props?.seo;
+  const title = seo?.title?.trim() || FALLBACK.title;
+  const description = seo?.description?.trim() || FALLBACK.description;
+  const ogTitle = seo?.ogTitle?.trim() || title;
+  const ogDescription = seo?.ogDescription?.trim() || description;
+  const ogImage = seo?.ogImage?.trim() || undefined;
+  const keywords = seo?.keywords
     ?.split(",")
     .map((k) => k.trim())
     .filter(Boolean);
@@ -86,6 +88,9 @@ export default async function Page({
   const { locale } = await params;
   if (!(await siteLocaleExists(slug, locale))) notFound();
 
-  const content = await readSiteContent(slug, locale);
-  return <BlockRenderer sections={content.sections} />;
+  const data = await readSiteContent(slug, locale);
+  // Slug is only used by the Puck editor's AI rewrite field; on the public
+  // render path nothing reads it, but the type wants a string.
+  const config = buildPuckConfig(slug);
+  return <Render config={config} data={data} />;
 }

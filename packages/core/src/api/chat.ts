@@ -73,9 +73,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Invalid locale: ${locale}` }, { status: 400 });
   }
 
-  let content;
+  let content: Record<string, unknown>;
   try {
-    content = await readContent(locale);
+    content = (await readContent(locale)) as Record<string, unknown>;
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "content read failed" },
@@ -83,7 +83,8 @@ export async function POST(req: Request) {
     );
   }
 
-  if (content.chatbot?.isEnabled === false) {
+  const chatbot = (content.chatbot ?? {}) as { isEnabled?: boolean; botName?: string };
+  if (chatbot.isEnabled === false) {
     return NextResponse.json({ error: "Chatbot is disabled" }, { status: 403 });
   }
 
@@ -96,7 +97,7 @@ export async function POST(req: Request) {
   }
 
   const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
-  const botName = content.chatbot?.botName?.trim() || "Assistant";
+  const botName = chatbot.botName?.trim() || "Assistant";
 
   const system: Msg = { role: "system", content: buildSystemPrompt(content, locale, botName) };
   const trimmed = messages.filter((m) => m.role !== "system").slice(-12);

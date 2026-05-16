@@ -2,15 +2,8 @@ import "server-only";
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { LOCALE_REGEX, localeName } from "@vibe-cms-platform/core/i18n";
-import { setByPath } from "@vibe-cms-platform/core/lib";
 import { readSession, canEditSlug } from "@/lib/auth";
-import {
-  readSiteContentWithDrafts,
-  siteLocaleExists,
-  writeSiteDraft,
-} from "@/lib/platform/site-content";
 import { readEnv } from "@/lib/platform/env";
-import type { Content } from "@vibe-cms-platform/core/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -39,6 +32,10 @@ Rules:
 - For German output, use Swiss conventions: ä/ö/ü and ss (never ß).
 - Return strictly JSON: {"text": "<result>"}. No commentary, no Markdown.`;
 
+/** Stateless rewrite endpoint. Takes a text + action, returns the rewritten
+ * text. The Puck editor (TextWithAIField) calls onChange with the result so
+ * the new text propagates into Puck's in-memory data tree. Persistence
+ * happens on Publish. */
 export async function POST(req: Request) {
   const session = await readSession();
   if (!session) {
@@ -87,9 +84,6 @@ export async function POST(req: Request) {
   if (!canEditSlug(session, slug)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (!(await siteLocaleExists(slug, locale))) {
-    return NextResponse.json({ error: `Locale not found: ${slug}/${locale}` }, { status: 404 });
-  }
 
   const stripped = inputText.replace(/<[^>]+>/g, "").trim();
   if (stripped.length === 0) {
@@ -112,7 +106,6 @@ export async function POST(req: Request) {
     ACTIONS[rawAction],
   );
 
-  let newText: string;
   try {
     const openai = new OpenAI({ apiKey: env.openai.apiKey });
     const completion = await openai.chat.completions.create({
@@ -130,23 +123,10 @@ export async function POST(req: Request) {
     if (typeof parsed.text !== "string") {
       throw new Error("OpenAI response missing 'text' string");
     }
-    newText = parsed.text;
+    return NextResponse.json({ ok: true, text: parsed.text });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "AI rewrite failed" },
-      { status: 500 },
-    );
-  }
-
-  // Persist to draft (no GitHub commit — Publish does that).
-  try {
-    const content = (await readSiteContentWithDrafts(slug, locale)) as unknown as Record<string, unknown>;
-    setByPath(content, dotPath, newText);
-    await writeSiteDraft(slug, locale, content as unknown as Content);
-    return NextResponse.json({ ok: true, draft: true, text: newText });
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Save failed" },
       { status: 500 },
     );
   }

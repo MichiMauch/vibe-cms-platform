@@ -1,18 +1,8 @@
 {
-  "seo": {
-    "title": "{{BRAND}} — {{TAGLINE}}",
-    "description": "{{DESCRIPTION}}",
-    "ogTitle": "{{BRAND}}",
-    "ogDescription": "{{DESCRIPTION}}",
-    "ogImage": "",
-    "keywords": "{{KEYWORDS}}"
-  },
-  "chatbot": { "isEnabled": false, "botName": "{{BRAND}}-Assistent", "welcomeMessage": "Hallo!" },
-  "sections": [
+  "content": [
     {
-      "id": "__hero",
       "type": "Hero",
-      "data": {
+      "props": {
         "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
@@ -21,47 +11,67 @@
       }
     },
     {
-      "id": "__features",
       "type": "Features",
-      "data": {
+      "props": {
         "title": "{{FEATURES_TITLE}}",
         "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
         "items": [
-          { "icon": "Sparkles", "title": "{{F1_TITLE}}", "description": "{{F1_DESC}}" },
-          { "icon": "Zap",      "title": "{{F2_TITLE}}", "description": "{{F2_DESC}}" },
-          { "icon": "ShieldCheck", "title": "{{F3_TITLE}}", "description": "{{F3_DESC}}" }
+          {
+            "icon": "Sparkles",
+            "title": "{{F1_TITLE}}",
+            "description": "{{F1_DESC}}"
+          },
+          {
+            "icon": "Zap",
+            "title": "{{F2_TITLE}}",
+            "description": "{{F2_DESC}}"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "{{F3_TITLE}}",
+            "description": "{{F3_DESC}}"
+          }
         ]
       }
     },
     {
-      "id": "__team",
       "type": "Team",
-      "data": {
+      "props": {
         "title": "Das Team",
         "subtitle": "<p>{{TEAM_SUBTITLE}}</p>",
         "members": [
-          { "name": "{{T1_NAME}}", "role": "{{T1_ROLE}}", "bio": "{{T1_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t1&backgroundColor=b6e3f4" },
-          { "name": "{{T2_NAME}}", "role": "{{T2_ROLE}}", "bio": "{{T2_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t2&backgroundColor=c0aede" },
-          { "name": "{{T3_NAME}}", "role": "{{T3_ROLE}}", "bio": "{{T3_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t3&backgroundColor=ffd5dc" }
+          {
+            "name": "{{T1_NAME}}",
+            "role": "{{T1_ROLE}}",
+            "bio": "{{T1_BIO}}",
+            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t1&backgroundColor=b6e3f4"
+          },
+          {
+            "name": "{{T2_NAME}}",
+            "role": "{{T2_ROLE}}",
+            "bio": "{{T2_BIO}}",
+            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t2&backgroundColor=c0aede"
+          },
+          {
+            "name": "{{T3_NAME}}",
+            "role": "{{T3_ROLE}}",
+            "bio": "{{T3_BIO}}",
+            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t3&backgroundColor=ffd5dc"
+          }
         ]
       }
     },
     {
-      "id": "__testimonial",
       "type": "Testimonial",
-      "data": {
+      "props": {
         "quote": "{{TESTIMONIAL_QUOTE}}",
         "author": "{{TESTIMONIAL_AUTHOR}}",
         "role": "{{TESTIMONIAL_ROLE}}"
       }
     },
     {
-      "id": "__cta",
       "type": "CallToAction",
-      "data": {
+      "props": {
         "title": "{{CTA_TITLE}}",
         "subtitle": "{{CTA_SUBTITLE}}",
         "ctaPrimary": "Anfrage senden",
@@ -69,9 +79,29 @@
       }
     },
     {
-      "id": "__footer",
       "type": "Footer",
-      "data": { "copyright": "© 2026 {{BRAND}}", "tagline": "{{TAGLINE}}" }
+      "props": {
+        "copyright": "© 2026 {{BRAND}}",
+        "tagline": "{{TAGLINE}}"
+      }
     }
-  ]
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "{{BRAND}} — {{TAGLINE}}",
+        "description": "{{DESCRIPTION}}",
+        "ogTitle": "{{BRAND}}",
+        "ogDescription": "{{DESCRIPTION}}",
+        "ogImage": "",
+        "keywords": "{{KEYWORDS}}"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "{{BRAND}}-Assistent",
+        "welcomeMessage": "Hallo!"
+      }
+    }
+  },
+  "zones": {}
 }

@@ -4,59 +4,15 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, Link as LinkIcon, Unlink } from "lucide-react";
-import { useState } from "react";
-import { useEditMode } from "./EditModeProvider";
-import { useSaveContent } from "./EditScopeProvider";
-import { useLocale } from "../components/LocaleProvider";
-import { AIActionsOverlay } from "./AIActionsOverlay";
 
 type Props = {
-  path: string;
   value: string;
-  as?: React.ElementType;
-  className?: string;
+  onChange: (html: string) => void;
 };
 
-export function EditableRichText({ path, value, as: Tag = "div", className }: Props) {
-  const { editMode } = useEditMode();
-  const [savedHtml, setSavedHtml] = useState(value);
-
-  if (!editMode) {
-    return (
-      <Tag
-        data-rich
-        className={className}
-        dangerouslySetInnerHTML={{ __html: savedHtml }}
-      />
-    );
-  }
-
-  return (
-    <EditorMount
-      path={path}
-      initial={savedHtml}
-      Tag={Tag}
-      className={className}
-      onSaved={setSavedHtml}
-    />
-  );
-}
-
-function EditorMount({
-  path,
-  initial,
-  Tag,
-  className,
-  onSaved,
-}: {
-  path: string;
-  initial: string;
-  Tag: React.ElementType;
-  className?: string;
-  onSaved: (html: string) => void;
-}) {
-  const locale = useLocale();
-  const save = useSaveContent();
+/** Puck custom field: a TipTap rich-text editor for HTML-string values.
+ * Matches the subset used by the old EditableRichText (StarterKit + link). */
+export function RichTextField({ value, onChange }: Props) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -69,34 +25,23 @@ function EditorMount({
         link: { openOnClick: false, autolink: true, linkOnPaste: true },
       }),
     ],
-    content: initial,
+    content: value,
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: "outline-none min-h-[1em]",
+        class: "outline-none min-h-[3em] rounded-md border border-slate-200 bg-white px-3 py-2 text-sm",
       },
     },
-    onBlur: async ({ editor }) => {
+    onBlur: ({ editor }) => {
       const html = normalize(editor.getHTML());
-      if (html === initial) return;
-      // Errors are surfaced by SaveStatusProvider via useSaveContent's wrapper.
-      let res: Response;
-      try {
-        res = await save({ path, value: html, locale });
-      } catch {
-        return;
-      }
-      if (res.ok) onSaved(html);
+      onChange(html);
     },
   });
 
   if (!editor) return null;
 
   return (
-    <Tag
-      data-rich
-      className={`${className ?? ""} relative group outline outline-2 outline-blue-400/60 outline-offset-2 rounded-sm cursor-text`.trim()}
-    >
+    <div className="relative">
       <EditorContent editor={editor} />
       <BubbleMenu
         editor={editor}
@@ -135,15 +80,7 @@ function EditorMount({
           </ToolbarButton>
         )}
       </BubbleMenu>
-      <AIActionsOverlay
-        path={path}
-        value={editor.getHTML()}
-        onUpdate={(html) => {
-          editor.commands.setContent(html);
-          onSaved(normalize(html));
-        }}
-      />
-    </Tag>
+    </div>
   );
 }
 

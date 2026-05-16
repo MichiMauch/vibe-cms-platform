@@ -14,23 +14,16 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./blocks": "./src/blocks/index.ts",
-    "./manager": "./src/manager/index.ts",
-    "./renderer": "./src/renderer/index.ts",
-    "./editors": "./src/editors/index.ts",
     "./components": "./src/components/index.ts",
-    "./components/chatbot": "./src/components/chatbot/index.ts",
-    "./components/seo": "./src/components/seo/index.ts",
     "./lib": "./src/lib/index.ts",
     "./lib/server": "./src/lib/server.ts",
     "./api": "./src/api/index.ts",
-    "./api/save-content": "./src/api/save-content.ts",
-    "./api/ai-rewrite": "./src/api/ai-rewrite.ts",
     "./api/chat": "./src/api/chat.ts",
     "./api/add-language": "./src/api/add-language.ts",
     "./i18n": "./src/i18n/index.ts",
     "./i18n/server": "./src/i18n/server.ts",
     "./types": "./src/types/index.ts",
+    "./puck": "./src/puck/index.ts",
     "./templates": "./templates/index.json",
     "./templates/*": "./templates/*.json"
   },
@@ -43,6 +36,7 @@
     "react-dom": ">=19"
   },
   "dependencies": {
+    "@puckeditor/core": "^0.21.2",
     "@tiptap/extension-link": "^3.23.4",
     "@tiptap/pm": "^3.23.4",
     "@tiptap/react": "^3.23.4",

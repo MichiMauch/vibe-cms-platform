@@ -54,7 +54,10 @@ export default async function LocaleLayout({
     <LocaleProvider value={locale}>
       <LanguageSwitcher locales={locales} current={locale} />
       {children}
-      <Chatbot config={content.chatbot} locale={locale} />
+      <Chatbot
+        config={content.root.props?.chatbot ?? { isEnabled: false, botName: "", welcomeMessage: "" }}
+        locale={locale}
+      />
       {canEdit && session && <SmartActionButton editUrl={editUrl} email={session.sub} />}
     </LocaleProvider>
   );

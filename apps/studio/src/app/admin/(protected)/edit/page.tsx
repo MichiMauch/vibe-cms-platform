@@ -6,8 +6,7 @@ import { readSession, canEditSlug } from "@/lib/auth";
 import { listSites, getSite } from "@/lib/platform/registry";
 import {
   listSiteLocales,
-  listSitePendingLocales,
-  readSiteContentWithDrafts,
+  readSiteContent,
   siteLocaleExists,
 } from "@/lib/platform/site-content";
 import { EditorClient } from "./EditorClient";
@@ -106,8 +105,7 @@ export default async function EditPage({
       ? DEFAULT_LOCALE
       : locales[0];
 
-  const content = await readSiteContentWithDrafts(slug, locale);
-  const pendingLocales = await listSitePendingLocales(slug);
+  const content = await readSiteContent(slug, locale);
   const isDev = process.env.NODE_ENV !== "production";
   const liveDomain = site.config.domains.find((d) => !d.startsWith("localhost"));
   const liveUrl = isDev
@@ -123,8 +121,7 @@ export default async function EditPage({
       locale={locale}
       locales={locales}
       liveUrl={liveUrl}
-      content={content}
-      pendingLocales={pendingLocales}
+      data={content}
       email={session.sub}
     />
   );

@@ -1,15 +1,10 @@
 import "server-only";
 import fs from "node:fs/promises";
 import { NextResponse } from "next/server";
+import { LOCALE_REGEX } from "@vibe-cms-platform/core/i18n";
 import { readSession, canEditSlug } from "@/lib/auth";
-import {
-  clearSiteDrafts,
-  listSitePendingLocales,
-  readSiteDraft,
-  siteDraftPath,
-  siteMessagePath,
-} from "@/lib/platform/site-content";
-import { createGitHubClient, type PutFile } from "@/lib/platform/github";
+import { siteLocaleExists, siteMessagePath } from "@/lib/platform/site-content";
+import { createGitHubClient } from "@/lib/platform/github";
 import { readEnv } from "@/lib/platform/env";
 
 export const dynamic = "force-dynamic";
@@ -17,66 +12,72 @@ export const maxDuration = 60;
 
 const SLUG_RE = /^[a-z][a-z0-9-]{1,38}[a-z0-9]$/;
 
+/** Publish takes the full Puck data tree for a single locale, writes it to
+ * sites/<slug>/messages/<locale>.json, and commits the change to GitHub
+ * (one file = one commit). The editor (Puck) keeps dirty state in-memory
+ * until the user clicks Publish, so there are no per-blur commits. */
 export async function POST(req: Request) {
   const session = await readSession();
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  let body: unknown = {};
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
-    /* empty body is fine */
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const b = body as { slug?: unknown };
+  const b = body as { slug?: unknown; locale?: unknown; data?: unknown };
+
   if (typeof b.slug !== "string" || !SLUG_RE.test(b.slug)) {
     return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
   }
-  const slug = b.slug;
+  if (typeof b.locale !== "string" || !LOCALE_REGEX.test(b.locale)) {
+    return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
+  }
+  if (!b.data || typeof b.data !== "object") {
+    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+  }
+
+  const { slug, locale, data } = b as { slug: string; locale: string; data: object };
 
   if (!canEditSlug(session, slug)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-
-  const pendingLocales = await listSitePendingLocales(slug);
-  if (pendingLocales.length === 0) {
-    return NextResponse.json({ ok: true, locales: [], commitSha: null, count: 0 });
+  if (!(await siteLocaleExists(slug, locale))) {
+    return NextResponse.json({ error: `Locale not found: ${slug}/${locale}` }, { status: 404 });
   }
 
-  // Read every draft as text once; we both (a) ship it to GitHub and
-  // (b) move it to the local messages/ file. Stash the raw strings so the
-  // local move is identical to what we commit.
-  const files: PutFile[] = [];
-  const localContents: Array<{ locale: string; raw: string }> = [];
-  for (const locale of pendingLocales) {
-    const content = await readSiteDraft(slug, locale);
-    if (!content) continue;
-    const raw = JSON.stringify(content, null, 2) + "\n";
-    files.push({
-      path: `sites/${slug}/messages/${locale}.json`,
-      content: raw,
-    });
-    localContents.push({ locale, raw });
+  const nextRaw = JSON.stringify(data, null, 2) + "\n";
+  const filePath = siteMessagePath(slug, locale);
+
+  // Local write — gives the running container an immediate fresh copy so
+  // the next admin / public render sees the published state without waiting
+  // for a redeploy.
+  try {
+    await fs.writeFile(filePath, nextRaw, "utf-8");
+  } catch {
+    // read-only FS (CF Pages runtime style) — git remains the source of truth.
   }
 
-  const env = readEnv();
   const isDev = process.env.NODE_ENV !== "production";
-
-  // In dev we can still write locally but only commit when COMMIT_FROM_DEV=true.
   let commitSha: string | null = null;
   if (!isDev || process.env.COMMIT_FROM_DEV === "true") {
     try {
+      const env = readEnv();
       const gh = createGitHubClient({
         token: env.github.token,
         owner: env.github.owner,
         repo: env.github.repo,
         branch: env.github.branch,
       });
-      const localeList = pendingLocales.join(", ");
-      const commitMessage = `chore(content): publish ${slug} (${pendingLocales.length} Sprache${pendingLocales.length === 1 ? "" : "n"}: ${localeList}) via ${session.sub}`;
-      commitSha = await gh.putFiles(files, commitMessage);
+      const repoRelative = `sites/${slug}/messages/${locale}.json`;
+      const commitMessage = `chore(content): publish ${slug}/${locale} via ${session.sub}`;
+      await gh.putFile(repoRelative, nextRaw, commitMessage);
+      // putFile doesn't return the SHA; not exposing for now.
+      commitSha = null;
     } catch (err) {
       return NextResponse.json(
         {
@@ -88,27 +89,11 @@ export async function POST(req: Request) {
     }
   }
 
-  // Commit succeeded (or we are in dev without COMMIT_FROM_DEV). Move drafts
-  // → published locally and wipe the .drafts/ directory.
-  for (const { locale, raw } of localContents) {
-    try {
-      await fs.writeFile(siteMessagePath(slug, locale), raw, "utf-8");
-    } catch {
-      // read-only FS (CF Pages runtime) — git is the source of truth, ignore.
-    }
-    try {
-      await fs.unlink(siteDraftPath(slug, locale));
-    } catch {
-      // best-effort
-    }
-  }
-  await clearSiteDrafts(slug);
-
   return NextResponse.json({
     ok: true,
-    locales: pendingLocales,
+    slug,
+    locale,
     commitSha,
-    count: pendingLocales.length,
     at: Date.now(),
   });
 }

@@ -1,22 +1,8 @@
 {
-  "seo": {
-    "title": "{{BRAND}} — {{TAGLINE}}",
-    "description": "{{DESCRIPTION}}",
-    "ogTitle": "{{BRAND}}",
-    "ogDescription": "{{DESCRIPTION}}",
-    "ogImage": "",
-    "keywords": "{{KEYWORDS}}"
-  },
-  "chatbot": {
-    "isEnabled": false,
-    "botName": "{{BRAND}}-Assistent",
-    "welcomeMessage": "Hallo! Frag mich alles über {{BRAND}}."
-  },
-  "sections": [
+  "content": [
     {
-      "id": "__hero",
       "type": "Hero",
-      "data": {
+      "props": {
         "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
@@ -25,22 +11,32 @@
       }
     },
     {
-      "id": "__features",
       "type": "Features",
-      "data": {
+      "props": {
         "title": "{{FEATURES_TITLE}}",
         "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
         "items": [
-          { "icon": "Sparkles", "title": "{{F1_TITLE}}", "description": "{{F1_DESC}}" },
-          { "icon": "Zap",      "title": "{{F2_TITLE}}", "description": "{{F2_DESC}}" },
-          { "icon": "ShieldCheck", "title": "{{F3_TITLE}}", "description": "{{F3_DESC}}" }
+          {
+            "icon": "Sparkles",
+            "title": "{{F1_TITLE}}",
+            "description": "{{F1_DESC}}"
+          },
+          {
+            "icon": "Zap",
+            "title": "{{F2_TITLE}}",
+            "description": "{{F2_DESC}}"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "{{F3_TITLE}}",
+            "description": "{{F3_DESC}}"
+          }
         ]
       }
     },
     {
-      "id": "__pricing",
       "type": "Pricing",
-      "data": {
+      "props": {
         "title": "Preise",
         "subtitle": "<p>Wähle den Plan, der zu dir passt.</p>",
         "plans": [
@@ -49,7 +45,17 @@
             "name": "Starter",
             "price": "Gratis",
             "priceCaption": "Zum Ausprobieren",
-            "features": ["{{P1_F1}}", "{{P1_F2}}", "{{P1_F3}}"],
+            "features": [
+              {
+                "value": "{{P1_F1}}"
+              },
+              {
+                "value": "{{P1_F2}}"
+              },
+              {
+                "value": "{{P1_F3}}"
+              }
+            ],
             "cta": "Jetzt testen",
             "featured": false
           },
@@ -58,7 +64,20 @@
             "name": "Pro",
             "price": "CHF 19/Mt",
             "priceCaption": "Für wachsende Teams",
-            "features": ["{{P2_F1}}", "{{P2_F2}}", "{{P2_F3}}", "{{P2_F4}}"],
+            "features": [
+              {
+                "value": "{{P2_F1}}"
+              },
+              {
+                "value": "{{P2_F2}}"
+              },
+              {
+                "value": "{{P2_F3}}"
+              },
+              {
+                "value": "{{P2_F4}}"
+              }
+            ],
             "cta": "Jetzt starten",
             "featured": true
           },
@@ -67,7 +86,23 @@
             "name": "Business",
             "price": "CHF 49/Mt",
             "priceCaption": "Für Profis & Agenturen",
-            "features": ["{{P3_F1}}", "{{P3_F2}}", "{{P3_F3}}", "{{P3_F4}}", "{{P3_F5}}"],
+            "features": [
+              {
+                "value": "{{P3_F1}}"
+              },
+              {
+                "value": "{{P3_F2}}"
+              },
+              {
+                "value": "{{P3_F3}}"
+              },
+              {
+                "value": "{{P3_F4}}"
+              },
+              {
+                "value": "{{P3_F5}}"
+              }
+            ],
             "cta": "Pro werden",
             "featured": false
           }
@@ -75,9 +110,8 @@
       }
     },
     {
-      "id": "__cta",
       "type": "CallToAction",
-      "data": {
+      "props": {
         "title": "{{CTA_TITLE}}",
         "subtitle": "{{CTA_SUBTITLE}}",
         "ctaPrimary": "Jetzt starten",
@@ -85,12 +119,29 @@
       }
     },
     {
-      "id": "__footer",
       "type": "Footer",
-      "data": {
+      "props": {
         "copyright": "© 2026 {{BRAND}}",
         "tagline": "{{TAGLINE}}"
       }
     }
-  ]
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "{{BRAND}} — {{TAGLINE}}",
+        "description": "{{DESCRIPTION}}",
+        "ogTitle": "{{BRAND}}",
+        "ogDescription": "{{DESCRIPTION}}",
+        "ogImage": "",
+        "keywords": "{{KEYWORDS}}"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "{{BRAND}}-Assistent",
+        "welcomeMessage": "Hallo! Frag mich alles über {{BRAND}}."
+      }
+    }
+  },
+  "zones": {}
 }
