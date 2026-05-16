@@ -18,7 +18,7 @@
       "type": "Hero",
       "data": {
         "eyebrow": "NETNODE",
-        "title": "Servus bei NETNODE",
+        "title": "Servus bei nETNODE",
         "subtitle": "<p>Ihr Partner für innovative KI-Lösungen, die Ihr Unternehmen voranbringen.</p>",
         "ctaPrimary": "Projekt starten",
         "ctaSecondary": "Arbeiten ansehen"
@@ -94,14 +94,6 @@
         "subtitle": "<p>Kontaktieren Sie uns, um mehr über unsere Dienstleistungen zu erfahren.</p>",
         "ctaPrimary": "Anfrage senden",
         "ctaSecondary": "Termin buchen"
-      }
-    },
-    {
-      "id": "be2645fd-7afa-4e58-9810-879f848a7e62",
-      "type": "Footer",
-      "data": {
-        "copyright": "© 2026 Deine Marke",
-        "tagline": "Made with love."
       }
     },
     {
