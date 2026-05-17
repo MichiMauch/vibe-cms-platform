@@ -6,20 +6,23 @@
  */
 import {
   ArrowRight,
-  Quote,
-  Sparkles,
-  Zap,
-  ShieldCheck,
-  Rocket,
-  Pencil,
-  Layers,
-  FileJson,
+  Check,
+  ChevronDown,
+  Crown,
+  Gem,
   Heart,
+  FileJson,
+  Layers,
+  Pencil,
+  Quote,
+  Rocket,
+  ShieldCheck,
+  Sparkles,
   Star,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
-// Shared icon map used by blocks that let the editor pick an icon.
 const ICONS: Record<string, LucideIcon> = {
   Sparkles,
   Zap,
@@ -30,6 +33,15 @@ const ICONS: Record<string, LucideIcon> = {
   FileJson,
   Heart,
   Star,
+};
+
+const PLAN_ICONS: Record<string, LucideIcon> = {
+  Gem,
+  Rocket,
+  Crown,
+  Sparkles,
+  Star,
+  Zap,
 };
 
 // ─── Hero ─────────────────────────────────────────────────────────────
@@ -248,5 +260,334 @@ export function ImageTextRender({
         )}
       </div>
     </section>
+  );
+}
+
+// ─── CtaBanner ────────────────────────────────────────────────────────
+export type CtaBannerProps = {
+  title: string;
+  subtitle: string;
+  ctaPrimaryLabel: string;
+  ctaPrimaryHref: string;
+  ctaSecondaryLabel: string;
+  ctaSecondaryHref: string;
+  theme: "blue" | "dark" | "gradient";
+};
+
+export function CtaBannerRender({
+  title,
+  subtitle,
+  ctaPrimaryLabel,
+  ctaPrimaryHref,
+  ctaSecondaryLabel,
+  ctaSecondaryHref,
+  theme,
+}: CtaBannerProps) {
+  const themeClass =
+    theme === "dark"
+      ? "bg-slate-900 text-white"
+      : theme === "gradient"
+        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+        : "bg-blue-600 text-white";
+  const subtleClass = theme === "dark" ? "text-slate-300" : "text-blue-50/90";
+  return (
+    <section className={`${themeClass} px-6 py-20 md:py-28`}>
+      <div className="mx-auto max-w-4xl text-center">
+        <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{title}</h2>
+        <div
+          className={`mx-auto mt-4 max-w-xl text-lg leading-relaxed ${subtleClass}`}
+          dangerouslySetInnerHTML={{ __html: subtitle }}
+        />
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+          {ctaPrimaryLabel && (
+            <a
+              href={ctaPrimaryHref || "#"}
+              className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg transition ${
+                theme === "dark"
+                  ? "bg-white text-slate-900 hover:bg-slate-100"
+                  : "bg-white text-blue-700 hover:bg-blue-50"
+              }`}
+            >
+              <span>{ctaPrimaryLabel}</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          )}
+          {ctaSecondaryLabel && (
+            <a
+              href={ctaSecondaryHref || "#"}
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20 transition"
+            >
+              <span>{ctaSecondaryLabel}</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── LogoCloud ────────────────────────────────────────────────────────
+export type LogoCloudProps = {
+  intro: string;
+  items: Array<{ name: string; image: string; link: string }>;
+};
+
+export function LogoCloudRender({ intro, items }: LogoCloudProps) {
+  return (
+    <section className="bg-white px-6 py-16 md:py-20">
+      <div className="mx-auto max-w-6xl">
+        {intro && (
+          <p className="text-center text-sm font-semibold uppercase tracking-widest text-slate-500">
+            {intro}
+          </p>
+        )}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 md:gap-x-14">
+          {items.map((logo, i) => {
+            const img = logo.image ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={logo.image}
+                alt={logo.name}
+                className="h-8 w-auto object-contain opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition"
+              />
+            ) : (
+              <span className="text-sm font-semibold text-slate-400">{logo.name}</span>
+            );
+            return logo.link ? (
+              <a key={i} href={logo.link} target="_blank" rel="noreferrer noopener" className="inline-flex">
+                {img}
+              </a>
+            ) : (
+              <span key={i} className="inline-flex">{img}</span>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── FAQ ──────────────────────────────────────────────────────────────
+export type FaqProps = {
+  title: string;
+  subtitle: string;
+  items: Array<{ question: string; answer: string }>;
+};
+
+export function FaqRender({ title, subtitle, items }: FaqProps) {
+  return (
+    <section className="bg-white px-6 py-20 md:py-28">
+      <div className="mx-auto max-w-3xl">
+        <div className="text-center">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">{title}</h2>
+          <div
+            className="mt-4 text-lg text-slate-600"
+            dangerouslySetInnerHTML={{ __html: subtitle }}
+          />
+        </div>
+        <div className="mt-12 divide-y divide-slate-200 border-y border-slate-200">
+          {items.map((it, i) => (
+            <details key={i} className="group py-5">
+              <summary className="flex cursor-pointer items-start justify-between gap-4 list-none">
+                <span className="text-base md:text-lg font-medium text-slate-900">
+                  {it.question}
+                </span>
+                <ChevronDown className="mt-1 h-5 w-5 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+              </summary>
+              <div
+                className="prose prose-slate mt-4 max-w-none text-slate-600"
+                dangerouslySetInnerHTML={{ __html: it.answer }}
+              />
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Team ─────────────────────────────────────────────────────────────
+export type TeamProps = {
+  title: string;
+  subtitle: string;
+  members: Array<{ name: string; role: string; bio: string; image: string }>;
+};
+
+export function TeamRender({ title, subtitle, members }: TeamProps) {
+  return (
+    <section className="bg-slate-50 px-6 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">{title}</h2>
+          <div
+            className="mt-4 text-lg text-slate-600"
+            dangerouslySetInnerHTML={{ __html: subtitle }}
+          />
+        </div>
+        <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-12">
+          {members.map((m, i) => (
+            <div key={i} className="flex flex-col items-center text-center">
+              {m.image ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={m.image}
+                  alt={m.name}
+                  className="h-28 w-28 rounded-full object-cover bg-slate-200"
+                />
+              ) : (
+                <div className="h-28 w-28 rounded-full bg-slate-200" />
+              )}
+              <h3 className="mt-5 text-lg font-semibold text-slate-900">{m.name}</h3>
+              <p className="mt-1 text-sm font-medium text-blue-600">{m.role}</p>
+              <div
+                className="mt-3 max-w-xs text-sm text-slate-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: m.bio }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Pricing ──────────────────────────────────────────────────────────
+export type PricingProps = {
+  title: string;
+  subtitle: string;
+  plans: Array<{
+    icon: string;
+    name: string;
+    price: string;
+    priceCaption: string;
+    features: Array<{ value: string }>;
+    ctaLabel: string;
+    ctaHref: string;
+    featured: boolean;
+  }>;
+};
+
+export function PricingRender({ title, subtitle, plans }: PricingProps) {
+  return (
+    <section className="bg-slate-50 px-6 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">{title}</h2>
+          <div
+            className="mt-4 text-lg text-slate-600"
+            dangerouslySetInnerHTML={{ __html: subtitle }}
+          />
+        </div>
+        <div className="mt-14 grid items-stretch gap-6 md:grid-cols-3 md:gap-8">
+          {plans.map((plan, i) => {
+            const Icon = PLAN_ICONS[plan.icon] ?? Sparkles;
+            return (
+              <div
+                key={i}
+                className={`relative flex flex-col rounded-2xl border bg-white p-7 transition ${
+                  plan.featured
+                    ? "border-blue-600 ring-1 ring-blue-600 shadow-xl shadow-blue-600/10 md:scale-[1.03]"
+                    : "border-slate-200 shadow-sm hover:border-slate-300"
+                }`}
+              >
+                {plan.featured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white shadow-md">
+                    Empfohlen
+                  </span>
+                )}
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${
+                      plan.featured ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">{plan.name}</h3>
+                </div>
+                <div className="mt-6">
+                  <p className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">
+                    {plan.price}
+                  </p>
+                  <p
+                    className={`mt-2 text-sm font-medium ${
+                      plan.featured ? "text-blue-600" : "text-slate-500"
+                    }`}
+                  >
+                    {plan.priceCaption}
+                  </p>
+                </div>
+                <ul className="mt-8 space-y-3 flex-1">
+                  {plan.features.map((f, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-slate-700">
+                      <Check
+                        className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
+                          plan.featured ? "text-blue-600" : "text-slate-400"
+                        }`}
+                      />
+                      <span className="leading-relaxed">{f.value}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={plan.ctaHref || "#"}
+                  className={`mt-10 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition ${
+                    plan.featured
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
+                      : "bg-slate-900 text-white hover:bg-slate-800"
+                  }`}
+                >
+                  <span>{plan.ctaLabel}</span>
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────
+export type FooterProps = {
+  copyright: string;
+  tagline: string;
+  columns: Array<{
+    heading: string;
+    links: Array<{ label: string; href: string }>;
+  }>;
+};
+
+export function FooterRender({ copyright, tagline, columns }: FooterProps) {
+  const hasColumns = columns.length > 0 && columns.some((c) => c.links.length > 0);
+  return (
+    <footer className="bg-slate-900 px-6 py-14 text-slate-300">
+      <div className="mx-auto max-w-6xl">
+        {hasColumns && (
+          <div className="grid gap-10 pb-12 md:grid-cols-4 md:gap-12 border-b border-slate-800">
+            {columns.map((col, i) => (
+              <div key={i}>
+                <h4 className="text-sm font-semibold uppercase tracking-widest text-white">
+                  {col.heading}
+                </h4>
+                <ul className="mt-4 space-y-2">
+                  {col.links.map((l, j) => (
+                    <li key={j}>
+                      <a href={l.href || "#"} className="text-sm hover:text-white transition">
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className={`flex flex-col items-center justify-between gap-3 text-sm text-slate-400 sm:flex-row ${hasColumns ? "pt-8" : ""}`}>
+          <p>{copyright}</p>
+          {tagline && <p className="text-slate-500">{tagline}</p>}
+        </div>
+      </div>
+    </footer>
   );
 }
