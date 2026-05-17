@@ -3,51 +3,19 @@
     {
       "type": "Hero",
       "props": {
-        "eyebrow": "{{EVENT_DATE}}",
+        "id": "hero-1",
+        "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
-        "ctaPrimary": "Jetzt anmelden",
-        "ctaSecondary": "Programm ansehen"
+        "ctaLabel": "{{HERO_CTA}}",
+        "ctaHref": "#"
       }
     },
     {
-      "type": "Features",
+      "type": "RichBlock",
       "props": {
-        "title": "Highlights",
-        "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
-        "items": [
-          {
-            "icon": "Sparkles",
-            "title": "{{F1_TITLE}}",
-            "description": "{{F1_DESC}}"
-          },
-          {
-            "icon": "Zap",
-            "title": "{{F2_TITLE}}",
-            "description": "{{F2_DESC}}"
-          },
-          {
-            "icon": "ShieldCheck",
-            "title": "{{F3_TITLE}}",
-            "description": "{{F3_DESC}}"
-          }
-        ]
-      }
-    },
-    {
-      "type": "CallToAction",
-      "props": {
-        "title": "{{CTA_TITLE}}",
-        "subtitle": "{{CTA_SUBTITLE}}",
-        "ctaPrimary": "Ticket sichern",
-        "ctaSecondary": "Mehr Infos"
-      }
-    },
-    {
-      "type": "Footer",
-      "props": {
-        "copyright": "© 2026 {{BRAND}}",
-        "tagline": "{{TAGLINE}}"
+        "id": "rich-1",
+        "content": "{{RICH_CONTENT}}"
       }
     }
   ],
@@ -64,7 +32,7 @@
       "chatbot": {
         "isEnabled": false,
         "botName": "{{BRAND}}-Assistent",
-        "welcomeMessage": "Hallo!"
+        "welcomeMessage": "Hallo! Wie kann ich helfen?"
       }
     }
   },

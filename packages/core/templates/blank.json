@@ -3,18 +3,19 @@
     {
       "type": "Hero",
       "props": {
+        "id": "hero-1",
         "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
-        "ctaPrimary": "Loslegen",
-        "ctaSecondary": "Mehr erfahren"
+        "ctaLabel": "{{HERO_CTA}}",
+        "ctaHref": "#"
       }
     },
     {
-      "type": "Footer",
+      "type": "RichBlock",
       "props": {
-        "copyright": "© 2026 {{BRAND}}",
-        "tagline": "{{TAGLINE}}"
+        "id": "rich-1",
+        "content": "{{RICH_CONTENT}}"
       }
     }
   ],

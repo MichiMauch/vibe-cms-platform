@@ -3,126 +3,19 @@
     {
       "type": "Hero",
       "props": {
+        "id": "hero-1",
         "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
-        "ctaPrimary": "Jetzt starten",
-        "ctaSecondary": "Demo ansehen"
+        "ctaLabel": "{{HERO_CTA}}",
+        "ctaHref": "#"
       }
     },
     {
-      "type": "Features",
+      "type": "RichBlock",
       "props": {
-        "title": "{{FEATURES_TITLE}}",
-        "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
-        "items": [
-          {
-            "icon": "Sparkles",
-            "title": "{{F1_TITLE}}",
-            "description": "{{F1_DESC}}"
-          },
-          {
-            "icon": "Zap",
-            "title": "{{F2_TITLE}}",
-            "description": "{{F2_DESC}}"
-          },
-          {
-            "icon": "ShieldCheck",
-            "title": "{{F3_TITLE}}",
-            "description": "{{F3_DESC}}"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Pricing",
-      "props": {
-        "title": "Preise",
-        "subtitle": "<p>Wähle den Plan, der zu dir passt.</p>",
-        "plans": [
-          {
-            "icon": "Gem",
-            "name": "Starter",
-            "price": "Gratis",
-            "priceCaption": "Zum Ausprobieren",
-            "features": [
-              {
-                "value": "{{P1_F1}}"
-              },
-              {
-                "value": "{{P1_F2}}"
-              },
-              {
-                "value": "{{P1_F3}}"
-              }
-            ],
-            "cta": "Jetzt testen",
-            "featured": false
-          },
-          {
-            "icon": "Rocket",
-            "name": "Pro",
-            "price": "CHF 19/Mt",
-            "priceCaption": "Für wachsende Teams",
-            "features": [
-              {
-                "value": "{{P2_F1}}"
-              },
-              {
-                "value": "{{P2_F2}}"
-              },
-              {
-                "value": "{{P2_F3}}"
-              },
-              {
-                "value": "{{P2_F4}}"
-              }
-            ],
-            "cta": "Jetzt starten",
-            "featured": true
-          },
-          {
-            "icon": "Crown",
-            "name": "Business",
-            "price": "CHF 49/Mt",
-            "priceCaption": "Für Profis & Agenturen",
-            "features": [
-              {
-                "value": "{{P3_F1}}"
-              },
-              {
-                "value": "{{P3_F2}}"
-              },
-              {
-                "value": "{{P3_F3}}"
-              },
-              {
-                "value": "{{P3_F4}}"
-              },
-              {
-                "value": "{{P3_F5}}"
-              }
-            ],
-            "cta": "Pro werden",
-            "featured": false
-          }
-        ]
-      }
-    },
-    {
-      "type": "CallToAction",
-      "props": {
-        "title": "{{CTA_TITLE}}",
-        "subtitle": "{{CTA_SUBTITLE}}",
-        "ctaPrimary": "Jetzt starten",
-        "ctaSecondary": "Mehr erfahren"
-      }
-    },
-    {
-      "type": "Footer",
-      "props": {
-        "copyright": "© 2026 {{BRAND}}",
-        "tagline": "{{TAGLINE}}"
+        "id": "rich-1",
+        "content": "{{RICH_CONTENT}}"
       }
     }
   ],
@@ -139,7 +32,7 @@
       "chatbot": {
         "isEnabled": false,
         "botName": "{{BRAND}}-Assistent",
-        "welcomeMessage": "Hallo! Frag mich alles über {{BRAND}}."
+        "welcomeMessage": "Hallo! Wie kann ich helfen?"
       }
     }
   },

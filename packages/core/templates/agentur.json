@@ -3,86 +3,19 @@
     {
       "type": "Hero",
       "props": {
+        "id": "hero-1",
         "eyebrow": "{{BRAND}}",
         "title": "{{HERO_TITLE}}",
         "subtitle": "{{HERO_SUBTITLE}}",
-        "ctaPrimary": "Projekt starten",
-        "ctaSecondary": "Arbeiten ansehen"
+        "ctaLabel": "{{HERO_CTA}}",
+        "ctaHref": "#"
       }
     },
     {
-      "type": "Features",
+      "type": "RichBlock",
       "props": {
-        "title": "{{FEATURES_TITLE}}",
-        "subtitle": "<p>{{FEATURES_SUBTITLE}}</p>",
-        "items": [
-          {
-            "icon": "Sparkles",
-            "title": "{{F1_TITLE}}",
-            "description": "{{F1_DESC}}"
-          },
-          {
-            "icon": "Zap",
-            "title": "{{F2_TITLE}}",
-            "description": "{{F2_DESC}}"
-          },
-          {
-            "icon": "ShieldCheck",
-            "title": "{{F3_TITLE}}",
-            "description": "{{F3_DESC}}"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Team",
-      "props": {
-        "title": "Das Team",
-        "subtitle": "<p>{{TEAM_SUBTITLE}}</p>",
-        "members": [
-          {
-            "name": "{{T1_NAME}}",
-            "role": "{{T1_ROLE}}",
-            "bio": "{{T1_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t1&backgroundColor=b6e3f4"
-          },
-          {
-            "name": "{{T2_NAME}}",
-            "role": "{{T2_ROLE}}",
-            "bio": "{{T2_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t2&backgroundColor=c0aede"
-          },
-          {
-            "name": "{{T3_NAME}}",
-            "role": "{{T3_ROLE}}",
-            "bio": "{{T3_BIO}}",
-            "image": "https://api.dicebear.com/9.x/personas/svg?seed=t3&backgroundColor=ffd5dc"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Testimonial",
-      "props": {
-        "quote": "{{TESTIMONIAL_QUOTE}}",
-        "author": "{{TESTIMONIAL_AUTHOR}}",
-        "role": "{{TESTIMONIAL_ROLE}}"
-      }
-    },
-    {
-      "type": "CallToAction",
-      "props": {
-        "title": "{{CTA_TITLE}}",
-        "subtitle": "{{CTA_SUBTITLE}}",
-        "ctaPrimary": "Anfrage senden",
-        "ctaSecondary": "Termin buchen"
-      }
-    },
-    {
-      "type": "Footer",
-      "props": {
-        "copyright": "© 2026 {{BRAND}}",
-        "tagline": "{{TAGLINE}}"
+        "id": "rich-1",
+        "content": "{{RICH_CONTENT}}"
       }
     }
   ],
@@ -99,7 +32,7 @@
       "chatbot": {
         "isEnabled": false,
         "botName": "{{BRAND}}-Assistent",
-        "welcomeMessage": "Hallo!"
+        "welcomeMessage": "Hallo! Wie kann ich helfen?"
       }
     }
   },
