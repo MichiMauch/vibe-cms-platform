@@ -10,6 +10,38 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
+
+  /* Brand theme defaults — preset 'studio' (matches pre-theming look).
+   * Per-site renderer overrides these via <style id="site-theme"> in the
+   * locale layout. Block classes (bg-brand-*, text-brand-*) resolve to
+   * whatever is set here. */
+  --brand-bg: #ffffff;
+  --brand-surface: #f8fafc;
+  --brand-surface-dark: #0f172a;
+  --brand-ink: #0f172a;
+  --brand-ink-muted: #475569;
+  --brand-ink-subtle: #94a3b8;
+  --brand-ink-inverse: #f1f5f9;
+  --brand-border: #e2e8f0;
+  --brand-accent: #2563eb;
+  --brand-accent-hover: #1d4ed8;
+  --brand-accent-fg: #ffffff;
+  --brand-accent-soft: #60a5fa;
+  --brand-accent-2: #4f46e5;
+  --brand-heading-font: var(--font-geist-sans);
+  --brand-body-font: var(--font-geist-sans);
+  --brand-radius: 1rem;
+  --brand-radius-pill: 9999px;
+
+  /* Round 2: structural style vars. Default values match preset 'studio'. */
+  --brand-h-weight: 700;
+  --brand-h-tracking: -0.025em;
+  --brand-h-transform: none;
+  --brand-radius-card: 1rem;
+  --brand-radius-button: 9999px;
+  --brand-shadow-card: 0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04);
+  --brand-card-border: 1px solid var(--brand-border);
+  --brand-bg-pattern-url: none;
 }
 
 @theme inline {
@@ -17,6 +49,22 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-dark: var(--brand-surface-dark);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-brand-ink-subtle: var(--brand-ink-subtle);
+  --color-brand-ink-inverse: var(--brand-ink-inverse);
+  --color-brand-border: var(--brand-border);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-accent-fg: var(--brand-accent-fg);
+  --color-brand-accent-soft: var(--brand-accent-soft);
+  --color-brand-accent-2: var(--brand-accent-2);
+  --font-brand-heading: var(--brand-heading-font);
+  --font-brand-body: var(--brand-body-font);
 }
 
 body {
@@ -46,3 +94,96 @@ body {
 .tippy-box {
   background: transparent;
 }
+
+/* ─── Theme: card surface ─────────────────────────────────────────── */
+/* All themed cards use a single class to pick up radius/shadow/border
+ * from the per-site theme vars. Add additional Tailwind classes (bg, p, hover)
+ * alongside. */
+.brand-card {
+  border-radius: var(--brand-radius-card);
+  box-shadow: var(--brand-shadow-card);
+  border: var(--brand-card-border);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.brand-card:hover {
+  box-shadow: var(--brand-shadow-card-hover, var(--brand-shadow-card));
+}
+
+/* ─── Theme: heading character ────────────────────────────────────── */
+/* `font-brand-heading` (utility) only sets font-family. Composed character
+ * (weight + tracking + transform) goes here so blocks can opt in via a
+ * single class. */
+.brand-heading {
+  font-family: var(--font-brand-heading);
+  font-weight: var(--brand-h-weight);
+  letter-spacing: var(--brand-h-tracking);
+  text-transform: var(--brand-h-transform);
+}
+
+/* Hero-specific decorations (accent bar, gradient title) live on the Hero
+ * block props — see `packages/core/src/puck/blocks.tsx`. */
+
+/* BG patterns stacked onto surfaces. The surface background-color from
+ * the Tailwind utility paints first; the data-URL paints on top. */
+[data-bg-pattern="blob"] .bg-brand-surface,
+[data-bg-pattern="noise"] .bg-brand-surface,
+[data-bg-pattern="rays"] .bg-brand-surface,
+[data-bg-pattern="dot-grid"] .bg-brand-surface {
+  background-image: var(--brand-bg-pattern-url);
+}
+[data-bg-pattern="dot-grid"] .bg-brand-surface {
+  background-size: 24px 24px;
+}
+[data-bg-pattern="noise"] .bg-brand-surface {
+  background-size: 200px 200px;
+}
+
+/* Section dividers — pseudo-element on each `.brand-section`. The dividers
+ * paint a small strip at the bottom of every section using the next
+ * section's background colour (var(--brand-bg) for surface sections and vice
+ * versa). For simplicity we use a neutral colour (border) for solid/dotted
+ * and the bg colour for wave/tilt. */
+.brand-section {
+  position: relative;
+}
+[data-divider="wave"] .brand-section::after,
+[data-divider="tilt"] .brand-section::after,
+[data-divider="dotted"] .brand-section::after,
+[data-divider="solid"] .brand-section::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  pointer-events: none;
+  z-index: 1;
+}
+[data-divider="wave"] .brand-section::after {
+  height: 32px;
+  background: var(--brand-bg);
+  -webkit-mask: var(--divider-wave-mask, none) center / 100% 100% no-repeat;
+          mask: var(--divider-wave-mask, none) center / 100% 100% no-repeat;
+}
+[data-divider="tilt"] .brand-section::after {
+  height: 60px;
+  background: var(--brand-bg);
+  clip-path: polygon(0 65%, 100% 0%, 100% 100%, 0% 100%);
+}
+[data-divider="dotted"] .brand-section::after {
+  height: 1px;
+  background-image: linear-gradient(to right, var(--brand-border) 50%, transparent 50%);
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+}
+[data-divider="solid"] .brand-section::after {
+  height: 1px;
+  background: var(--brand-border);
+}
+
+/* Wave mask URL is set in the per-site <style> only when needed. Set the
+ * fallback here so unset previews don't 404. */
+:root {
+  --divider-wave-mask: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%201200%20100'%20preserveAspectRatio%3D'none'%3E%3Cpath%20d%3D'M0%2C60%20C300%2C20%20600%2C100%20900%2C50%20C1050%2C25%201150%2C55%201200%2C40%20L1200%2C100%20L0%2C100%20Z'%20fill%3D'black'/%3E%3C/svg%3E");
+}
+
+/* Hero layout — branching now happens inside Hero block markup itself.
+ * See packages/core/src/puck/blocks.tsx HeroRender. */

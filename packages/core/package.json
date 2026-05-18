@@ -24,6 +24,7 @@
     "./i18n/server": "./src/i18n/server.ts",
     "./types": "./src/types/index.ts",
     "./puck": "./src/puck/index.ts",
+    "./theme": "./src/theme/index.ts",
     "./templates": "./templates/index.json",
     "./templates/*": "./templates/*.json"
   },

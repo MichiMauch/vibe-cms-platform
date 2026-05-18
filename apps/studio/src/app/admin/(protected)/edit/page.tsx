@@ -123,6 +123,7 @@ export default async function EditPage({
       liveUrl={liveUrl}
       data={content}
       email={session.sub}
+      initialTheme={site.config.theme ?? null}
     />
   );
 }

@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Mail,
 } from "lucide-react";
+import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
 
 const TEMPLATES = [
   { id: "saas", label: "SaaS / Produkt", description: "Hero, Features, Pricing, CTA, Footer." },
@@ -29,6 +30,8 @@ export function NewSiteForm() {
   const [primaryGoal, setPrimaryGoal] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customDomain, setCustomDomain] = useState("");
+  const [themePreset, setThemePreset] = useState<ThemePresetId>(DEFAULT_PRESET_ID);
+  const [accentOverride, setAccentOverride] = useState("");
   const [busy, setBusy] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
   const [done, setDone] = useState<{
@@ -59,6 +62,10 @@ export function NewSiteForm() {
           primaryGoal,
           customerEmail,
           customDomain: customDomain.trim() || undefined,
+          theme: {
+            preset: themePreset,
+            accentOverride: accentOverride.trim() || undefined,
+          },
         }),
       });
       if (!res.ok || !res.body) {
@@ -155,6 +162,59 @@ export function NewSiteForm() {
             </label>
           ))}
         </div>
+      </fieldset>
+
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-slate-700">Look (Theme)</legend>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          {THEME_PRESETS.map((p) => (
+            <label
+              key={p.id}
+              title={p.description}
+              className={`relative flex cursor-pointer flex-col gap-2 rounded-lg border p-3 transition ${
+                themePreset === p.id
+                  ? "border-blue-500 ring-2 ring-blue-200"
+                  : "border-slate-200 hover:border-slate-300"
+              }`}
+            >
+              <input
+                type="radio"
+                name="theme-preset"
+                value={p.id}
+                checked={themePreset === p.id}
+                onChange={() => setThemePreset(p.id)}
+                disabled={busy}
+                className="sr-only"
+              />
+              <div
+                className="h-10 w-full rounded overflow-hidden flex border border-slate-200"
+                style={{
+                  background: p.colors["bg"],
+                }}
+              >
+                <span className="flex-1" style={{ background: p.colors["surface"] }} />
+                <span className="flex-1" style={{ background: p.colors["accent"] }} />
+                <span className="flex-1" style={{ background: p.colors["accent-2"] }} />
+                <span className="flex-1" style={{ background: p.colors["surface-dark"] }} />
+              </div>
+              <span className="text-xs font-medium text-slate-900">{p.name}</span>
+            </label>
+          ))}
+        </div>
+        <label className="mt-2 block">
+          <span className="text-xs text-slate-500">
+            Akzentfarbe überschreiben (optional, Hex z.B. <code>#ff3366</code>)
+          </span>
+          <input
+            type="text"
+            value={accentOverride}
+            onChange={(e) => setAccentOverride(e.target.value)}
+            disabled={busy}
+            placeholder="#"
+            pattern="#[0-9a-fA-F]{6}"
+            className="mt-1 w-40 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-mono focus:border-blue-500 focus:outline-none"
+          />
+        </label>
       </fieldset>
 
       <label className="block">

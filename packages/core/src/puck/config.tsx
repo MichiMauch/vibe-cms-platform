@@ -1,4 +1,5 @@
 import type { Config, Data } from "@puckeditor/core";
+import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "../theme";
 import {
   HeroRender,
   type HeroProps,
@@ -29,7 +30,9 @@ import { RichTextField } from "./fields/RichTextField";
 import { ImageField } from "./fields/ImageField";
 import { TextWithAIField } from "./fields/TextWithAIField";
 
-/** Page-level SEO/chatbot props live on Puck's root.props. */
+/** Page-level SEO/chatbot/theme props live on Puck's root.props. The theme
+ * here is the *edit-time* copy; the renderer reads from `site.config.theme`,
+ * which the publish endpoint mirrors from `root.props.theme` on each save. */
 export type RootProps = {
   seo: {
     title: string;
@@ -43,6 +46,11 @@ export type RootProps = {
     isEnabled: boolean;
     botName: string;
     welcomeMessage: string;
+  };
+  theme: {
+    preset: ThemePresetId;
+    accentOverride: string;
+    inkOverride: string;
   };
 };
 
@@ -109,9 +117,31 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
   return {
     root: {
       fields: {
+        // Order matters — Puck renders fields top-to-bottom. Design first
+        // because it has the biggest visual impact and is what customers
+        // tend to look for after they've drafted content.
+        theme: {
+          type: "object",
+          label: "🎨 Design (Theme)",
+          objectFields: {
+            preset: {
+              type: "radio",
+              label: "Preset",
+              options: THEME_PRESETS.map((p) => ({ label: p.name, value: p.id })),
+            },
+            accentOverride: {
+              type: "text",
+              label: "Akzentfarbe (Hex, optional, z.B. #ff3366)",
+            },
+            inkOverride: {
+              type: "text",
+              label: "Text-Hauptfarbe (Hex, optional)",
+            },
+          },
+        },
         seo: {
           type: "object",
-          label: "SEO",
+          label: "🔍 SEO",
           objectFields: {
             title: { type: "text", label: "Title" },
             description: { type: "textarea", label: "Description" },
@@ -123,7 +153,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
         },
         chatbot: {
           type: "object",
-          label: "Chatbot",
+          label: "💬 Chatbot",
           objectFields: {
             isEnabled: {
               type: "radio",
@@ -152,6 +182,11 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
           botName: "Assistent",
           welcomeMessage: "Hallo!",
         },
+        theme: {
+          preset: DEFAULT_PRESET_ID,
+          accentOverride: "",
+          inkOverride: "",
+        },
       },
     },
     components: {
@@ -163,6 +198,138 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
           subtitle: { type: "custom", label: "Subtitle", render: renderRichText },
           ctaLabel: { type: "text", label: "CTA-Label" },
           ctaHref: { type: "text", label: "CTA-Link" },
+          layout: {
+            type: "object",
+            label: "Layout",
+            objectFields: {
+              layout: {
+                type: "radio",
+                label: "Anordnung",
+                options: [
+                  { label: "Zentriert", value: "centered" },
+                  { label: "Linksbündig", value: "left" },
+                  { label: "Split (Bild rechts)", value: "split-right" },
+                  { label: "Split (Bild links)", value: "split-left" },
+                ],
+              },
+              density: {
+                type: "radio",
+                label: "Vertikale Dichte",
+                options: [
+                  { label: "Kompakt", value: "compact" },
+                  { label: "Standard", value: "default" },
+                  { label: "Luftig", value: "spacious" },
+                ],
+              },
+            },
+          },
+          imageGroup: {
+            type: "object",
+            label: "Bild",
+            objectFields: {
+              image: { type: "custom", label: "Bild", render: renderImage },
+              imageAlt: { type: "text", label: "Alt-Text" },
+              imageStyle: {
+                type: "radio",
+                label: "Bild-Stil",
+                options: [
+                  { label: "Karte mit Schatten", value: "card" },
+                  { label: "Randlos", value: "bleed" },
+                  { label: "Leicht gekippt", value: "tilt" },
+                  { label: "Browser-Frame", value: "browser-frame" },
+                ],
+              },
+            },
+          },
+          background: {
+            type: "object",
+            label: "Hintergrund",
+            objectFields: {
+              bgStyle: {
+                type: "radio",
+                label: "Stil",
+                options: [
+                  { label: "Gradient", value: "gradient" },
+                  { label: "Ruhige Fläche", value: "surface" },
+                  { label: "Akzentfarbe", value: "accent" },
+                  { label: "Eigenes Bild", value: "image" },
+                ],
+              },
+              bgImage: { type: "custom", label: "Hintergrundbild (bei Stil=Bild)", render: renderImage },
+            },
+          },
+          style: {
+            type: "object",
+            label: "Style",
+            objectFields: {
+              eyebrowStyle: {
+                type: "radio",
+                label: "Eyebrow-Stil",
+                options: [
+                  { label: "Pill (Border)", value: "pill" },
+                  { label: "Badge (gefüllt)", value: "badge" },
+                  { label: "Nur Caps-Text", value: "caps" },
+                  { label: "Ausblenden", value: "none" },
+                ],
+              },
+              accentBar: {
+                type: "radio",
+                label: "Akzent-Bar vor Titel",
+                options: [
+                  { label: "Ja", value: true },
+                  { label: "Nein", value: false },
+                ],
+              },
+              gradientTitle: {
+                type: "radio",
+                label: "Gradient-Text auf Titel",
+                options: [
+                  { label: "Ja", value: true },
+                  { label: "Nein", value: false },
+                ],
+              },
+            },
+          },
+          secondaryCta: {
+            type: "object",
+            label: "Sekundärer CTA",
+            objectFields: {
+              ctaSecondaryLabel: { type: "text", label: "Label (leer = aus)" },
+              ctaSecondaryHref: { type: "text", label: "Link" },
+            },
+          },
+          trustAndMode: {
+            type: "object",
+            label: "Trust-Line & Modus",
+            objectFields: {
+              trustLine: { type: "text", label: "Trust-Line unter CTA" },
+              mode: {
+                type: "radio",
+                label: "Modus",
+                options: [
+                  { label: "CTA-Buttons", value: "cta" },
+                  { label: "Email-Capture", value: "email-capture" },
+                ],
+              },
+              emailPlaceholder: { type: "text", label: "Email-Placeholder" },
+              emailSubmitLabel: { type: "text", label: "Email-Submit-Label" },
+              emailEndpoint: { type: "text", label: "Email-Endpoint URL (leer = Demo)" },
+            },
+          },
+          extras: {
+            type: "object",
+            label: "Extras",
+            objectFields: {
+              scrollIndicator: {
+                type: "radio",
+                label: "Scroll-Indicator",
+                options: [
+                  { label: "Ja", value: true },
+                  { label: "Nein", value: false },
+                ],
+              },
+            },
+          },
         },
         defaultProps: {
           eyebrow: "",
@@ -170,6 +337,19 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
           subtitle: "<p>Schreib hier den Pitch.</p>",
           ctaLabel: "Loslegen",
           ctaHref: "#",
+          layout: { layout: "centered", density: "default" },
+          imageGroup: { image: "", imageAlt: "", imageStyle: "card" },
+          background: { bgStyle: "gradient", bgImage: "" },
+          style: { eyebrowStyle: "pill", accentBar: false, gradientTitle: false },
+          secondaryCta: { ctaSecondaryLabel: "", ctaSecondaryHref: "" },
+          trustAndMode: {
+            trustLine: "",
+            mode: "cta",
+            emailPlaceholder: "deine@adresse.ch",
+            emailSubmitLabel: "Eintragen",
+            emailEndpoint: "",
+          },
+          extras: { scrollIndicator: false },
         },
         render: HeroRender,
       },

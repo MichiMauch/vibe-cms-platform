@@ -2,12 +2,15 @@ import "server-only";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import type { SiteThemeChoice } from "@vibe-cms-platform/core/theme";
 
 export type SiteConfig = {
   brand: string;
   domains: string[];
   template?: string;
   createdAt?: string;
+  /** Optional per-site visual identity. Missing → preset 'studio' (default). */
+  theme?: SiteThemeChoice;
 };
 
 export type SiteAccess = {

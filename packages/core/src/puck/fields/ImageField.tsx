@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Image as ImageIcon, Loader2, AlertCircle } from "lucide-react";
+import { Image as ImageIcon, Loader2, AlertCircle, X } from "lucide-react";
 import { clearCloudinaryCallback, isCloudinaryConfigured, openCloudinary } from "./cloudinary-singleton";
 
 type Props = {
@@ -52,6 +52,18 @@ export function ImageField({ value, onChange }: Props) {
         <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt="" className="h-32 w-full object-cover" />
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              onChange("");
+            }}
+            aria-label="Bild entfernen"
+            title="Bild entfernen"
+            className="absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 text-white shadow-sm hover:bg-slate-900 transition"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       ) : (
         <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400">
@@ -59,19 +71,34 @@ export function ImageField({ value, onChange }: Props) {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={handleOpen}
-        disabled={opening}
-        className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-400 disabled:opacity-50 transition"
-      >
-        {opening ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        ) : (
-          <ImageIcon className="h-3.5 w-3.5" />
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleOpen}
+          disabled={opening}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-400 disabled:opacity-50 transition"
+        >
+          {opening ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <ImageIcon className="h-3.5 w-3.5" />
+          )}
+          {value ? "Bild ersetzen" : "Bild wählen"}
+        </button>
+        {value && (
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              onChange("");
+            }}
+            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition"
+          >
+            <X className="h-3.5 w-3.5" />
+            Entfernen
+          </button>
         )}
-        {value ? "Bild ersetzen" : "Bild wählen"}
-      </button>
+      </div>
 
       {error && (
         <div className="flex items-start gap-1.5 rounded-md bg-red-50 px-2 py-1.5 text-xs text-red-700">

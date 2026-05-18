@@ -16,10 +16,9 @@ type EditMode = {
   liveUrl: string | null;
   /** Site slug shown as a small label so master users know which site they edit. */
   siteLabel?: string;
-  /** Async publish action. The editor owns the data tree and decides what to send. */
-  publish: () => Promise<{ ok: boolean; error?: string }>;
-  /** Reserved for future use — kept for backward-compat with older callers. */
-  initialPendingLocales?: string[];
+  /** Optional async publish action. If omitted, the publish pill is hidden
+   * (e.g. when Puck's own header publish button drives the flow). */
+  publish?: () => Promise<{ ok: boolean; error?: string }>;
 };
 
 type Props = {
@@ -84,8 +83,12 @@ function EditModeContents({ editMode }: { editMode: EditMode }) {
           {siteLabel}
         </span>
       )}
-      <span className="h-5 w-px bg-white/15" aria-hidden />
-      <PublishPill publish={publish} />
+      {publish && (
+        <>
+          <span className="h-5 w-px bg-white/15" aria-hidden />
+          <PublishPill publish={publish} />
+        </>
+      )}
       {locales.length > 1 && (
         <select
           value={currentLocale}

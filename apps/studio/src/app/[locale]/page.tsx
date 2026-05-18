@@ -3,11 +3,12 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Render } from "@puckeditor/core/rsc";
 import { buildPuckConfig } from "@vibe-cms-platform/core/puck";
-import { resolveTenant, isAdminHost } from "@/lib/platform/registry";
+import { resolveTenant, isAdminHost, getSite } from "@/lib/platform/registry";
 import {
   readSiteContent,
   siteLocaleExists,
 } from "@/lib/platform/site-content";
+import { renderTheme } from "@/lib/platform/theme";
 
 export const dynamic = "force-dynamic";
 
@@ -89,8 +90,15 @@ export default async function Page({
   if (!(await siteLocaleExists(slug, locale))) notFound();
 
   const data = await readSiteContent(slug, locale);
+  const site = await getSite(slug);
+  const { themeCss, bodyAttrs } = renderTheme(site?.config.theme);
   // Slug is only used by the Puck editor's AI rewrite field; on the public
   // render path nothing reads it, but the type wants a string.
   const config = buildPuckConfig(slug);
-  return <Render config={config} data={data} />;
+  return (
+    <div {...bodyAttrs}>
+      <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
+      <Render config={config} data={data} />
+    </div>
+  );
 }

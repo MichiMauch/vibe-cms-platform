@@ -8,6 +8,7 @@ import { createGitHubClient } from "@/lib/platform/github";
 import { createCloudflareClient } from "@/lib/platform/cloudflare";
 import { scaffoldContent, type Brief, type TemplateId } from "@/lib/platform/scaffold";
 import { sitesDir, clearDomainCache, getSite } from "@/lib/platform/registry";
+import { isValidPresetId, DEFAULT_PRESET_ID, type SiteThemeChoice } from "@vibe-cms-platform/core/theme";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 90;
@@ -16,6 +17,7 @@ const VALID_TEMPLATES: TemplateId[] = ["blank", "saas", "agentur", "event"];
 const SLUG_RE = /^[a-z][a-z0-9-]{1,38}[a-z0-9]$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOMAIN_RE = /^(?!:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 export async function POST(req: Request) {
   const session = await readSession();
@@ -30,13 +32,32 @@ export async function POST(req: Request) {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const b = body as Partial<Brief & { slug: string; customerEmail: string; customDomain?: string }>;
+  const b = body as Partial<
+    Brief & {
+      slug: string;
+      customerEmail: string;
+      customDomain?: string;
+      theme?: { preset?: string; accentOverride?: string; inkOverride?: string };
+    }
+  >;
   const slug = (b.slug ?? "").trim().toLowerCase();
   const brand = (b.brand ?? "").trim();
   const template = (b.template ?? "blank") as TemplateId;
   const description = (b.description ?? "").trim();
   const customerEmail = (b.customerEmail ?? "").trim().toLowerCase();
   const customDomain = b.customDomain?.trim().toLowerCase() || null;
+
+  // Resolve theme. Missing or invalid preset → default 'studio'. Hex overrides
+  // are silently dropped if they don't match the regex; this is intentional
+  // because the form already enforces the pattern client-side.
+  const themePresetCandidate = b.theme?.preset;
+  const theme: SiteThemeChoice = {
+    preset: isValidPresetId(themePresetCandidate) ? themePresetCandidate : DEFAULT_PRESET_ID,
+  };
+  const accent = b.theme?.accentOverride?.trim();
+  if (accent && HEX_RE.test(accent)) theme.accentOverride = accent;
+  const ink = b.theme?.inkOverride?.trim();
+  if (ink && HEX_RE.test(ink)) theme.inkOverride = ink;
 
   if (!SLUG_RE.test(slug)) {
     return new Response("Slug must be 3-40 chars, lowercase, alphanumeric + dashes.", { status: 400 });
@@ -82,12 +103,34 @@ export async function POST(req: Request) {
         // 1. AI scaffold
         send("progress", { step: "scaffold", label: "Generiere Inhalte mit AI" });
         const templatesDir = path.resolve(process.cwd(), "..", "..", "packages", "core", "templates");
-        const contentJson = await scaffoldContent({
+        const rawContentJson = await scaffoldContent({
           apiKey: env.openai.apiKey,
           model: env.openai.model,
           brief: { brand, template, description, audience: b.audience, primaryGoal: b.primaryGoal },
           templatesDir,
         });
+
+        // Inject the chosen theme into root.props.theme so the editor's
+        // root.fields.theme widget is pre-populated and stays in sync with
+        // config.json from the first edit on. Tolerant of malformed AI output:
+        // if parsing fails, we ship the raw string unchanged.
+        let contentJson = rawContentJson;
+        try {
+          const parsed = JSON.parse(rawContentJson) as {
+            root?: { props?: Record<string, unknown> };
+            [k: string]: unknown;
+          };
+          parsed.root = parsed.root ?? {};
+          parsed.root.props = parsed.root.props ?? {};
+          parsed.root.props.theme = {
+            preset: theme.preset,
+            accentOverride: theme.accentOverride ?? "",
+            inkOverride: theme.inkOverride ?? "",
+          };
+          contentJson = JSON.stringify(parsed, null, 2);
+        } catch {
+          // keep rawContentJson — theme will live only in config.json
+        }
 
         // 2. Local FS write — gives the dev server an immediate copy.
         send("progress", { step: "fs", label: "Lege Site-Dateien lokal an" });
@@ -98,6 +141,7 @@ export async function POST(req: Request) {
           template,
           domains: allDomains,
           createdAt: new Date().toISOString(),
+          theme,
         };
         const access = { users: [customerEmail] };
         await fs.mkdir(messagesDir, { recursive: true });
