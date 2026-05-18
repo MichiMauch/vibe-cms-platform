@@ -16,6 +16,27 @@ type Widget = {
   show: () => void;
 };
 
+type CloudinaryInsertData = { assets?: { secure_url: string }[] };
+type CloudinaryLibraryOpts = {
+  cloud_name: string;
+  api_key: string;
+  multiple: boolean;
+  max_files: number;
+  insert_caption: string;
+};
+type CloudinaryGlobal = {
+  createMediaLibrary: (
+    opts: CloudinaryLibraryOpts,
+    handlers: { insertHandler: (data: CloudinaryInsertData) => void },
+  ) => Widget;
+};
+
+declare global {
+  interface Window {
+    cloudinary?: CloudinaryGlobal;
+  }
+}
+
 let widget: Widget | null = null;
 let activeCallback: InsertCallback | null = null;
 

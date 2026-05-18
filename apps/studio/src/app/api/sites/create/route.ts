@@ -6,7 +6,6 @@ import { sendMagicLink } from "@/lib/auth";
 import { readEnv } from "@/lib/platform/env";
 import { createGitHubClient } from "@/lib/platform/github";
 import { createCloudflareClient } from "@/lib/platform/cloudflare";
-import { createCoolifyClient } from "@/lib/platform/coolify";
 import { scaffoldContent, type Brief, type TemplateId } from "@/lib/platform/scaffold";
 import { sitesDir, clearDomainCache, getSite } from "@/lib/platform/registry";
 import { isValidPresetId, DEFAULT_PRESET_ID, type SiteThemeChoice } from "@vibe-cms-platform/core/theme";
@@ -162,17 +161,18 @@ export async function POST(req: Request) {
         await gh.putFile(`sites/${slug}/config.json`, JSON.stringify(config, null, 2) + "\n", `feat(site): add ${slug} config`);
         await gh.putFile(`sites/${slug}/access.json`, JSON.stringify(access, null, 2) + "\n", `feat(site): add ${slug} access`);
 
-        // 4. Cloudflare DNS — point the subdomain at Studio (Coolify). The
-        // reverse proxy there is configured with a wildcard for `*.<root>`,
-        // so we don't need to register the domain anywhere else.
-        send("progress", { step: "cloudflare", label: "DNS konfigurieren" });
+        // 4. Cloudflare — CNAME the subdomain at the Pages project and
+        // attach it (plus any custom domain) as a custom domain on Pages.
+        // The Pages build is triggered by the GitHub commits in step 3.
+        send("progress", { step: "cloudflare", label: "DNS + Pages-Domain konfigurieren" });
         const cf = createCloudflareClient({
+          accountId: env.cloudflare.accountId,
           apiToken: env.cloudflare.apiToken,
           zoneId: env.cloudflare.zoneId,
         });
 
         try {
-          await cf.upsertCname(subdomainHost, env.cloudflare.tenantHost);
+          await cf.upsertCname(subdomainHost, `${env.cloudflare.projectName}.pages.dev`);
         } catch (err) {
           send("warning", {
             step: "dns",
@@ -180,22 +180,15 @@ export async function POST(req: Request) {
           });
         }
 
-        // Custom domains live in the customer's own DNS zone — we can't write
-        // there. The UI surfaces the CNAME target so the customer can set it.
-
-        // 4b. Attach the subdomain to the Studio app in Coolify so Traefik
-        // routes it and Let's Encrypt issues a cert. Skipped silently when
-        // COOLIFY_* env vars are not configured.
-        if (env.coolify) {
-          send("progress", { step: "coolify", label: "Domain in Coolify hinterlegen" });
-          const coolify = createCoolifyClient(env.coolify);
+        for (const fqdn of allDomains) {
           try {
-            await coolify.attachDomain(subdomainHost);
+            await cf.addPagesDomain(env.cloudflare.projectName, fqdn);
           } catch (err) {
-            send("warning", {
-              step: "coolify",
-              message: `Coolify ${subdomainHost}: ${err instanceof Error ? err.message : "failed"}`,
-            });
+            const msg = err instanceof Error ? err.message : "domain attach failed";
+            // Idempotent: "already exists" is the no-op happy path.
+            if (!/already|exists/i.test(msg)) {
+              send("warning", { step: "domain", message: `${fqdn}: ${msg}` });
+            }
           }
         }
 

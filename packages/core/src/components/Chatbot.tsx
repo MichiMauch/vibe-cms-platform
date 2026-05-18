@@ -12,11 +12,18 @@ import {
 } from "lucide-react";
 import type { Chatbot as ChatbotConfig } from "../types/content";
 
-type Props = { config: ChatbotConfig; locale: string };
+type Props = {
+  config: ChatbotConfig;
+  locale: string;
+  /** Absolute or relative URL of the /api/chat endpoint. Defaults to a
+   * same-origin call so the studio (which serves its own API) works without
+   * extra config; tenant static builds pass the studio's public URL. */
+  apiUrl?: string;
+};
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-export function Chatbot({ config, locale }: Props) {
+export function Chatbot({ config, locale, apiUrl = "/api/chat" }: Props) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: config.welcomeMessage },
@@ -57,7 +64,7 @@ export function Chatbot({ config, locale }: Props) {
       abortRef.current = controller;
 
       try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: next, locale }),
@@ -93,7 +100,7 @@ export function Chatbot({ config, locale }: Props) {
         abortRef.current = null;
       }
     },
-    [messages, locale, streaming],
+    [messages, locale, streaming, apiUrl],
   );
 
   function reset() {

@@ -5,6 +5,9 @@ const CF_API = "https://api.cloudflare.com/client/v4";
 export type CloudflareClient = {
   /** Create or update a CNAME record in the configured zone. */
   upsertCname: (name: string, target: string) => Promise<void>;
+  /** Attach a custom domain to the Pages project (idempotent — "already
+   * exists" errors are swallowed by the caller). */
+  addPagesDomain: (project: string, fqdn: string) => Promise<void>;
 };
 
 type CFResult<T> = { success: boolean; errors?: { message: string }[]; result: T };
@@ -28,10 +31,11 @@ async function cf<T>(token: string, path: string, init?: RequestInit): Promise<T
 }
 
 export function createCloudflareClient(opts: {
+  accountId: string;
   apiToken: string;
   zoneId: string;
 }): CloudflareClient {
-  const { apiToken, zoneId } = opts;
+  const { accountId, apiToken, zoneId } = opts;
 
   async function upsertCname(name: string, target: string) {
     const existing = await cf<{ id: string; name: string }[]>(
@@ -55,5 +59,12 @@ export function createCloudflareClient(opts: {
     }
   }
 
-  return { upsertCname };
+  async function addPagesDomain(project: string, fqdn: string) {
+    await cf(apiToken, `/accounts/${accountId}/pages/projects/${project}/domains`, {
+      method: "POST",
+      body: JSON.stringify({ name: fqdn }),
+    });
+  }
+
+  return { upsertCname, addPagesDomain };
 }
