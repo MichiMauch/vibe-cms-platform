@@ -15,7 +15,7 @@
         "welcomeMessage": "Hallo! Wie kann ich helfen?"
       },
       "theme": {
-        "preset": "mono",
+        "preset": "brutal",
         "accentOverride": "",
         "inkOverride": ""
       }

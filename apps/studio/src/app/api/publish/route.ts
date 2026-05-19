@@ -130,38 +130,35 @@ export async function POST(req: Request) {
     }
   }
 
-  const isDev = process.env.NODE_ENV !== "production";
   let commitSha: string | null = null;
-  if (!isDev || process.env.COMMIT_FROM_DEV === "true") {
-    try {
-      const env = readEnv();
-      const gh = createGitHubClient({
-        token: env.github.token,
-        owner: env.github.owner,
-        repo: env.github.repo,
-        branch: env.github.branch,
-      });
-      const repoRelative = `sites/${slug}/messages/${locale}.json`;
-      const commitMessage = `chore(content): publish ${slug}/${locale} via ${session.sub}`;
-      await gh.putFile(repoRelative, nextRaw, commitMessage);
-      if (configRaw) {
-        await gh.putFile(
-          `sites/${slug}/config.json`,
-          configRaw,
-          `chore(theme): update ${slug} theme via ${session.sub}`,
-        );
-      }
-      // putFile doesn't return the SHA; not exposing for now.
-      commitSha = null;
-    } catch (err) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: err instanceof Error ? err.message : "GitHub commit failed",
-        },
-        { status: 502 },
+  try {
+    const env = readEnv();
+    const gh = createGitHubClient({
+      token: env.github.token,
+      owner: env.github.owner,
+      repo: env.github.repo,
+      branch: env.github.branch,
+    });
+    const repoRelative = `sites/${slug}/messages/${locale}.json`;
+    const commitMessage = `chore(content): publish ${slug}/${locale} via ${session.sub}`;
+    await gh.putFile(repoRelative, nextRaw, commitMessage);
+    if (configRaw) {
+      await gh.putFile(
+        `sites/${slug}/config.json`,
+        configRaw,
+        `chore(theme): update ${slug} theme via ${session.sub}`,
       );
     }
+    // putFile doesn't return the SHA; not exposing for now.
+    commitSha = null;
+  } catch (err) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: err instanceof Error ? err.message : "GitHub commit failed",
+      },
+      { status: 502 },
+    );
   }
 
   return NextResponse.json({
