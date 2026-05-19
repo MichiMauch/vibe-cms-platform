@@ -1,4 +1,26 @@
 {
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Wandererlebnis im Wallis",
+        "description": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
+        "ogTitle": "Wandererlebnis im Wallis",
+        "ogDescription": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
+        "ogImage": "",
+        "keywords": "Wanderung, Wallis, Abenteuer, Natur, Erlebnis"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Testli-Assistent",
+        "welcomeMessage": "Kurze Begrüssung."
+      },
+      "theme": {
+        "preset": "playful",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
   "content": [
     {
       "type": "Hero",
@@ -213,27 +235,5 @@
       }
     }
   ],
-  "root": {
-    "props": {
-      "seo": {
-        "title": "Wandererlebnis im Wallis",
-        "description": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
-        "ogTitle": "Wandererlebnis im Wallis",
-        "ogDescription": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
-        "ogImage": "",
-        "keywords": "Wanderung, Wallis, Abenteuer, Natur, Erlebnis"
-      },
-      "chatbot": {
-        "isEnabled": false,
-        "botName": "Testli-Assistent",
-        "welcomeMessage": "Kurze Begrüssung."
-      },
-      "theme": {
-        "preset": "brutal",
-        "accentOverride": "",
-        "inkOverride": ""
-      }
-    }
-  },
   "zones": {}
 }
