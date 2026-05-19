@@ -1,0 +1,239 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Entdecke die Schönheit des Wallis",
+        "subtitle": "<p>Schliesse dich uns an für ein unvergessliches Wandererlebnis in den atemberaubenden Alpen.</p>",
+        "ctaLabel": "Jetzt anmelden",
+        "ctaHref": "#pricing",
+        "layout": {
+          "layout": "centered",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-3",
+        "title": "Warum mit uns wandern?",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Globe",
+            "title": "Erstklassige Routen",
+            "description": "<p>Wir bieten sorgfältig ausgewählte Wanderwege für jedes Niveau.</p>"
+          },
+          {
+            "icon": "Heart",
+            "title": "Gemeinschaft",
+            "description": "<p>Treffe Gleichgesinnte und teile unvergessliche Momente.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Sicherheit zuerst",
+            "description": "<p>Unsere Guides sorgen für deine Sicherheit während der gesamten Tour.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "grid",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "500+",
+            "label": "Teilnehmer pro Jahr"
+          },
+          {
+            "value": "100+",
+            "label": "Wanderungen"
+          },
+          {
+            "value": "10",
+            "label": "Jahre Erfahrung"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "centered",
+        "quote": "<p>Ein fantastisches Erlebnis! Die Natur und die Guides waren einfach unglaublich.</p>",
+        "author": "Max Müller",
+        "role": "Teilnehmer",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "cards-3",
+        "title": "Preise für unsere Wanderungen",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Einzelwanderung",
+            "price": "CHF 49",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Geführte Wanderung"
+              },
+              {
+                "value": "Kartenmaterial"
+              },
+              {
+                "value": "Snacks inklusive"
+              }
+            ]
+          },
+          {
+            "icon": "Star",
+            "name": "Gruppenangebot",
+            "price": "CHF 199",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Für bis zu 5 Personen"
+              },
+              {
+                "value": "Geführte Wanderung"
+              },
+              {
+                "value": "Snacks inklusive"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie lange dauern die Wanderungen?",
+            "answer": "<p>Die Wanderungen dauern in der Regel zwischen 3 und 6 Stunden.</p>"
+          },
+          {
+            "question": "Brauche ich spezielle Ausrüstung?",
+            "answer": "<p>Wir empfehlen festes Schuhwerk und wetterfeste Kleidung.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für dein Abenteuer?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt anmelden",
+        "ctaPrimaryHref": "#pricing",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Testli. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Links",
+            "links": [
+              {
+                "label": "Über uns",
+                "href": "#"
+              },
+              {
+                "label": "Kontakt",
+                "href": "#"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Wandererlebnis im Wallis",
+        "description": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
+        "ogTitle": "Wandererlebnis im Wallis",
+        "ogDescription": "Erlebe unvergessliche Wanderungen im Wallis. Melde dich jetzt an für unser nächstes Abenteuer!",
+        "ogImage": "",
+        "keywords": "Wanderung, Wallis, Abenteuer, Natur, Erlebnis"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Testli-Assistent",
+        "welcomeMessage": "Kurze Begrüssung."
+      },
+      "theme": {
+        "preset": "brutal",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
