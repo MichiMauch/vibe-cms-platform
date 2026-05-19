@@ -12,6 +12,9 @@ export {
 export {
   SCAFFOLD_BLOCKS,
   renderSchemaForPrompt,
+  VIBES,
+  renderVibesForPrompt,
   type BlockSpec,
   type BlockFieldSpec,
+  type Vibe,
 } from "./scaffold-schema";

@@ -1,7 +1,8 @@
 import "server-only";
 import OpenAI from "openai";
 import { BLOCK_DEFAULTS, BLOCK_TYPES, ROOT_DEFAULTS } from "@vibe-cms-platform/core/puck";
-import { renderSchemaForPrompt } from "@vibe-cms-platform/core/puck";
+import { renderSchemaForPrompt, renderVibesForPrompt } from "@vibe-cms-platform/core/puck";
+import { isValidPresetId, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
 
 export type TemplateId = "blank" | "saas" | "agentur" | "event";
 
@@ -11,6 +12,19 @@ export type Brief = {
   description: string;
   audience?: string;
   primaryGoal?: string;
+  /** If set, the AI is told to USE this vibe and skip suggestion. */
+  pinnedVibe?: ThemePresetId | null;
+};
+
+export type VibeSuggestion = {
+  preset: ThemePresetId;
+  rationale: string;
+  confidence: "high" | "medium" | "low";
+};
+
+export type ScaffoldResult = {
+  contentJson: string;
+  vibeSuggestion: VibeSuggestion;
 };
 
 /** Stylistic hint per template — picks block bias without being prescriptive.
@@ -29,7 +43,8 @@ Return strict JSON, no commentary, with exactly these top-level keys:
 {
   "content": [ { "type": "<BlockType>", "props": { ... } }, ... ],
   "root": { "props": { "seo": {...}, "chatbot": {...} } },
-  "zones": {}
+  "zones": {},
+  "vibeSuggestion": { "preset": "<id>", "rationale": "<≤140 chars, German>", "confidence": "high|medium|low" }
 }
 
 CONTENT RULES
@@ -46,6 +61,23 @@ CONTENT RULES
     array    → JSON array of objects matching the item-field schema
 - Swiss German conventions for German output: ä/ö/ü, ss — never ß.
 - Brand names, technical terms, product nouns: keep them unchanged.
+
+LAYOUT VARIANT SELECTION
+- Each block whose schema lists a "layout" enum supports multiple visual layouts.
+- Pick the layout that best fits the chosen vibe and the brief, following the per-block hints.
+- Layouts are OPTIONAL — omit when the default is best.
+
+VIBE SELECTION
+You MUST pick exactly ONE vibe preset that fits the brand's industry, tone, and target audience.
+Vibe vocabulary:
+${renderVibesForPrompt()}
+
+Return your pick under top-level "vibeSuggestion":
+- "preset": the id (e.g. "tech")
+- "rationale": one short German sentence (≤140 chars) explaining WHY this vibe fits
+- "confidence": "high" if the brief gives clear signals, "medium" for plausible-but-debatable, "low" when guessing
+
+If the user pinned a vibe (look at brief.pinnedVibe), echo it back as preset, set rationale = "Vom Nutzer gewählt." and confidence = "high".
 
 ROOT RULES
 - root.props.seo: fill title (≤ 60 chars), description (≤ 160 chars), ogTitle, ogDescription, keywords (comma-separated, 5-10 keywords).
@@ -84,7 +116,20 @@ type RawTree = {
   content?: unknown;
   root?: { props?: unknown };
   zones?: unknown;
+  vibeSuggestion?: unknown;
 };
+
+function normaliseVibeSuggestion(raw: unknown): VibeSuggestion {
+  const obj = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const presetRaw = obj.preset;
+  const preset: ThemePresetId = isValidPresetId(presetRaw) ? presetRaw : DEFAULT_PRESET_ID;
+  const rationaleRaw = typeof obj.rationale === "string" ? obj.rationale : "";
+  const rationale = rationaleRaw.slice(0, 200);
+  const confRaw = obj.confidence;
+  const confidence: VibeSuggestion["confidence"] =
+    confRaw === "high" || confRaw === "low" ? confRaw : "medium";
+  return { preset, rationale, confidence };
+}
 
 /** Validate AI output, drop unknown blocks, back-fill defaults, assign ids. */
 function normaliseTree(raw: RawTree): {
@@ -120,7 +165,7 @@ export async function scaffoldContent(opts: {
   apiKey: string;
   model: string;
   brief: Brief;
-}): Promise<string> {
+}): Promise<ScaffoldResult> {
   const openai = new OpenAI({ apiKey: opts.apiKey });
   const completion = await openai.chat.completions.create({
     model: opts.model,
@@ -152,5 +197,21 @@ export async function scaffoldContent(opts: {
   if (normalised.content.length === 0) {
     throw new Error("AI scaffolder produced no valid blocks");
   }
-  return JSON.stringify(normalised, null, 2);
+
+  // Vibe-suggestion lives outside the tree so callers can show it before save.
+  // If the user pinned a vibe, force it through — never let the model override
+  // an explicit user choice.
+  let vibeSuggestion = normaliseVibeSuggestion(parsed.vibeSuggestion);
+  if (opts.brief.pinnedVibe && isValidPresetId(opts.brief.pinnedVibe)) {
+    vibeSuggestion = {
+      preset: opts.brief.pinnedVibe,
+      rationale: "Vom Nutzer gewählt.",
+      confidence: "high",
+    };
+  }
+
+  return {
+    contentJson: JSON.stringify(normalised, null, 2),
+    vibeSuggestion,
+  };
 }

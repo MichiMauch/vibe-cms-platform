@@ -38,6 +38,9 @@ export async function POST(req: Request) {
       customerEmail: string;
       customDomain?: string;
       theme?: { preset?: string; accentOverride?: string; inkOverride?: string };
+      /** Pre-generated content tree from `/api/sites/scaffold`. When present,
+       * the AI step is skipped — Phase B of the two-phase create flow. */
+      contentJson?: string;
     }
   >;
   const slug = (b.slug ?? "").trim().toLowerCase();
@@ -46,6 +49,9 @@ export async function POST(req: Request) {
   const description = (b.description ?? "").trim();
   const customerEmail = (b.customerEmail ?? "").trim().toLowerCase();
   const customDomain = b.customDomain?.trim().toLowerCase() || null;
+  const preGeneratedContent = typeof b.contentJson === "string" && b.contentJson.length > 0
+    ? b.contentJson
+    : null;
 
   // Resolve theme. Missing or invalid preset → default 'studio'. Hex overrides
   // are silently dropped if they don't match the regex; this is intentional
@@ -100,13 +106,29 @@ export async function POST(req: Request) {
       };
 
       try {
-        // 1. AI scaffold — free-form block composition driven by the brief.
-        send("progress", { step: "scaffold", label: "Generiere Inhalte mit AI" });
-        const rawContentJson = await scaffoldContent({
-          apiKey: env.openai.apiKey,
-          model: env.openai.model,
-          brief: { brand, template, description, audience: b.audience, primaryGoal: b.primaryGoal },
-        });
+        // 1. AI scaffold — skipped when Phase A already produced the tree
+        // (typical two-phase flow). External scripts that POST directly to
+        // /create still trigger the AI here as a fallback.
+        let rawContentJson: string;
+        if (preGeneratedContent) {
+          send("progress", { step: "scaffold", label: "Inhalte aus Vorschau übernehmen" });
+          rawContentJson = preGeneratedContent;
+        } else {
+          send("progress", { step: "scaffold", label: "Generiere Inhalte mit AI" });
+          const result = await scaffoldContent({
+            apiKey: env.openai.apiKey,
+            model: env.openai.model,
+            brief: {
+              brand,
+              template,
+              description,
+              audience: b.audience,
+              primaryGoal: b.primaryGoal,
+              pinnedVibe: theme.preset,
+            },
+          });
+          rawContentJson = result.contentJson;
+        }
 
         // Inject the chosen theme into root.props.theme so the editor's
         // root.fields.theme widget is pre-populated and stays in sync with

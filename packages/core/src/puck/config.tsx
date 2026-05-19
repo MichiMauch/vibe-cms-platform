@@ -206,6 +206,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
                   { label: "Linksbündig", value: "left" },
                   { label: "Split (Bild rechts)", value: "split-right" },
                   { label: "Split (Bild links)", value: "split-left" },
+                  { label: "Oversized (nur Typografie)", value: "oversized" },
                 ],
               },
               density: {
@@ -341,6 +342,16 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
       FeaturesGrid: {
         label: "Features-Grid",
         fields: {
+          layout: {
+            type: "radio",
+            label: "Layout",
+            options: [
+              { label: "3 Spalten (Standard)", value: "grid-3" },
+              { label: "4 Spalten", value: "grid-4" },
+              { label: "Liste mit Icon links", value: "list-icon-left" },
+              { label: "Bento (Mix-Größen)", value: "bento" },
+            ],
+          },
           title: { type: "custom", label: "Titel", render: renderTextAI },
           subtitle: { type: "custom", label: "Subtitle", render: renderRichText },
           items: {
@@ -350,11 +361,20 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
               icon: { type: "select", label: "Icon", options: ICON_OPTIONS },
               title: { type: "custom", label: "Titel", render: renderTextAI },
               description: { type: "custom", label: "Beschreibung", render: renderRichText },
+              emphasis: {
+                type: "radio",
+                label: "Größe (nur Bento)",
+                options: [
+                  { label: "Normal", value: "normal" },
+                  { label: "Groß", value: "large" },
+                ],
+              },
             },
             defaultItemProps: {
               icon: "Sparkles",
               title: "Vorteil",
               description: "<p>Was macht dein Produkt besonders?</p>",
+              emphasis: "normal",
             },
             getItemSummary: (item) => (item as { title?: string }).title ?? "Feature",
           },
@@ -365,6 +385,15 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
       Stats: {
         label: "Stats",
         fields: {
+          layout: {
+            type: "radio",
+            label: "Layout",
+            options: [
+              { label: "Grid (Standard)", value: "grid" },
+              { label: "Inline-Reihe", value: "row" },
+              { label: "Oversized", value: "oversized" },
+            ],
+          },
           intro: { type: "text", label: "Intro (optional)" },
           items: {
             type: "array",
@@ -383,10 +412,36 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
       Testimonial: {
         label: "Testimonial",
         fields: {
+          layout: {
+            type: "radio",
+            label: "Layout",
+            options: [
+              { label: "Zentriert (Standard)", value: "centered" },
+              { label: "3-Spalten-Grid", value: "grid-3" },
+              { label: "Karussell", value: "carousel" },
+            ],
+          },
           quote: { type: "custom", label: "Zitat", render: renderRichText },
           author: { type: "custom", label: "Autor", render: renderTextAI },
           role: { type: "custom", label: "Rolle", render: renderTextAI },
           avatar: { type: "custom", label: "Avatar (optional)", render: renderImage },
+          items: {
+            type: "array",
+            label: "Weitere Stimmen (nur Grid/Karussell)",
+            arrayFields: {
+              quote: { type: "custom", label: "Zitat", render: renderRichText },
+              author: { type: "custom", label: "Autor", render: renderTextAI },
+              role: { type: "custom", label: "Rolle", render: renderTextAI },
+              avatar: { type: "custom", label: "Avatar (optional)", render: renderImage },
+            },
+            defaultItemProps: {
+              quote: "<p>Eine zweite Stimme.</p>",
+              author: "Person",
+              role: "Rolle",
+              avatar: "",
+            },
+            getItemSummary: (item) => (item as { author?: string }).author ?? "Stimme",
+          },
         },
         defaultProps: TESTIMONIAL_DEFAULTS,
         render: TestimonialRender,
@@ -394,13 +449,23 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
       ImageText: {
         label: "Bild + Text",
         fields: {
+          layout: {
+            type: "radio",
+            label: "Layout",
+            options: [
+              { label: "Bild links", value: "image-left" },
+              { label: "Bild rechts (Standard)", value: "image-right" },
+              { label: "Gestapelt", value: "stacked" },
+              { label: "Karte über Bild", value: "card-overlay" },
+            ],
+          },
           title: { type: "custom", label: "Titel", render: renderTextAI },
           content: { type: "custom", label: "Inhalt", render: renderRichText },
           image: { type: "custom", label: "Bild", render: renderImage },
           imageAlt: { type: "text", label: "Alt-Text" },
           imagePosition: {
             type: "radio",
-            label: "Bild-Position",
+            label: "Bild-Position (deprecated, wird durch Layout ersetzt)",
             options: [
               { label: "Links", value: "left" },
               { label: "Rechts", value: "right" },
@@ -502,8 +567,33 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
       Pricing: {
         label: "Preise",
         fields: {
+          layout: {
+            type: "radio",
+            label: "Layout",
+            options: [
+              { label: "3 Karten (Standard)", value: "cards-3" },
+              { label: "Vergleichstabelle", value: "comparison-table" },
+              { label: "Einzelkarte (Monatlich/Jährlich)", value: "single-toggle" },
+            ],
+          },
           title: { type: "custom", label: "Titel", render: renderTextAI },
           subtitle: { type: "custom", label: "Subtitle", render: renderRichText },
+          rowLabels: {
+            type: "array",
+            label: "Zeilen-Labels (nur Vergleichstabelle)",
+            arrayFields: { value: { type: "text", label: "Zeile" } },
+            defaultItemProps: { value: "Neue Zeile" },
+            getItemSummary: (item) => (item as { value?: string }).value ?? "Zeile",
+          },
+          toggle: {
+            type: "object",
+            label: "Monat/Jahr-Toggle (nur Einzelkarte)",
+            objectFields: {
+              monthlyLabel: { type: "text", label: "Label monatlich" },
+              yearlyLabel: { type: "text", label: "Label jährlich" },
+              yearlyDiscountHint: { type: "text", label: "Rabatt-Hinweis (z.B. „2 Monate gratis“)" },
+            },
+          },
           plans: {
             type: "array",
             label: "Pläne",
@@ -529,6 +619,15 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
                 defaultItemProps: { value: "Neues Feature" },
                 getItemSummary: (item) => (item as { value?: string }).value ?? "Feature",
               },
+              priceMonthly: { type: "text", label: "Preis monatlich (nur Einzelkarte)" },
+              priceYearly: { type: "text", label: "Preis jährlich (nur Einzelkarte)" },
+              rowValues: {
+                type: "array",
+                label: "Zellen-Werte (nur Vergleichstabelle)",
+                arrayFields: { value: { type: "text", label: "Wert („✓“, „true“ oder Text)" } },
+                defaultItemProps: { value: "—" },
+                getItemSummary: (item) => (item as { value?: string }).value ?? "Wert",
+              },
             },
             defaultItemProps: {
               icon: "Sparkles",
@@ -539,6 +638,9 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
               ctaHref: "#",
               featured: false,
               features: [],
+              priceMonthly: "",
+              priceYearly: "",
+              rowValues: [],
             },
             getItemSummary: (item) => (item as { name?: string }).name ?? "Plan",
           },

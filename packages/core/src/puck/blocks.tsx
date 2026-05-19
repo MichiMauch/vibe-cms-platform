@@ -30,6 +30,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { EmailCaptureForm } from "../components/EmailCaptureForm";
+import { PricingToggle } from "../components/PricingToggle";
+import { TestimonialCarousel } from "../components/TestimonialCarousel";
 
 const ICONS: Record<string, LucideIcon> = {
   Sparkles,
@@ -53,7 +55,12 @@ const PLAN_ICONS: Record<string, LucideIcon> = {
 };
 
 // ─── Hero ─────────────────────────────────────────────────────────────
-export type HeroLayout = "centered" | "left" | "split-right" | "split-left";
+export type HeroLayout =
+  | "centered"
+  | "left"
+  | "split-right"
+  | "split-left"
+  | "oversized";
 export type HeroDensity = "compact" | "default" | "spacious";
 export type HeroImageStyle = "card" | "bleed" | "tilt" | "browser-frame";
 export type HeroBgStyle = "gradient" | "surface" | "accent" | "image";
@@ -256,7 +263,11 @@ export function HeroRender(props: HeroProps) {
   const titleGradientClass = gradientTitle
     ? "bg-gradient-to-r from-brand-accent to-brand-accent-2 bg-clip-text text-transparent"
     : "";
-  const titleClasses = `text-4xl md:text-6xl leading-[1.05] brand-heading ${
+  const titleSizeClass =
+    layout === "oversized"
+      ? "text-6xl md:text-8xl xl:text-9xl leading-[0.95]"
+      : "text-4xl md:text-6xl leading-[1.05]";
+  const titleClasses = `${titleSizeClass} brand-heading ${
     gradientTitle ? titleGradientClass : titleColorClass
   }`;
 
@@ -341,7 +352,8 @@ export function HeroRender(props: HeroProps) {
 
   // ── CTA cluster (or email-capture form) ──────────────────────────
   const isSplitLayout = layout === "split-right" || layout === "split-left";
-  const ctasJustify = layout === "centered" ? "justify-center" : "justify-start";
+  const isCentered = layout === "centered" || layout === "oversized";
+  const ctasJustify = isCentered ? "justify-center" : "justify-start";
 
   let actionsEl: React.ReactNode;
   if (mode === "email-capture") {
@@ -378,8 +390,8 @@ export function HeroRender(props: HeroProps) {
   // ── Subtitle node ────────────────────────────────────────────────
   const subtitleEl = (
     <div
-      className={`mt-6 max-w-2xl text-lg leading-relaxed ${subtitleColorClass} ${
-        layout === "centered" ? "mx-auto" : ""
+      className={`mt-6 ${layout === "oversized" ? "max-w-3xl text-base md:text-lg" : "max-w-2xl text-lg"} leading-relaxed ${subtitleColorClass} ${
+        isCentered ? "mx-auto" : ""
       }`}
       dangerouslySetInnerHTML={{ __html: subtitle }}
     />
@@ -387,8 +399,8 @@ export function HeroRender(props: HeroProps) {
 
   // ── Text cluster (used in all layouts) ───────────────────────────
   const textCluster = (
-    <div className={layout === "centered" ? "text-center" : "text-left"}>
-      {accentBarEl && (layout === "centered" ? (
+    <div className={isCentered ? "text-center" : "text-left"}>
+      {accentBarEl && (isCentered ? (
         <div className="flex justify-center">{accentBarEl}</div>
       ) : (
         accentBarEl
@@ -403,7 +415,11 @@ export function HeroRender(props: HeroProps) {
 
   // ── Layout shell ─────────────────────────────────────────────────
   let body: React.ReactNode;
-  if (layout === "centered") {
+  if (layout === "oversized") {
+    // Pure-typography hero: image suppressed entirely so the headline
+    // carries the whole impact. Companion vibes: Tech (grid bg), Editorial.
+    body = <div className="mx-auto max-w-6xl">{textCluster}</div>;
+  } else if (layout === "centered") {
     body = (
       <div className="mx-auto max-w-4xl">
         {textCluster}
@@ -502,13 +518,24 @@ export function RichBlockRender({ content }: RichBlockProps) {
 }
 
 // ─── FeaturesGrid ─────────────────────────────────────────────────────
+export type FeaturesLayout = "grid-3" | "grid-4" | "list-icon-left" | "bento";
+export type FeaturesItem = {
+  icon: string;
+  title: string;
+  description: string;
+  /** Only honored in bento layout; "large" items span more rows/cols. */
+  emphasis?: "normal" | "large";
+};
 export type FeaturesGridProps = {
   title: string;
   subtitle: string;
-  items: Array<{ icon: string; title: string; description: string }>;
+  /** Optional. Defaults to "grid-3" so legacy sites render identically. */
+  layout?: FeaturesLayout;
+  items: Array<FeaturesItem>;
 };
 
-export function FeaturesGridRender({ title, subtitle, items }: FeaturesGridProps) {
+export function FeaturesGridRender({ title, subtitle, layout, items }: FeaturesGridProps) {
+  const variant: FeaturesLayout = layout ?? "grid-3";
   return (
     <section className="brand-section bg-brand-bg px-6 py-20 md:py-28 font-brand-body text-brand-ink">
       <div className="mx-auto max-w-6xl">
@@ -519,35 +546,113 @@ export function FeaturesGridRender({ title, subtitle, items }: FeaturesGridProps
             dangerouslySetInnerHTML={{ __html: subtitle }}
           />
         </div>
-        <div className="mt-14 grid gap-6 md:grid-cols-3 md:gap-8">
-          {items.map((item, i) => {
-            const Icon = ICONS[item.icon] ?? Sparkles;
-            return (
-              <div key={i} className="brand-card bg-brand-bg p-7">
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-accent text-brand-accent-fg shadow-md shadow-brand-accent/20">
-                  <Icon className="w-5 h-5" />
+
+        {variant === "grid-3" && (
+          <div className="mt-14 grid gap-6 md:grid-cols-3 md:gap-8">
+            {items.map((item, i) => {
+              const Icon = ICONS[item.icon] ?? Sparkles;
+              return (
+                <div key={i} className="brand-card bg-brand-bg p-7">
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-accent text-brand-accent-fg shadow-md shadow-brand-accent/20">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold text-brand-ink font-brand-heading">{item.title}</h3>
+                  <div
+                    className="mt-2 text-brand-ink-muted leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                  />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-brand-ink font-brand-heading">{item.title}</h3>
-                <div
-                  className="mt-2 text-brand-ink-muted leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: item.description }}
-                />
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
+
+        {variant === "grid-4" && (
+          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4 md:gap-6">
+            {items.map((item, i) => {
+              const Icon = ICONS[item.icon] ?? Sparkles;
+              return (
+                <div key={i} className="brand-card bg-brand-bg p-6">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-accent text-brand-accent-fg shadow-md shadow-brand-accent/20">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold text-brand-ink font-brand-heading">{item.title}</h3>
+                  <div
+                    className="mt-2 text-sm text-brand-ink-muted leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {variant === "list-icon-left" && (
+          <ul className="mx-auto mt-14 grid max-w-3xl gap-8">
+            {items.map((item, i) => {
+              const Icon = ICONS[item.icon] ?? Sparkles;
+              return (
+                <li key={i} className="flex items-start gap-5">
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-brand-accent-soft text-brand-accent">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <h3 className="text-lg font-semibold text-brand-ink font-brand-heading">{item.title}</h3>
+                    <div
+                      className="mt-1.5 text-brand-ink-muted leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        {variant === "bento" && (
+          <div className="mt-14 grid auto-rows-[minmax(11rem,auto)] grid-cols-2 gap-4 md:grid-cols-6 md:gap-5">
+            {items.map((item, i) => {
+              const Icon = ICONS[item.icon] ?? Sparkles;
+              // Pattern: first item is large by default, others normal. Author
+              // can opt in to extra `emphasis: "large"` items for richer grids.
+              const large = item.emphasis === "large" || i === 0;
+              const cellClass = large
+                ? "col-span-2 row-span-2 md:col-span-3"
+                : "col-span-1 row-span-1 md:col-span-2";
+              return (
+                <div key={i} className={`brand-card bg-brand-bg p-6 flex flex-col ${cellClass}`}>
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-accent text-brand-accent-fg shadow-md shadow-brand-accent/20">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className={`mt-5 font-semibold text-brand-ink font-brand-heading ${large ? "text-2xl" : "text-base"}`}>
+                    {item.title}
+                  </h3>
+                  <div
+                    className={`mt-2 text-brand-ink-muted leading-relaxed ${large ? "text-base" : "text-sm"}`}
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 // ─── Stats ────────────────────────────────────────────────────────────
+export type StatsLayout = "grid" | "row" | "oversized";
 export type StatsProps = {
+  /** Optional. Defaults to "grid" so legacy sites render identically. */
+  layout?: StatsLayout;
   intro: string;
   items: Array<{ value: string; label: string }>;
 };
 
-export function StatsRender({ intro, items }: StatsProps) {
+export function StatsRender({ layout, intro, items }: StatsProps) {
+  const variant: StatsLayout = layout ?? "grid";
+
   return (
     <section className="brand-section bg-brand-surface px-6 py-16 md:py-20 font-brand-body text-brand-ink">
       <div className="mx-auto max-w-6xl">
@@ -556,64 +661,167 @@ export function StatsRender({ intro, items }: StatsProps) {
             {intro}
           </p>
         )}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {items.map((s, i) => (
-            <div key={i} className="text-center">
-              <p className="text-3xl md:text-5xl text-brand-ink brand-heading">
-                {s.value}
-              </p>
-              <p className="mt-2 text-sm font-medium text-brand-ink-muted">{s.label}</p>
-            </div>
-          ))}
-        </div>
+
+        {variant === "grid" && (
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {items.map((s, i) => (
+              <div key={i} className="text-center">
+                <p className="text-3xl md:text-5xl text-brand-ink brand-heading">{s.value}</p>
+                <p className="mt-2 text-sm font-medium text-brand-ink-muted">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {variant === "row" && (
+          <div className="flex flex-wrap items-center justify-center divide-x divide-brand-border md:flex-nowrap">
+            {items.map((s, i) => (
+              <div
+                key={i}
+                className="flex min-w-[12rem] flex-1 items-baseline justify-center gap-3 px-6 py-3"
+              >
+                <p className="text-3xl md:text-4xl text-brand-ink brand-heading">{s.value}</p>
+                <p className="text-sm font-medium text-brand-ink-muted">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {variant === "oversized" && (
+          <div className="brand-vibe-gap grid gap-10">
+            {items.map((s, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <p className="text-7xl md:text-9xl text-brand-ink brand-heading leading-none">
+                  {s.value}
+                </p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-brand-ink-subtle">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 // ─── Testimonial ──────────────────────────────────────────────────────
-export type TestimonialProps = {
+export type TestimonialLayout = "centered" | "grid-3" | "carousel";
+export type TestimonialItem = {
   quote: string;
   author: string;
   role: string;
   avatar: string;
 };
 
-export function TestimonialRender({ quote, author, role, avatar }: TestimonialProps) {
-  return (
-    <section className="brand-section bg-brand-surface-dark px-6 py-24 md:py-32 text-brand-ink-inverse font-brand-body">
-      <div className="mx-auto max-w-3xl text-center">
-        <Quote className="mx-auto h-10 w-10 text-brand-accent-soft" />
-        <blockquote
-          className="mt-8 text-2xl md:text-3xl font-medium leading-relaxed text-brand-ink-inverse font-brand-heading"
-          dangerouslySetInnerHTML={{ __html: quote }}
-        />
-        <div className="mt-10 flex flex-col items-center gap-3">
-          {avatar && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={avatar}
-              alt={author}
-              className="h-14 w-14 rounded-full object-cover bg-brand-ink-subtle"
-            />
-          )}
-          <div>
-            <p className="text-base font-semibold text-brand-ink-inverse">{author}</p>
-            <p className="text-sm text-brand-ink-inverse/60">{role}</p>
+export type TestimonialProps = {
+  /** Optional. Defaults to "centered" so legacy sites render identically. */
+  layout?: TestimonialLayout;
+  /** Legacy single-quote fields — used by "centered" and as fallback first
+   * item for "grid-3"/"carousel" when `items` is empty. */
+  quote: string;
+  author: string;
+  role: string;
+  avatar: string;
+  /** Multi-quote support for grid-3 and carousel. */
+  items?: TestimonialItem[];
+};
+
+export function TestimonialRender({ layout, quote, author, role, avatar, items }: TestimonialProps) {
+  const variant: TestimonialLayout = layout ?? "centered";
+  // Use new items array if present; otherwise the legacy top-level fields
+  // act as the single item. Keeps existing JSON renderable unchanged.
+  const allItems: TestimonialItem[] =
+    items && items.length > 0
+      ? items
+      : [{ quote, author, role, avatar }];
+
+  if (variant === "centered") {
+    return (
+      <section className="brand-section bg-brand-surface-dark px-6 py-24 md:py-32 text-brand-ink-inverse font-brand-body">
+        <div className="mx-auto max-w-3xl text-center">
+          <Quote className="mx-auto h-10 w-10 text-brand-accent-soft" />
+          <blockquote
+            className="mt-8 text-2xl md:text-3xl font-medium leading-relaxed text-brand-ink-inverse font-brand-heading"
+            dangerouslySetInnerHTML={{ __html: allItems[0].quote }}
+          />
+          <div className="mt-10 flex flex-col items-center gap-3">
+            {allItems[0].avatar && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={allItems[0].avatar}
+                alt={allItems[0].author}
+                className="h-14 w-14 rounded-full object-cover bg-brand-ink-subtle"
+              />
+            )}
+            <div>
+              <p className="text-base font-semibold text-brand-ink-inverse">{allItems[0].author}</p>
+              <p className="text-sm text-brand-ink-inverse/60">{allItems[0].role}</p>
+            </div>
           </div>
         </div>
+      </section>
+    );
+  }
+
+  if (variant === "grid-3") {
+    return (
+      <section className="brand-section bg-brand-surface-dark px-6 py-24 md:py-28 text-brand-ink-inverse font-brand-body">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-6 md:grid-cols-3 md:gap-8">
+            {allItems.map((it, i) => (
+              <figure key={i} className="brand-card bg-brand-bg/5 p-6 backdrop-blur">
+                <Quote className="h-6 w-6 text-brand-accent-soft" />
+                <blockquote
+                  className="mt-5 text-base leading-relaxed text-brand-ink-inverse font-brand-heading"
+                  dangerouslySetInnerHTML={{ __html: it.quote }}
+                />
+                <figcaption className="mt-6 flex items-center gap-3">
+                  {it.avatar && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={it.avatar}
+                      alt={it.author}
+                      className="h-10 w-10 rounded-full object-cover bg-brand-ink-subtle"
+                    />
+                  )}
+                  <div>
+                    <p className="text-sm font-semibold text-brand-ink-inverse">{it.author}</p>
+                    <p className="text-xs text-brand-ink-inverse/60">{it.role}</p>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // carousel
+  return (
+    <section className="brand-section bg-brand-surface-dark px-6 py-24 md:py-28 text-brand-ink-inverse font-brand-body">
+      <div className="mx-auto max-w-6xl">
+        <TestimonialCarousel items={allItems} />
       </div>
     </section>
   );
 }
 
 // ─── ImageText (Split) ────────────────────────────────────────────────
+export type ImageTextLayout = "image-left" | "image-right" | "stacked" | "card-overlay";
+
 export type ImageTextProps = {
   title: string;
   content: string;
   image: string;
   imageAlt: string;
-  imagePosition: "left" | "right";
+  /** Legacy field — when `layout` is undefined, maps "left"→"image-left",
+   * "right"→"image-right". Editor will start writing `layout` on next save. */
+  imagePosition?: "left" | "right";
+  /** New canonical field. Defaults to "image-right" via `imagePosition`. */
+  layout?: ImageTextLayout;
 };
 
 export function ImageTextRender({
@@ -622,8 +830,12 @@ export function ImageTextRender({
   image,
   imageAlt,
   imagePosition,
+  layout,
 }: ImageTextProps) {
-  const imageFirst = imagePosition === "left";
+  const variant: ImageTextLayout =
+    layout ?? (imagePosition === "left" ? "image-left" : "image-right");
+
+  const placeholderClass = "w-full rounded-[var(--brand-radius-card)] bg-brand-surface";
   const imageNode = image ? (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
@@ -632,8 +844,9 @@ export function ImageTextRender({
       className="w-full rounded-[var(--brand-radius-card)] object-cover shadow-md aspect-[4/3]"
     />
   ) : (
-    <div className="w-full rounded-[var(--brand-radius-card)] bg-brand-surface aspect-[4/3]" />
+    <div className={`${placeholderClass} aspect-[4/3]`} />
   );
+
   const textNode = (
     <div>
       <h2 className="text-3xl md:text-4xl text-brand-ink brand-heading">{title}</h2>
@@ -643,6 +856,45 @@ export function ImageTextRender({
       />
     </div>
   );
+
+  if (variant === "stacked") {
+    return (
+      <section className="brand-section bg-brand-bg px-6 py-20 md:py-28 font-brand-body text-brand-ink">
+        <div className="mx-auto max-w-4xl">
+          {imageNode}
+          <div className="mt-10">{textNode}</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (variant === "card-overlay") {
+    const imageWideNode = image ? (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={image}
+        alt={imageAlt}
+        className="w-full rounded-[var(--brand-radius-card)] object-cover shadow-xl aspect-[16/9]"
+      />
+    ) : (
+      <div className={`${placeholderClass} aspect-[16/9]`} />
+    );
+    return (
+      <section className="brand-section bg-brand-bg px-6 py-20 md:py-28 font-brand-body text-brand-ink">
+        <div className="mx-auto max-w-6xl">
+          {imageWideNode}
+          <div className="-mt-16 mx-auto max-w-2xl">
+            <div className="brand-card bg-brand-bg p-8 md:p-10 shadow-2xl">
+              {textNode}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // image-left or image-right
+  const imageFirst = variant === "image-left";
   return (
     <section className="brand-section bg-brand-bg px-6 py-20 md:py-28 font-brand-body text-brand-ink">
       <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2 md:gap-16">
@@ -851,22 +1103,43 @@ export function TeamRender({ title, subtitle, members }: TeamProps) {
 }
 
 // ─── Pricing ──────────────────────────────────────────────────────────
+export type PricingLayout = "cards-3" | "comparison-table" | "single-toggle";
+
+export type PricingPlan = {
+  icon: string;
+  name: string;
+  price: string;
+  priceCaption: string;
+  features: Array<{ value: string }>;
+  ctaLabel: string;
+  ctaHref: string;
+  featured: boolean;
+  /** Used by single-toggle. Falls back to `price` when absent. */
+  priceMonthly?: string;
+  priceYearly?: string;
+  /** Used by comparison-table; parallel to `rowLabels`. */
+  rowValues?: Array<{ value: string }>;
+};
+
 export type PricingProps = {
   title: string;
   subtitle: string;
-  plans: Array<{
-    icon: string;
-    name: string;
-    price: string;
-    priceCaption: string;
-    features: Array<{ value: string }>;
-    ctaLabel: string;
-    ctaHref: string;
-    featured: boolean;
-  }>;
+  /** Optional. Defaults to "cards-3" so legacy sites render identically. */
+  layout?: PricingLayout;
+  /** Row labels for comparison-table layout. Ignored otherwise. */
+  rowLabels?: Array<{ value: string }>;
+  /** Configures the period toggle for single-toggle layout. */
+  toggle?: {
+    monthlyLabel: string;
+    yearlyLabel: string;
+    yearlyDiscountHint: string;
+  };
+  plans: Array<PricingPlan>;
 };
 
-export function PricingRender({ title, subtitle, plans }: PricingProps) {
+export function PricingRender({ title, subtitle, layout, rowLabels, toggle, plans }: PricingProps) {
+  const variant: PricingLayout = layout ?? "cards-3";
+
   return (
     <section className="brand-section bg-brand-surface px-6 py-20 md:py-28 font-brand-body text-brand-ink">
       <div className="mx-auto max-w-6xl">
@@ -877,71 +1150,171 @@ export function PricingRender({ title, subtitle, plans }: PricingProps) {
             dangerouslySetInnerHTML={{ __html: subtitle }}
           />
         </div>
-        <div className="mt-14 grid items-stretch gap-6 md:grid-cols-3 md:gap-8">
-          {plans.map((plan, i) => {
-            const Icon = PLAN_ICONS[plan.icon] ?? Sparkles;
-            return (
-              <div
-                key={i}
-                className={`relative flex flex-col bg-brand-bg p-7 ${
-                  plan.featured
-                    ? "rounded-[var(--brand-radius-card)] border-2 border-brand-accent ring-1 ring-brand-accent shadow-xl shadow-brand-accent/10 md:scale-[1.03]"
-                    : "brand-card"
-                }`}
-              >
-                {plan.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-accent px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-accent-fg shadow-md">
-                    Empfohlen
-                  </span>
-                )}
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${
-                      plan.featured ? "bg-brand-accent text-brand-accent-fg" : "bg-brand-surface text-brand-ink-muted"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-brand-ink font-brand-heading">{plan.name}</h3>
-                </div>
-                <div className="mt-6">
-                  <p className="text-4xl md:text-5xl text-brand-ink brand-heading">
-                    {plan.price}
-                  </p>
-                  <p
-                    className={`mt-2 text-sm font-medium ${
-                      plan.featured ? "text-brand-accent" : "text-brand-ink-muted"
-                    }`}
-                  >
-                    {plan.priceCaption}
-                  </p>
-                </div>
-                <ul className="mt-8 space-y-3 flex-1">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-brand-ink-muted">
-                      <Check
-                        className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
-                          plan.featured ? "text-brand-accent" : "text-brand-ink-subtle"
-                        }`}
-                      />
-                      <span className="leading-relaxed">{f.value}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={plan.ctaHref || "#"}
-                  className={`mt-10 inline-flex items-center justify-center rounded-[var(--brand-radius-button)] px-6 py-3 text-sm font-semibold transition ${
+
+        {variant === "cards-3" && (
+          <div className="mt-14 grid items-stretch gap-6 md:grid-cols-3 md:gap-8">
+            {plans.map((plan, i) => {
+              const Icon = PLAN_ICONS[plan.icon] ?? Sparkles;
+              return (
+                <div
+                  key={i}
+                  className={`relative flex flex-col bg-brand-bg p-7 ${
                     plan.featured
-                      ? "bg-brand-accent text-brand-accent-fg shadow-lg shadow-brand-accent/20 hover:bg-brand-accent-hover"
-                      : "bg-brand-ink text-brand-ink-inverse hover:bg-brand-ink/90"
+                      ? "rounded-[var(--brand-radius-card)] border-2 border-brand-accent ring-1 ring-brand-accent shadow-xl shadow-brand-accent/10 md:scale-[1.03]"
+                      : "brand-card"
                   }`}
                 >
-                  <span>{plan.ctaLabel}</span>
-                </a>
-              </div>
-            );
-          })}
-        </div>
+                  {plan.featured && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-accent px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-accent-fg shadow-md">
+                      Empfohlen
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${
+                        plan.featured ? "bg-brand-accent text-brand-accent-fg" : "bg-brand-surface text-brand-ink-muted"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-brand-ink font-brand-heading">{plan.name}</h3>
+                  </div>
+                  <div className="mt-6">
+                    <p className="text-4xl md:text-5xl text-brand-ink brand-heading">{plan.price}</p>
+                    <p
+                      className={`mt-2 text-sm font-medium ${
+                        plan.featured ? "text-brand-accent" : "text-brand-ink-muted"
+                      }`}
+                    >
+                      {plan.priceCaption}
+                    </p>
+                  </div>
+                  <ul className="mt-8 space-y-3 flex-1">
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm text-brand-ink-muted">
+                        <Check
+                          className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
+                            plan.featured ? "text-brand-accent" : "text-brand-ink-subtle"
+                          }`}
+                        />
+                        <span className="leading-relaxed">{f.value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={plan.ctaHref || "#"}
+                    className={`mt-10 inline-flex items-center justify-center rounded-[var(--brand-radius-button)] px-6 py-3 text-sm font-semibold transition ${
+                      plan.featured
+                        ? "bg-brand-accent text-brand-accent-fg shadow-lg shadow-brand-accent/20 hover:bg-brand-accent-hover"
+                        : "bg-brand-ink text-brand-ink-inverse hover:bg-brand-ink/90"
+                    }`}
+                  >
+                    <span>{plan.ctaLabel}</span>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {variant === "comparison-table" && (
+          <div className="mt-14 overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left">
+              <thead>
+                <tr>
+                  <th className="w-1/4 border-b border-brand-border p-4 text-sm font-semibold uppercase tracking-widest text-brand-ink-subtle">
+                    Features
+                  </th>
+                  {plans.map((plan, i) => (
+                    <th
+                      key={i}
+                      className={`border-b border-brand-border p-4 text-center align-bottom ${
+                        plan.featured ? "bg-brand-accent/5 ring-1 ring-brand-accent" : ""
+                      }`}
+                    >
+                      <div className="text-xl font-semibold text-brand-ink font-brand-heading">{plan.name}</div>
+                      <div className="mt-2 text-3xl text-brand-ink brand-heading">{plan.price}</div>
+                      <div className="mt-1 text-xs text-brand-ink-muted">{plan.priceCaption}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(rowLabels ?? []).map((row, r) => (
+                  <tr key={r}>
+                    <td className="border-b border-brand-border p-4 text-sm font-medium text-brand-ink">
+                      {row.value}
+                    </td>
+                    {plans.map((plan, c) => {
+                      const cell = plan.rowValues?.[r]?.value ?? "—";
+                      return (
+                        <td
+                          key={c}
+                          className={`border-b border-brand-border p-4 text-center text-sm text-brand-ink-muted ${
+                            plan.featured ? "bg-brand-accent/5" : ""
+                          }`}
+                        >
+                          {cell === "true" || cell === "✓" ? (
+                            <Check className="mx-auto h-5 w-5 text-brand-accent" />
+                          ) : (
+                            cell
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td className="p-4" />
+                  {plans.map((plan, i) => (
+                    <td
+                      key={i}
+                      className={`p-4 text-center ${plan.featured ? "bg-brand-accent/5" : ""}`}
+                    >
+                      <a
+                        href={plan.ctaHref || "#"}
+                        className={`inline-flex items-center justify-center rounded-[var(--brand-radius-button)] px-5 py-2.5 text-sm font-semibold transition ${
+                          plan.featured
+                            ? "bg-brand-accent text-brand-accent-fg hover:bg-brand-accent-hover"
+                            : "bg-brand-ink text-brand-ink-inverse hover:bg-brand-ink/90"
+                        }`}
+                      >
+                        {plan.ctaLabel}
+                      </a>
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
+
+        {variant === "single-toggle" && (() => {
+          const plan = plans.find((p) => p.featured) ?? plans[0];
+          if (!plan) return null;
+          const t = toggle ?? {
+            monthlyLabel: "Monatlich",
+            yearlyLabel: "Jährlich",
+            yearlyDiscountHint: "",
+          };
+          return (
+            <PricingToggle
+              plan={{
+                icon: plan.icon,
+                name: plan.name,
+                priceMonthly: plan.priceMonthly ?? plan.price,
+                priceYearly: plan.priceYearly ?? plan.price,
+                priceCaption: plan.priceCaption,
+                features: plan.features,
+                ctaLabel: plan.ctaLabel,
+                ctaHref: plan.ctaHref,
+              }}
+              toggle={t}
+            />
+          );
+        })()}
       </div>
     </section>
   );

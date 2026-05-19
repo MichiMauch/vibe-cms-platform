@@ -23,7 +23,9 @@ export type FontPair =
   | "inter"
   | "manrope"
   | "fraunces"
-  | "jetbrains";
+  | "jetbrains"
+  | "space-grotesk"
+  | "playfair";
 
 export type RadiusScale = "sm" | "md" | "lg";
 
@@ -31,6 +33,28 @@ export const RADIUS_VALUES: Record<RadiusScale, { card: string; pill: string }> 
   sm: { card: "0.5rem", pill: "9999px" },
   md: { card: "1rem", pill: "9999px" },
   lg: { card: "1.5rem", pill: "9999px" },
+};
+
+/** Extended radius scale used by the new archetype presets. Bridges legacy
+ * `RadiusScale` (sm/md/lg) with finer-grained options for brutalism (0) and
+ * extra-rounded organic/playful looks. */
+export type RadiusScaleX =
+  | "none"
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "2xl";
+
+export const RADIUS_X_VALUES: Record<RadiusScaleX, { card: string; pill: string }> = {
+  none: { card: "0", pill: "0" },
+  xs: { card: "0.25rem", pill: "9999px" },
+  sm: { card: "0.5rem", pill: "9999px" },
+  md: { card: "1rem", pill: "9999px" },
+  lg: { card: "1.5rem", pill: "9999px" },
+  xl: { card: "2rem", pill: "9999px" },
+  "2xl": { card: "3rem", pill: "9999px" },
 };
 
 /** CSS variables the renderer writes to `:root` per site.
@@ -60,6 +84,8 @@ export const FONT_PAIR_VARS: Record<FontPair, { heading: string; body: string }>
   manrope: { heading: "var(--font-manrope)", body: "var(--font-manrope)" },
   fraunces: { heading: "var(--font-fraunces)", body: "var(--font-inter)" },
   jetbrains: { heading: "var(--font-jetbrains)", body: "var(--font-inter)" },
+  "space-grotesk": { heading: "var(--font-space-grotesk)", body: "var(--font-inter)" },
+  playfair: { heading: "var(--font-playfair)", body: "var(--font-inter)" },
 };
 
 // ─── Round 2: style tokens ────────────────────────────────────────────
@@ -67,12 +93,48 @@ export const FONT_PAIR_VARS: Record<FontPair, { heading: string; body: string }>
 // Hero-specific decorations (layout, accent-bar, gradient-title) live on
 // the Hero block props, not here — themes control GLOBAL look only.
 
-export type DividerKind = "none" | "wave" | "tilt" | "dotted" | "solid";
-export type BgPattern = "none" | "blob" | "noise" | "rays" | "dot-grid";
-export type CardStyle = "soft" | "soft-lg" | "outline" | "hard-offset" | "brutal";
+export type DividerKind =
+  | "none"
+  | "wave"
+  | "tilt"
+  | "dotted"
+  | "solid"
+  | "zigzag"
+  | "double-line";
+
+export type BgPattern =
+  | "none"
+  | "blob"
+  | "noise"
+  | "rays"
+  | "dot-grid"
+  | "grid"
+  | "diagonal"
+  | "halftone"
+  | "scribble";
+
+export type CardStyle =
+  | "soft"
+  | "soft-lg"
+  | "outline"
+  | "hard-offset"
+  | "brutal"
+  | "glass"
+  | "sticker";
+
 export type ButtonShape = "pill" | "rounded" | "sharp";
 export type HeadingTransform = "none" | "uppercase";
 export type HeadingTracking = "tightest" | "tighter" | "tight" | "normal";
+
+/** Vertical-rhythm multiplier applied via `--brand-spacing-multiplier`. */
+export type SpacingDensity = "tight" | "normal" | "comfortable" | "airy";
+
+export const SPACING_MULTIPLIER: Record<SpacingDensity, string> = {
+  tight: "0.75",
+  normal: "1",
+  comfortable: "1.15",
+  airy: "1.35",
+};
 
 export type PresetStyle = {
   divider: DividerKind;
@@ -82,6 +144,10 @@ export type PresetStyle = {
   headingWeight: 400 | 500 | 600 | 700 | 800 | 900;
   headingTracking: HeadingTracking;
   headingTransform: HeadingTransform;
+  /** New: vertical-rhythm density multiplier. */
+  spacing: SpacingDensity;
+  /** New: finer-grained radius scale; overrides `radius`/`cardStyle` defaults. */
+  radiusX: RadiusScaleX;
 };
 
 export const TRACKING_VALUES: Record<HeadingTracking, string> = {
@@ -97,6 +163,8 @@ export const CARD_RADIUS_VALUES: Record<CardStyle, string> = {
   outline: "0.5rem",
   "hard-offset": "1rem",
   brutal: "0",
+  glass: "1.25rem",
+  sticker: "1rem",
 };
 
 export const BUTTON_RADIUS_VALUES: Record<ButtonShape, string> = {
@@ -104,4 +172,3 @@ export const BUTTON_RADIUS_VALUES: Record<ButtonShape, string> = {
   rounded: "0.5rem",
   sharp: "0",
 };
-

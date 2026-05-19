@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Manrope, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Manrope, Fraunces, JetBrains_Mono, Space_Grotesk, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -40,6 +40,18 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: { default: "Vibe-CMS", template: "%s | Vibe-CMS" },
   description: "Bearbeite deine Seite direkt im Browser. Kein Backend, keine Datenbank.",
@@ -57,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${manrope.variable} ${fraunces.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${manrope.variable} ${fraunces.variable} ${jetbrains.variable} ${spaceGrotesk.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-ink">
         {children}

@@ -60,16 +60,18 @@ export const RICH_BLOCK_DEFAULTS = {
 };
 
 export const FEATURES_GRID_DEFAULTS = {
+  layout: "grid-3" as const,
   title: "Drei Vorteile auf einen Blick",
   subtitle: "<p>Kurzer Untertitel.</p>",
   items: [
-    { icon: "Sparkles", title: "Vorteil 1", description: "<p>Was macht dein Produkt besonders?</p>" },
-    { icon: "Zap", title: "Vorteil 2", description: "<p>Wie schnell oder einfach ist es?</p>" },
-    { icon: "ShieldCheck", title: "Vorteil 3", description: "<p>Warum können Kunden vertrauen?</p>" },
+    { icon: "Sparkles", title: "Vorteil 1", description: "<p>Was macht dein Produkt besonders?</p>", emphasis: "normal" as const },
+    { icon: "Zap", title: "Vorteil 2", description: "<p>Wie schnell oder einfach ist es?</p>", emphasis: "normal" as const },
+    { icon: "ShieldCheck", title: "Vorteil 3", description: "<p>Warum können Kunden vertrauen?</p>", emphasis: "normal" as const },
   ],
 };
 
 export const STATS_DEFAULTS = {
+  layout: "grid" as const,
   intro: "Zahlen, die für sich sprechen",
   items: [
     { value: "+200%", label: "Conversion-Rate" },
@@ -80,13 +82,16 @@ export const STATS_DEFAULTS = {
 };
 
 export const TESTIMONIAL_DEFAULTS = {
+  layout: "centered" as const,
   quote: "<p>Ein starker Satz von einem zufriedenen Kunden.</p>",
   author: "Vorname Nachname",
   role: "Rolle, Firma",
   avatar: "",
+  items: [] as Array<{ quote: string; author: string; role: string; avatar: string }>,
 };
 
 export const IMAGE_TEXT_DEFAULTS = {
+  layout: "image-right" as const,
   title: "Erzähl deine Story",
   content:
     "<p>Hier kommt die längere Erklärung. <strong>Fett</strong> und <em>kursiv</em> erlaubt.</p>",
@@ -137,8 +142,15 @@ export const TEAM_DEFAULTS = {
 };
 
 export const PRICING_DEFAULTS = {
+  layout: "cards-3" as const,
   title: "Preise",
   subtitle: "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+  rowLabels: [] as Array<{ value: string }>,
+  toggle: {
+    monthlyLabel: "Monatlich",
+    yearlyLabel: "Jährlich",
+    yearlyDiscountHint: "",
+  },
   plans: [] as Array<{
     icon: string;
     name: string;
@@ -148,6 +160,9 @@ export const PRICING_DEFAULTS = {
     ctaHref: string;
     featured: boolean;
     features: { value: string }[];
+    priceMonthly?: string;
+    priceYearly?: string;
+    rowValues?: { value: string }[];
   }>,
 };
 

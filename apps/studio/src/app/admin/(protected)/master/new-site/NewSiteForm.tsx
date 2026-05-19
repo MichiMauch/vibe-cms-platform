@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
-import { CreateProgressModal, type ProgressStep, type SuccessPayload } from "./CreateProgressModal";
+import { useToast } from "@/components/Feedback";
+import {
+  CreateProgressModal,
+  type ProgressStep,
+  type Stage,
+  type SuccessPayload,
+  type VibeSuggestion,
+} from "./CreateProgressModal";
 
 const TEMPLATES = [
   { id: "saas", label: "SaaS / Produkt", description: "Hero, Features, Pricing, CTA, Footer." },
@@ -23,26 +30,35 @@ export function NewSiteForm() {
   const [customDomain, setCustomDomain] = useState("");
   const [themePreset, setThemePreset] = useState<ThemePresetId>(DEFAULT_PRESET_ID);
   const [accentOverride, setAccentOverride] = useState("");
+
   const [busy, setBusy] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [stage, setStage] = useState<Stage>({ kind: "scaffolding" });
   const [steps, setSteps] = useState<ProgressStep[]>([]);
   const [done, setDone] = useState<SuccessPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  // Carry the AI output across the modal stages so Phase B can submit it.
+  const [contentJson, setContentJson] = useState<string | null>(null);
+
+  const toast = useToast();
 
   function closeModal() {
     setModalOpen(false);
     setSteps([]);
     setDone(null);
     setError(null);
+    setContentJson(null);
+    setStage({ kind: "scaffolding" });
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  /** Phase B — POST to /api/sites/create with the pre-generated content tree
+   * and the user's final preset choice. Streams progress via SSE as before. */
+  async function runCreate(finalPreset: ThemePresetId, finalContentJson: string) {
     setBusy(true);
+    setStage({ kind: "creating" });
     setSteps([]);
     setDone(null);
     setError(null);
-    setModalOpen(true);
 
     try {
       const res = await fetch("/api/sites/create", {
@@ -58,20 +74,23 @@ export function NewSiteForm() {
           customerEmail,
           customDomain: customDomain.trim() || undefined,
           theme: {
-            preset: themePreset,
+            preset: finalPreset,
             accentOverride: accentOverride.trim() || undefined,
           },
+          contentJson: finalContentJson,
         }),
       });
       if (!res.ok || !res.body) {
         const text = await res.text();
         setError(text || `HTTP ${res.status}`);
+        setStage({ kind: "error" });
         setBusy(false);
         return;
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      let sawDone = false;
       while (true) {
         const { value, done: streamDone } = await reader.read();
         if (streamDone) break;
@@ -86,15 +105,99 @@ export function NewSiteForm() {
           const parsed = JSON.parse(data);
           if (name === "progress") setSteps((s) => [...s, parsed]);
           else if (name === "warning") setSteps((s) => [...s, { step: parsed.step, label: `⚠ ${parsed.message}` }]);
-          else if (name === "done") setDone(parsed);
-          else if (name === "error") setError(parsed.message);
+          else if (name === "done") {
+            setDone(parsed);
+            setStage({ kind: "done" });
+            sawDone = true;
+          } else if (name === "error") {
+            setError(parsed.message);
+            setStage({ kind: "error" });
+          }
         }
+      }
+      if (!sawDone && !error) {
+        // Stream ended without a done/error event — surface a generic failure.
+        setError("Stream ended unexpectedly");
+        setStage({ kind: "error" });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
+      setStage({ kind: "error" });
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Phase A — fetch the AI tree + vibe suggestion. Then either skip
+   * straight to Phase B (if AI agrees with the user's choice and confidence
+   * is not "low") or show the vibe-review step. */
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setSteps([]);
+    setDone(null);
+    setError(null);
+    setStage({ kind: "scaffolding" });
+    setModalOpen(true);
+
+    try {
+      const res = await fetch("/api/sites/scaffold", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brand,
+          template,
+          description,
+          audience,
+          primaryGoal,
+          // Do NOT pin: we want the AI to think freely; the user can still
+          // override after reviewing. The form preset is shown as "Deine Wahl".
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || `HTTP ${res.status}`);
+        setStage({ kind: "error" });
+        setBusy(false);
+        return;
+      }
+      const data = (await res.json()) as { contentJson: string; vibeSuggestion: VibeSuggestion };
+      setContentJson(data.contentJson);
+
+      const suggestion = data.vibeSuggestion;
+      const matches = suggestion.preset === themePreset;
+      const skipReview = matches && suggestion.confidence !== "low";
+
+      if (skipReview) {
+        toast.info("AI hat deine Auswahl bestätigt.");
+        // Phase B kicks off immediately with the user's original preset.
+        setBusy(false);
+        runCreate(themePreset, data.contentJson);
+        return;
+      }
+
+      setBusy(false);
+      setStage({
+        kind: "vibe-review",
+        suggestion,
+        manualPreset: themePreset,
+        chosenPreset: suggestion.preset,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+      setStage({ kind: "error" });
+      setBusy(false);
+    }
+  }
+
+  function onChoosePreset(p: ThemePresetId) {
+    if (stage.kind !== "vibe-review") return;
+    setStage({ ...stage, chosenPreset: p });
+  }
+
+  function onApproveVibe() {
+    if (stage.kind !== "vibe-review" || !contentJson) return;
+    runCreate(stage.chosenPreset, contentJson);
   }
 
   return (
@@ -160,7 +263,7 @@ export function NewSiteForm() {
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-slate-700">Look (Theme)</legend>
+        <legend className="text-sm font-medium text-slate-700">Look (Vibe)</legend>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {THEME_PRESETS.map((p) => (
             <label
@@ -196,6 +299,9 @@ export function NewSiteForm() {
             </label>
           ))}
         </div>
+        <p className="mt-1 text-xs text-slate-500">
+          Die AI schlägt nach dem Submit zusätzlich einen Vibe basierend auf Brief & Branche vor — du kannst ihn übernehmen oder bei deiner Wahl bleiben.
+        </p>
         <label className="mt-2 block">
           <span className="text-xs text-slate-500">
             Akzentfarbe überschreiben (optional, Hex z.B. <code>#ff3366</code>)
@@ -293,10 +399,13 @@ export function NewSiteForm() {
 
       <CreateProgressModal
         open={modalOpen}
+        stage={stage}
         busy={busy}
         steps={steps}
         done={done}
         error={error}
+        onChoosePreset={onChoosePreset}
+        onApproveVibe={onApproveVibe}
         onClose={closeModal}
       />
     </form>

@@ -6,10 +6,12 @@
 import {
   CSS_VAR_NAMES,
   RADIUS_VALUES,
+  RADIUS_X_VALUES,
   FONT_PAIR_VARS,
   TRACKING_VALUES,
   CARD_RADIUS_VALUES,
   BUTTON_RADIUS_VALUES,
+  SPACING_MULTIPLIER,
   type ColorToken,
   type CardStyle,
 } from "./tokens";
@@ -38,6 +40,10 @@ function cardShadowFor(style: CardStyle): string {
       return "6px 6px 0 0 var(--color-brand-ink)";
     case "brutal":
       return "4px 4px 0 0 var(--color-brand-ink)";
+    case "glass":
+      return "0 8px 24px -8px rgba(0,0,0,0.08)";
+    case "sticker":
+      return "6px 6px 0 0 var(--color-brand-accent)";
   }
 }
 
@@ -49,6 +55,10 @@ function cardBorderFor(style: CardStyle): string {
     case "outline":
       return "1px solid var(--color-brand-border)";
     case "brutal":
+      return "2px solid var(--color-brand-ink)";
+    case "glass":
+      return "1px solid color-mix(in oklab, var(--color-brand-ink) 12%, transparent)";
+    case "sticker":
       return "2px solid var(--color-brand-ink)";
   }
 }
@@ -77,6 +87,7 @@ export function renderTheme(theme?: SiteThemeChoice | null): ThemeRenderResult {
   const fonts = FONT_PAIR_VARS[preset.fontPair];
   const radius = RADIUS_VALUES[preset.radius];
   const s = preset.style;
+  const radiusX = RADIUS_X_VALUES[s.radiusX];
 
   const lines: string[] = [];
   for (const [token, value] of Object.entries(colors) as [ColorToken, string][]) {
@@ -89,8 +100,14 @@ export function renderTheme(theme?: SiteThemeChoice | null): ThemeRenderResult {
   lines.push(`--brand-h-weight:${s.headingWeight}`);
   lines.push(`--brand-h-tracking:${TRACKING_VALUES[s.headingTracking]}`);
   lines.push(`--brand-h-transform:${s.headingTransform}`);
-  lines.push(`--brand-radius-card:${CARD_RADIUS_VALUES[s.cardStyle]}`);
+  // radiusX overrides the cardStyle-derived card radius so presets get a single
+  // source of truth (e.g. `brutal` cardStyle would yield 0, but radiusX="md"
+  // would lift it to 1rem). Default falls back to CARD_RADIUS_VALUES.
+  lines.push(`--brand-radius-card:${radiusX.card || CARD_RADIUS_VALUES[s.cardStyle]}`);
   lines.push(`--brand-radius-button:${BUTTON_RADIUS_VALUES[s.buttonShape]}`);
+  lines.push(`--brand-radius-x:${radiusX.card}`);
+  lines.push(`--brand-pill:${radiusX.pill}`);
+  lines.push(`--brand-spacing-multiplier:${SPACING_MULTIPLIER[s.spacing]}`);
   lines.push(`--brand-shadow-card:${cardShadowFor(s.cardStyle)}`);
   lines.push(`--brand-card-border:${cardBorderFor(s.cardStyle)}`);
   lines.push(`--brand-bg-pattern-url:${BG_PATTERN_URLS[s.bgPattern]}`);
@@ -100,6 +117,8 @@ export function renderTheme(theme?: SiteThemeChoice | null): ThemeRenderResult {
   const bodyAttrs: Record<string, string> = {
     "data-divider": s.divider,
     "data-bg-pattern": s.bgPattern,
+    "data-card-style": s.cardStyle,
+    "data-spacing": s.spacing,
   };
 
   return { themeCss, bodyAttrs };

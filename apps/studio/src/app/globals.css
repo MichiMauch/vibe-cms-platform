@@ -42,6 +42,17 @@
   --brand-shadow-card: 0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04);
   --brand-card-border: 1px solid var(--brand-border);
   --brand-bg-pattern-url: none;
+
+  /* Round 3: vibe-archetype tokens. Defaults match preset 'studio'. */
+  --brand-spacing-multiplier: 1;
+  --brand-radius-x: 1rem;
+  --brand-pill: 9999px;
+
+  /* Vertical-rhythm anchors used inside `.brand-section`/`.brand-grid-gap`.
+   * Multiplier above scales these per-vibe. Tailwind utilities on a block
+   * still win when explicitly set, so legacy markup is untouched. */
+  --brand-section-py: 5rem;
+  --brand-grid-gap: 1.5rem;
 }
 
 @theme inline {
@@ -65,6 +76,10 @@
   --color-brand-accent-2: var(--brand-accent-2);
   --font-brand-heading: var(--brand-heading-font);
   --font-brand-body: var(--brand-body-font);
+
+  --radius-brand-card: var(--brand-radius-card);
+  --radius-brand-button: var(--brand-radius-button);
+  --radius-brand-x: var(--brand-radius-x);
 }
 
 body {
@@ -134,11 +149,23 @@ button:disabled {
  * block props — see `packages/core/src/puck/blocks.tsx`. */
 
 /* BG patterns stacked onto surfaces. The surface background-color from
- * the Tailwind utility paints first; the data-URL paints on top. */
+ * the Tailwind utility paints first; the data-URL paints on top.
+ * Round 3: patterns also paint on .bg-brand-bg so vibes like Tech (grid) and
+ * Brutalism (diagonal) cover the entire page, not just surface sections. */
 [data-bg-pattern="blob"] .bg-brand-surface,
 [data-bg-pattern="noise"] .bg-brand-surface,
 [data-bg-pattern="rays"] .bg-brand-surface,
-[data-bg-pattern="dot-grid"] .bg-brand-surface {
+[data-bg-pattern="dot-grid"] .bg-brand-surface,
+[data-bg-pattern="grid"] .bg-brand-surface,
+[data-bg-pattern="diagonal"] .bg-brand-surface,
+[data-bg-pattern="halftone"] .bg-brand-surface,
+[data-bg-pattern="scribble"] .bg-brand-surface {
+  background-image: var(--brand-bg-pattern-url);
+}
+[data-bg-pattern="grid"] .bg-brand-bg,
+[data-bg-pattern="diagonal"] .bg-brand-bg,
+[data-bg-pattern="halftone"] .bg-brand-bg,
+[data-bg-pattern="scribble"] .bg-brand-bg {
   background-image: var(--brand-bg-pattern-url);
 }
 [data-bg-pattern="dot-grid"] .bg-brand-surface {
@@ -146,6 +173,23 @@ button:disabled {
 }
 [data-bg-pattern="noise"] .bg-brand-surface {
   background-size: 200px 200px;
+}
+[data-bg-pattern="grid"] .bg-brand-surface,
+[data-bg-pattern="grid"] .bg-brand-bg {
+  background-size: 24px 24px;
+}
+[data-bg-pattern="diagonal"] .bg-brand-surface,
+[data-bg-pattern="diagonal"] .bg-brand-bg {
+  background-size: 12px 12px;
+}
+[data-bg-pattern="halftone"] .bg-brand-surface,
+[data-bg-pattern="halftone"] .bg-brand-bg {
+  background-size: 16px 16px;
+}
+[data-bg-pattern="scribble"] .bg-brand-surface,
+[data-bg-pattern="scribble"] .bg-brand-bg {
+  background-size: 200px 40px;
+  background-repeat: repeat;
 }
 
 /* Section dividers — pseudo-element on each `.brand-section`. The dividers
@@ -159,7 +203,9 @@ button:disabled {
 [data-divider="wave"] .brand-section::after,
 [data-divider="tilt"] .brand-section::after,
 [data-divider="dotted"] .brand-section::after,
-[data-divider="solid"] .brand-section::after {
+[data-divider="solid"] .brand-section::after,
+[data-divider="zigzag"] .brand-section::after,
+[data-divider="double-line"] .brand-section::after {
   content: "";
   position: absolute;
   inset-inline: 0;
@@ -188,11 +234,52 @@ button:disabled {
   height: 1px;
   background: var(--brand-border);
 }
+[data-divider="zigzag"] .brand-section::after {
+  height: 14px;
+  background: var(--brand-bg);
+  -webkit-mask: var(--divider-zigzag-mask, none) center / 100% 100% no-repeat;
+          mask: var(--divider-zigzag-mask, none) center / 100% 100% no-repeat;
+}
+[data-divider="double-line"] .brand-section::after {
+  height: 5px;
+  background: transparent;
+  border-top: 1px solid var(--brand-border);
+  border-bottom: 1px solid var(--brand-border);
+}
 
-/* Wave mask URL is set in the per-site <style> only when needed. Set the
- * fallback here so unset previews don't 404. */
+/* Wave/zigzag mask URL fallbacks so unset previews don't 404. */
 :root {
   --divider-wave-mask: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%201200%20100'%20preserveAspectRatio%3D'none'%3E%3Cpath%20d%3D'M0%2C60%20C300%2C20%20600%2C100%20900%2C50%20C1050%2C25%201150%2C55%201200%2C40%20L1200%2C100%20L0%2C100%20Z'%20fill%3D'black'/%3E%3C/svg%3E");
+  --divider-zigzag-mask: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%201200%2014'%20preserveAspectRatio%3D'none'%3E%3Cpath%20d%3D'M0%2C14%20L40%2C0%20L80%2C14%20L120%2C0%20L160%2C14%20L200%2C0%20L240%2C14%20L280%2C0%20L320%2C14%20L360%2C0%20L400%2C14%20L440%2C0%20L480%2C14%20L520%2C0%20L560%2C14%20L600%2C0%20L640%2C14%20L680%2C0%20L720%2C14%20L760%2C0%20L800%2C14%20L840%2C0%20L880%2C14%20L920%2C0%20L960%2C14%20L1000%2C0%20L1040%2C14%20L1080%2C0%20L1120%2C14%20L1160%2C0%20L1200%2C14%20Z'%20fill%3D'black'/%3E%3C/svg%3E");
+}
+
+/* ─── Card-style modifiers (glass + sticker) ──────────────────────────
+ * Vibes pick the cardStyle, the renderer emits matching shadow/border
+ * via CSS vars, and these data-attribute selectors layer on the extras
+ * (backdrop blur for glass, hover-lift for sticker). */
+[data-card-style="glass"] .brand-card {
+  background-color: color-mix(in oklab, var(--brand-bg) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+[data-card-style="sticker"] .brand-card {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+[data-card-style="sticker"] .brand-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0 0 var(--brand-accent);
+}
+
+/* ─── Spacing-density helpers (opt-in) ────────────────────────────────
+ * Legacy blocks use `.brand-section` (position:relative only) with explicit
+ * Tailwind `py-…` utilities, which we must NOT override. New layout
+ * variants opt in to vibe-driven spacing by adding `.brand-vibe-py` /
+ * `.brand-vibe-gap` to the section/grid markup. */
+.brand-vibe-py {
+  padding-block: calc(var(--brand-section-py) * var(--brand-spacing-multiplier));
+}
+.brand-vibe-gap {
+  gap: calc(var(--brand-grid-gap) * var(--brand-spacing-multiplier));
 }
 
 /* Hero layout — branching now happens inside Hero block markup itself.
