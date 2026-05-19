@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
@@ -13,6 +14,7 @@ type Props = {
 /** Puck custom field: a TipTap rich-text editor for HTML-string values.
  * Matches the subset used by the old EditableRichText (StarterKit + link). */
 export function RichTextField({ value, onChange }: Props) {
+  const [linkPromptOpen, setLinkPromptOpen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -74,12 +76,98 @@ export function RichTextField({ value, onChange }: Props) {
           <ToolbarButton
             label="Link"
             active={false}
-            onClick={() => promptLink(editor)}
+            onClick={() => setLinkPromptOpen(true)}
           >
             <LinkIcon className="w-4 h-4" />
           </ToolbarButton>
         )}
       </BubbleMenu>
+      {linkPromptOpen && (
+        <LinkPromptDialog
+          initialValue={(editor.getAttributes("link").href as string) ?? ""}
+          onCancel={() => setLinkPromptOpen(false)}
+          onSubmit={(url) => {
+            setLinkPromptOpen(false);
+            applyLink(editor, url);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function applyLink(editor: Editor, url: string) {
+  if (url.trim() === "") {
+    editor.chain().focus().unsetLink().run();
+    return;
+  }
+  let normalized = url.trim();
+  if (!/^https?:\/\//i.test(normalized) && !normalized.startsWith("/") && !normalized.startsWith("#") && !normalized.startsWith("mailto:")) {
+    normalized = `https://${normalized}`;
+  }
+  editor.chain().focus().extendMarkRange("link").setLink({ href: normalized }).run();
+}
+
+function LinkPromptDialog({
+  initialValue,
+  onCancel,
+  onSubmit,
+}: {
+  initialValue: string;
+  onCancel: () => void;
+  onSubmit: (url: string) => void;
+}) {
+  const [value, setValue] = useState(initialValue || "https://");
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <form
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(value);
+        }}
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+      >
+        <h2 className="text-base font-semibold text-slate-900">Link einfügen</h2>
+        <p className="mt-2 text-sm text-slate-600">Leer lassen + OK entfernt den Link.</p>
+        <input
+          autoFocus
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="https://…"
+          className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        />
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="submit"
+            className="rounded-full bg-slate-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-slate-800 transition"
+          >
+            OK
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -109,21 +197,6 @@ function ToolbarButton({
       {children}
     </button>
   );
-}
-
-function promptLink(editor: Editor) {
-  const previous = editor.getAttributes("link").href as string | undefined;
-  const url = window.prompt("URL eingeben (leer = Link entfernen):", previous ?? "https://");
-  if (url === null) return;
-  if (url.trim() === "") {
-    editor.chain().focus().unsetLink().run();
-    return;
-  }
-  let normalized = url.trim();
-  if (!/^https?:\/\//i.test(normalized) && !normalized.startsWith("/") && !normalized.startsWith("#") && !normalized.startsWith("mailto:")) {
-    normalized = `https://${normalized}`;
-  }
-  editor.chain().focus().extendMarkRange("link").setLink({ href: normalized }).run();
 }
 
 function normalize(html: string): string {

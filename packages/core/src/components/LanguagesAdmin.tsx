@@ -24,6 +24,7 @@ export function LanguagesAdmin({ initialLocales, hasOpenAiKey }: Props) {
   const [status, setStatus] = useState<"idle" | "generating" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [progressText, setProgressText] = useState<string>("");
+  const [askDelete, setAskDelete] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -107,9 +108,6 @@ export function LanguagesAdmin({ initialLocales, hasOpenAiKey }: Props) {
   async function remove(target: string) {
     if (target === DEFAULT_LOCALE) return;
     const targetName = localeName(target, DEFAULT_LOCALE);
-    if (!window.confirm(`Sprache "${targetName}" (${target}) wirklich löschen?\nDie Datei messages/${target}.json wird gelöscht.`)) {
-      return;
-    }
     try {
       const res = await fetch(`/api/add-language?locale=${encodeURIComponent(target)}`, {
         method: "DELETE",
@@ -246,7 +244,7 @@ export function LanguagesAdmin({ initialLocales, hasOpenAiKey }: Props) {
                 {code !== DEFAULT_LOCALE && (
                   <button
                     type="button"
-                    onClick={() => remove(code)}
+                    onClick={() => setAskDelete(code)}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600 transition"
                     aria-label={`${code} löschen`}
                     title={`${code} löschen`}
@@ -259,6 +257,72 @@ export function LanguagesAdmin({ initialLocales, hasOpenAiKey }: Props) {
           ))}
         </ul>
       </section>
+
+      {askDelete && (
+        <InlineConfirm
+          title={`Sprache "${localeName(askDelete, DEFAULT_LOCALE)}" wirklich löschen?`}
+          body={`Die Datei messages/${askDelete}.json wird gelöscht.`}
+          onCancel={() => setAskDelete(null)}
+          onConfirm={() => {
+            const target = askDelete;
+            setAskDelete(null);
+            void remove(target);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function InlineConfirm({
+  title,
+  body,
+  onConfirm,
+  onCancel,
+}: {
+  title: string;
+  body: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        <p className="mt-2 text-sm text-slate-600 whitespace-pre-line">{body}</p>
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-full bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-500 transition"
+          >
+            Löschen
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

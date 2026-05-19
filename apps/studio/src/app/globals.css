@@ -73,6 +73,16 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* Tailwind v4 defaults to `cursor: default` on <button>. We want the
+ * pointer back on every interactive button — clearer affordance than the
+ * arrow. Disabled buttons keep the not-allowed cue. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 [contenteditable="true"]:focus {
   outline-offset: 4px;
 }

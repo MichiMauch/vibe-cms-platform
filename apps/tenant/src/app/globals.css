@@ -73,6 +73,15 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* Tailwind v4 defaults to `cursor: default` on <button>. Restore the
+ * pointer cursor everywhere; disabled buttons keep the not-allowed cue. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 [contenteditable="true"]:focus {
   outline-offset: 4px;
 }
