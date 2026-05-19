@@ -1,4 +1,26 @@
 {
+  "root": {
+    "props": {
+      "seo": {
+        "title": "VibeCMS - Landingpages in Minuten",
+        "description": "Erstellen Sie Ihre Landingpage schnell und einfach mit VibeCMS. Demos, Preise und mehr.",
+        "ogTitle": "VibeCMS - Landingpages in Minuten",
+        "ogDescription": "Erstellen Sie Ihre Landingpage schnell und einfach mit VibeCMS. Demos, Preise und mehr.",
+        "ogImage": "",
+        "keywords": "VibeCMS, Landingpage, SaaS, Website, Erstellung"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Test-Assistent",
+        "welcomeMessage": "Kurze Begrüssung."
+      },
+      "theme": {
+        "preset": "sunset",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
   "content": [
     {
       "type": "Hero",
@@ -100,6 +122,30 @@
       }
     },
     {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit loszulegen?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt starten",
+        "ctaPrimaryHref": "#",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-8e23c38b-9c78-4ed0-afbe-b3be6da6022c"
+      }
+    },
+    {
+      "type": "ImageText",
+      "props": {
+        "title": "Erzähl deine Story",
+        "content": "<p>Hier kommt die längere Erklärung. <strong>Fett</strong> und <em>kursiv</em> erlaubt.</p>",
+        "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703196/cld-sample-3.jpg",
+        "imageAlt": "",
+        "imagePosition": "right",
+        "id": "ImageText-ed314f4e-b318-42da-92f7-a175fe7645ad"
+      }
+    },
+    {
       "type": "Pricing",
       "props": {
         "title": "Preise",
@@ -164,6 +210,35 @@
       }
     },
     {
+      "type": "LogoCloud",
+      "props": {
+        "intro": "Vertraut von führenden Unternehmen",
+        "items": [
+          {
+            "name": "Acme",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703197/main-sample.png",
+            "link": ""
+          },
+          {
+            "name": "Globex",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703197/cld-sample-5.jpg",
+            "link": ""
+          },
+          {
+            "name": "Initech",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703197/cld-sample-4.jpg",
+            "link": ""
+          },
+          {
+            "name": "Umbrella",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703196/cld-sample-2.jpg",
+            "link": ""
+          }
+        ],
+        "id": "LogoCloud-cef1d845-ea8d-4ef0-86e6-658b670ff743"
+      }
+    },
+    {
       "type": "Faq",
       "props": {
         "title": "Häufig gestellte Fragen",
@@ -196,6 +271,34 @@
         "ctaSecondaryHref": "#",
         "theme": "blue",
         "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Team",
+      "props": {
+        "title": "Unser Team",
+        "subtitle": "<p>Die Köpfe hinter dem Produkt.</p>",
+        "members": [
+          {
+            "name": "Vorname Nachname",
+            "role": "Rolle",
+            "bio": "<p>Kurze Bio.</p>",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703195/cld-sample.jpg"
+          },
+          {
+            "name": "Vorname Nachname",
+            "role": "Rolle",
+            "bio": "<p>Kurze Bio.</p>",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703193/samples/upscale-face-1.jpg"
+          },
+          {
+            "name": "Vorname Nachname",
+            "role": "Rolle",
+            "bio": "<p>Kurze Bio.</p>",
+            "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703190/samples/man-portrait.jpg"
+          }
+        ],
+        "id": "Team-9810f7ba-d2c0-4028-829f-14c68c8d762c"
       }
     },
     {
@@ -235,27 +338,5 @@
       }
     }
   ],
-  "root": {
-    "props": {
-      "seo": {
-        "title": "VibeCMS - Landingpages in Minuten",
-        "description": "Erstellen Sie Ihre Landingpage schnell und einfach mit VibeCMS. Demos, Preise und mehr.",
-        "ogTitle": "VibeCMS - Landingpages in Minuten",
-        "ogDescription": "Erstellen Sie Ihre Landingpage schnell und einfach mit VibeCMS. Demos, Preise und mehr.",
-        "ogImage": "",
-        "keywords": "VibeCMS, Landingpage, SaaS, Website, Erstellung"
-      },
-      "chatbot": {
-        "isEnabled": false,
-        "botName": "Test-Assistent",
-        "welcomeMessage": "Kurze Begrüssung."
-      },
-      "theme": {
-        "preset": "sunset",
-        "accentOverride": "",
-        "inkOverride": ""
-      }
-    }
-  },
   "zones": {}
 }
