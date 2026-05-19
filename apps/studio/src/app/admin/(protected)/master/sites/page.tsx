@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Layers, Plus, ExternalLink, Pencil } from "lucide-react";
 import { readSession } from "@/lib/auth";
 import { listSites } from "@/lib/platform/registry";
+import { DeleteSiteButton } from "./DeleteSiteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -60,13 +61,6 @@ export default async function MasterSitesPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Link
-                  href={`/de?site=${encodeURIComponent(s.slug)}`}
-                  target="_blank"
-                  className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-emerald-800 hover:border-emerald-400 transition"
-                >
-                  <ExternalLink className="h-3 w-3" /> Lokal ansehen
-                </Link>
                 {s.config.domains
                   .filter((d) => !d.startsWith("localhost"))
                   .map((d) => (
@@ -86,6 +80,7 @@ export default async function MasterSitesPage() {
                 >
                   <Pencil className="h-3 w-3" /> Edit
                 </Link>
+                <DeleteSiteButton slug={s.slug} brand={s.config.brand} />
               </div>
             </li>
           ))}

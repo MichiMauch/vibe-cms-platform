@@ -18,6 +18,9 @@ export type GitHubClient = {
   /** Commit multiple files in ONE commit via the Git Data API
    * (createTree + createCommit + updateRef). Returns the new commit SHA. */
   putFiles: (files: PutFile[], commitMessage: string) => Promise<string>;
+  /** Delete every file under a directory in one commit. Returns the new
+   * commit SHA, or null when the directory was already empty / missing. */
+  deleteDir: (dirPath: string, commitMessage: string) => Promise<string | null>;
 };
 
 export function createGitHubClient(opts: {
@@ -148,5 +151,98 @@ export function createGitHubClient(opts: {
     return commit.data.sha;
   }
 
-  return { putFile, putBase64File, putFiles };
+  async function deleteDir(dirPath: string, commitMessage: string): Promise<string | null> {
+    // 1. List the dir (returns the contents at HEAD).
+    const trimmed = dirPath.replace(/^\/+|\/+$/g, "");
+    if (!trimmed) throw new Error("deleteDir: refusing to delete repo root");
+
+    let entries: Array<{ path: string; type: string }>;
+    try {
+      const listing = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+        owner,
+        repo,
+        path: trimmed,
+        ref: branch,
+      });
+      if (!Array.isArray(listing.data)) {
+        // single file at this path — treat as a 1-entry directory
+        entries = [{ path: listing.data.path, type: listing.data.type }];
+      } else {
+        entries = listing.data.map((e) => ({ path: e.path, type: e.type }));
+      }
+    } catch (err) {
+      const status = (err as { status?: number })?.status;
+      if (status === 404) return null;
+      throw err;
+    }
+
+    // 2. Recursively gather all blob paths under dir.
+    const blobPaths: string[] = [];
+    async function walk(p: string) {
+      const res = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+        owner,
+        repo,
+        path: p,
+        ref: branch,
+      });
+      if (Array.isArray(res.data)) {
+        for (const e of res.data) {
+          if (e.type === "dir") await walk(e.path);
+          else if (e.type === "file") blobPaths.push(e.path);
+        }
+      } else if (res.data.type === "file") {
+        blobPaths.push(res.data.path);
+      }
+    }
+    for (const e of entries) {
+      if (e.type === "dir") await walk(e.path);
+      else if (e.type === "file") blobPaths.push(e.path);
+    }
+    if (blobPaths.length === 0) return null;
+
+    // 3. Build a tree that marks each blob with sha:null (= deletion).
+    const refRes = await octokit.request("GET /repos/{owner}/{repo}/git/ref/{ref}", {
+      owner,
+      repo,
+      ref: `heads/${branch}`,
+    });
+    const parentSha = refRes.data.object.sha;
+    const parentCommit = await octokit.request("GET /repos/{owner}/{repo}/git/commits/{commit_sha}", {
+      owner,
+      repo,
+      commit_sha: parentSha,
+    });
+    const baseTreeSha = parentCommit.data.tree.sha;
+
+    const tree = await octokit.request("POST /repos/{owner}/{repo}/git/trees", {
+      owner,
+      repo,
+      base_tree: baseTreeSha,
+      tree: blobPaths.map((p) => ({
+        path: p,
+        mode: "100644" as const,
+        type: "blob" as const,
+        sha: null,
+      })),
+    });
+
+    const commit = await octokit.request("POST /repos/{owner}/{repo}/git/commits", {
+      owner,
+      repo,
+      message: commitMessage,
+      tree: tree.data.sha,
+      parents: [parentSha],
+    });
+
+    await octokit.request("PATCH /repos/{owner}/{repo}/git/refs/{ref}", {
+      owner,
+      repo,
+      ref: `heads/${branch}`,
+      sha: commit.data.sha,
+    });
+
+    return commit.data.sha;
+  }
+
+  return { putFile, putBase64File, putFiles, deleteDir };
 }
