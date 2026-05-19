@@ -146,6 +146,13 @@ export function EditorClient({
         <Puck
           config={config}
           data={data as unknown as Data}
+          // Puck defaults to rendering the preview in an iframe for style
+          // isolation. We disable it because our `<style id="site-theme">`
+          // and `data-*` attrs (bg-pattern, divider, card-style, spacing)
+          // live on a wrapper outside the iframe — the iframe would freeze
+          // on the initial theme and ignore preset switches. Editor and
+          // tenant share the same Tailwind config so isolation buys nothing.
+          iframe={{ enabled: false }}
           overrides={PUCK_OVERRIDES}
           onChange={(d) => {
             const next = extractEditorTheme(d as unknown as PuckData, initialTheme);
