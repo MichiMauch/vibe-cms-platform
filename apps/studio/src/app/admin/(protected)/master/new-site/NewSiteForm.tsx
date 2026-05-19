@@ -1,16 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import {
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  ExternalLink,
-  Mail,
-} from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
+import { CreateProgressModal, type ProgressStep, type SuccessPayload } from "./CreateProgressModal";
 
 const TEMPLATES = [
   { id: "saas", label: "SaaS / Produkt", description: "Hero, Features, Pricing, CTA, Footer." },
@@ -18,8 +11,6 @@ const TEMPLATES = [
   { id: "event", label: "Event / Launch", description: "Hero, Highlights, CTA, Footer." },
   { id: "blank", label: "Blank", description: "Minimal: nur Hero + Footer." },
 ];
-
-type Step = { step: string; label: string };
 
 export function NewSiteForm() {
   const [slug, setSlug] = useState("");
@@ -33,14 +24,17 @@ export function NewSiteForm() {
   const [themePreset, setThemePreset] = useState<ThemePresetId>(DEFAULT_PRESET_ID);
   const [accentOverride, setAccentOverride] = useState("");
   const [busy, setBusy] = useState(false);
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [done, setDone] = useState<{
-    slug: string;
-    previewUrl: string;
-    customDomainUrl: string | null;
-    magicLinkSent: boolean;
-  } | null>(null);
+  const [steps, setSteps] = useState<ProgressStep[]>([]);
+  const [done, setDone] = useState<SuccessPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  function closeModal() {
+    setModalOpen(false);
+    setSteps([]);
+    setDone(null);
+    setError(null);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,6 +42,7 @@ export function NewSiteForm() {
     setSteps([]);
     setDone(null);
     setError(null);
+    setModalOpen(true);
 
     try {
       const res = await fetch("/api/sites/create", {
@@ -296,65 +291,14 @@ export function NewSiteForm() {
         {busy ? "Erstelle …" : "Site anlegen"}
       </button>
 
-      {steps.length > 0 && (
-        <ol className="space-y-2 text-sm">
-          {steps.map((s, i) => (
-            <li key={i} className="flex items-center gap-2 text-slate-700">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" /> {s.label}
-            </li>
-          ))}
-        </ol>
-      )}
-
-      {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          <AlertCircle className="h-4 w-4" /> {error}
-        </div>
-      )}
-
-      {done && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 space-y-2">
-          <h3 className="text-base font-semibold text-emerald-900">
-            🎉 „{done.slug}" angelegt
-          </h3>
-          <ul className="space-y-1.5 text-sm">
-            <li>
-              <a
-                href={done.previewUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-emerald-900 hover:underline"
-              >
-                <ExternalLink className="h-3.5 w-3.5" /> {done.previewUrl}
-              </a>
-            </li>
-            {done.customDomainUrl && (
-              <li>
-                <a
-                  href={done.customDomainUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-emerald-900 hover:underline"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" /> {done.customDomainUrl}
-                </a>{" "}
-                <span className="text-emerald-700">(SSL provisioniert sich)</span>
-              </li>
-            )}
-            {done.magicLinkSent && (
-              <li className="inline-flex items-center gap-1.5 text-emerald-900">
-                <Mail className="h-3.5 w-3.5" /> Magic-Link an Kunden gesendet
-              </li>
-            )}
-          </ul>
-          <p className="text-xs text-emerald-700 pt-1">
-            Cloudflare baut die Site jetzt im Hintergrund (~1–2 Min).{" "}
-            <Link href="/admin/master/sites" className="font-medium underline">
-              Alle Sites
-            </Link>
-          </p>
-        </div>
-      )}
+      <CreateProgressModal
+        open={modalOpen}
+        busy={busy}
+        steps={steps}
+        done={done}
+        error={error}
+        onClose={closeModal}
+      />
     </form>
   );
 }
