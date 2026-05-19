@@ -12,7 +12,10 @@ export async function generateStaticParams() {
 export default async function TenantIndex({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const locale = getDefaultLocale(slug);
-  const target = `/${slug}/${locale}/`;
+  // From the visitor's POV the URL is <slug>.pages.mauch.rocks/<locale>/ —
+  // the Pages Worker rewrites that onto /<slug>/<locale>/ internally, so the
+  // target here must be the slug-less host-relative path.
+  const target = `/${locale}/`;
   return (
     <>
       <meta httpEquiv="refresh" content={`0; url=${target}`} />
