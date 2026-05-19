@@ -1,7 +1,7 @@
 import "server-only";
 import OpenAI from "openai";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { BLOCK_DEFAULTS, BLOCK_TYPES, ROOT_DEFAULTS } from "@vibe-cms-platform/core/puck";
+import { renderSchemaForPrompt } from "@vibe-cms-platform/core/puck";
 
 export type TemplateId = "blank" | "saas" | "agentur" | "event";
 
@@ -13,27 +13,114 @@ export type Brief = {
   primaryGoal?: string;
 };
 
-const SYSTEM_PROMPT = `You scaffold a Vibe-CMS landing page from a JSON template.
+/** Stylistic hint per template — picks block bias without being prescriptive.
+ * The AI still decides the final composition based on the brief. */
+const TEMPLATE_HINT: Record<TemplateId, string> = {
+  blank: "Neutral page. Pick whatever blocks make sense for the brief.",
+  saas: "SaaS product landing — typically Hero · FeaturesGrid · Stats · Testimonial · Pricing · Faq · CtaBanner · Footer.",
+  agentur: "Agency / studio site — typically Hero · ImageText · Team · LogoCloud · Testimonial · CtaBanner · Footer.",
+  event: "Single-event page — typically Hero · ImageText · Stats · Faq · CtaBanner · Footer.",
+};
 
-Rules:
-- Input is a template JSON skeleton with placeholders like {{BRAND}}, {{HERO_TITLE}}, {{F1_TITLE}}.
-- Replace every placeholder with concrete copy that fits the user's brief.
-- Keep the JSON structure exactly. Do NOT add/remove keys. Do NOT change "type" fields.
-- Top-level shape is { content: [{type,props}], root: { props: { seo, chatbot } }, zones }. Keep it.
-- Keep HTML inside subtitle/description/bio fields valid (<p>, <strong>, <em>, <a href>).
-- Use Swiss German conventions (ä/ö/ü, ss — never ß) for German output.
-- Keep brand names, technical names, and product nouns unchanged.
-- Return strictly JSON. No commentary, no markdown.`;
+const SYSTEM_PROMPT = `You compose a landing-page content tree for the Vibe-CMS Puck editor.
+
+OUTPUT FORMAT
+Return strict JSON, no commentary, with exactly these top-level keys:
+{
+  "content": [ { "type": "<BlockType>", "props": { ... } }, ... ],
+  "root": { "props": { "seo": {...}, "chatbot": {...} } },
+  "zones": {}
+}
+
+CONTENT RULES
+- The "content" array is the page, top to bottom. Pick the blocks that fit the brief; obey the user's explicit wishes (e.g. "use every block once").
+- Always start with a Hero and end with a Footer.
+- Only use block types listed in the schema below — anything else is silently dropped.
+- For each block, populate the REQUIRED fields with realistic, brief-specific copy.
+  Optional fields: include them when they add value, otherwise omit them — defaults will be applied.
+- Field types:
+    text     → plain string
+    richHtml → HTML string; wrap paragraphs in <p>, use <strong>, <em>, <a href="…">
+    url      → "#" or a section anchor like "#pricing"
+    enum     → exactly one of the listed values
+    array    → JSON array of objects matching the item-field schema
+- Swiss German conventions for German output: ä/ö/ü, ss — never ß.
+- Brand names, technical terms, product nouns: keep them unchanged.
+
+ROOT RULES
+- root.props.seo: fill title (≤ 60 chars), description (≤ 160 chars), ogTitle, ogDescription, keywords (comma-separated, 5-10 keywords).
+- root.props.chatbot: { "isEnabled": false, "botName": "<Brand>-Assistent", "welcomeMessage": "Kurze Begrüssung." }
+
+AVAILABLE BLOCKS:
+
+${renderSchemaForPrompt()}
+
+Return only the JSON object. No prose around it.`;
+
+/** Deep-merge plain objects. Arrays are overwritten wholesale by the override. */
+function mergeDeep<T extends Record<string, unknown>>(base: T, override: Partial<T>): T {
+  const out: Record<string, unknown> = { ...base };
+  for (const [k, v] of Object.entries(override)) {
+    if (v === undefined) continue;
+    const b = (base as Record<string, unknown>)[k];
+    if (
+      v !== null &&
+      typeof v === "object" &&
+      !Array.isArray(v) &&
+      b !== null &&
+      typeof b === "object" &&
+      !Array.isArray(b)
+    ) {
+      out[k] = mergeDeep(b as Record<string, unknown>, v as Record<string, unknown>);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out as T;
+}
+
+type RawBlock = { type?: unknown; props?: unknown };
+type RawTree = {
+  content?: unknown;
+  root?: { props?: unknown };
+  zones?: unknown;
+};
+
+/** Validate AI output, drop unknown blocks, back-fill defaults, assign ids. */
+function normaliseTree(raw: RawTree): {
+  content: Array<{ type: string; props: Record<string, unknown> }>;
+  root: { props: Record<string, unknown> };
+  zones: Record<string, unknown>;
+} {
+  const validBlocks = new Set(BLOCK_TYPES);
+  const inputContent = Array.isArray(raw.content) ? (raw.content as RawBlock[]) : [];
+  const content: Array<{ type: string; props: Record<string, unknown> }> = [];
+  const counter: Record<string, number> = {};
+
+  for (const b of inputContent) {
+    if (typeof b?.type !== "string" || !validBlocks.has(b.type)) continue;
+    const props = (b.props && typeof b.props === "object" ? b.props : {}) as Record<string, unknown>;
+    const defaults = BLOCK_DEFAULTS[b.type] ?? {};
+    const merged = mergeDeep(defaults as Record<string, unknown>, props);
+    counter[b.type] = (counter[b.type] ?? 0) + 1;
+    merged.id = `${b.type}-${counter[b.type]}`;
+    content.push({ type: b.type, props: merged });
+  }
+
+  const rawRootProps =
+    raw.root && typeof raw.root === "object" && raw.root.props && typeof raw.root.props === "object"
+      ? (raw.root.props as Record<string, unknown>)
+      : {};
+  const rootProps = mergeDeep(ROOT_DEFAULTS as unknown as Record<string, unknown>, rawRootProps);
+
+  return { content, root: { props: rootProps }, zones: {} };
+}
 
 export async function scaffoldContent(opts: {
   apiKey: string;
   model: string;
   brief: Brief;
-  templatesDir: string;
 }): Promise<string> {
-  const templatePath = path.join(opts.templatesDir, `${opts.brief.template}.json`);
-  const skeleton = await fs.readFile(templatePath, "utf-8");
-
   const openai = new OpenAI({ apiKey: opts.apiKey });
   const completion = await openai.chat.completions.create({
     model: opts.model,
@@ -45,14 +132,25 @@ export async function scaffoldContent(opts: {
         role: "user",
         content: JSON.stringify({
           brief: opts.brief,
-          template: JSON.parse(skeleton),
+          templateHint: TEMPLATE_HINT[opts.brief.template],
         }),
       },
     ],
   });
+
   const raw = completion.choices[0]?.message?.content;
   if (!raw) throw new Error("OpenAI returned empty response");
-  // Validate JSON-parses; we return the raw string so the caller can commit it verbatim.
-  JSON.parse(raw);
-  return raw;
+
+  let parsed: RawTree;
+  try {
+    parsed = JSON.parse(raw) as RawTree;
+  } catch (err) {
+    throw new Error(`OpenAI returned invalid JSON: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  const normalised = normaliseTree(parsed);
+  if (normalised.content.length === 0) {
+    throw new Error("AI scaffolder produced no valid blocks");
+  }
+  return JSON.stringify(normalised, null, 2);
 }

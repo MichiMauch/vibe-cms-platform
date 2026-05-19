@@ -18,7 +18,6 @@ type Props = {
   brand: string;
   locale: string;
   locales: string[];
-  liveUrl: string | null;
   data: PuckData;
   email: string;
   /** Persisted theme from config.json — used as fallback when the Puck data
@@ -94,7 +93,6 @@ export function EditorClient({
   brand,
   locale,
   locales,
-  liveUrl,
   data,
   email,
   initialTheme,
@@ -175,7 +173,6 @@ export function EditorClient({
           currentLocale: locale,
           locales,
           onSwitchLocale: switchLocale,
-          liveUrl,
           siteLabel: `${brand} · ${slug}`,
         }}
       />

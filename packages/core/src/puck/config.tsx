@@ -1,5 +1,20 @@
 import type { Config, Data } from "@puckeditor/core";
-import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "../theme";
+import { THEME_PRESETS, type ThemePresetId } from "../theme";
+import {
+  ROOT_DEFAULTS,
+  HERO_DEFAULTS,
+  RICH_BLOCK_DEFAULTS,
+  FEATURES_GRID_DEFAULTS,
+  STATS_DEFAULTS,
+  TESTIMONIAL_DEFAULTS,
+  IMAGE_TEXT_DEFAULTS,
+  CTA_BANNER_DEFAULTS,
+  LOGO_CLOUD_DEFAULTS,
+  FAQ_DEFAULTS,
+  TEAM_DEFAULTS,
+  PRICING_DEFAULTS,
+  FOOTER_DEFAULTS,
+} from "./defaults";
 import {
   HeroRender,
   type HeroProps,
@@ -168,26 +183,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
           },
         },
       },
-      defaultProps: {
-        seo: {
-          title: "",
-          description: "",
-          ogTitle: "",
-          ogDescription: "",
-          ogImage: "",
-          keywords: "",
-        },
-        chatbot: {
-          isEnabled: false,
-          botName: "Assistent",
-          welcomeMessage: "Hallo!",
-        },
-        theme: {
-          preset: DEFAULT_PRESET_ID,
-          accentOverride: "",
-          inkOverride: "",
-        },
-      },
+      defaultProps: ROOT_DEFAULTS,
     },
     components: {
       Hero: {
@@ -331,26 +327,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             },
           },
         },
-        defaultProps: {
-          eyebrow: "",
-          title: "Dein grosser Auftritt",
-          subtitle: "<p>Schreib hier den Pitch.</p>",
-          ctaLabel: "Loslegen",
-          ctaHref: "#",
-          layout: { layout: "centered", density: "default" },
-          imageGroup: { image: "", imageAlt: "", imageStyle: "card" },
-          background: { bgStyle: "gradient", bgImage: "" },
-          style: { eyebrowStyle: "pill", accentBar: false, gradientTitle: false },
-          secondaryCta: { ctaSecondaryLabel: "", ctaSecondaryHref: "" },
-          trustAndMode: {
-            trustLine: "",
-            mode: "cta",
-            emailPlaceholder: "deine@adresse.ch",
-            emailSubmitLabel: "Eintragen",
-            emailEndpoint: "",
-          },
-          extras: { scrollIndicator: false },
-        },
+        defaultProps: HERO_DEFAULTS,
         render: HeroRender,
       },
       RichBlock: {
@@ -358,9 +335,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
         fields: {
           content: { type: "custom", label: "Inhalt", render: renderRichText },
         },
-        defaultProps: {
-          content: "<p>Hier kommt dein Inhalt hin. <strong>Fett</strong>, <em>kursiv</em>, Links — alles geht.</p>",
-        },
+        defaultProps: RICH_BLOCK_DEFAULTS,
         render: RichBlockRender,
       },
       FeaturesGrid: {
@@ -384,15 +359,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { title?: string }).title ?? "Feature",
           },
         },
-        defaultProps: {
-          title: "Drei Vorteile auf einen Blick",
-          subtitle: "<p>Kurzer Untertitel.</p>",
-          items: [
-            { icon: "Sparkles", title: "Vorteil 1", description: "<p>Was macht dein Produkt besonders?</p>" },
-            { icon: "Zap", title: "Vorteil 2", description: "<p>Wie schnell oder einfach ist es?</p>" },
-            { icon: "ShieldCheck", title: "Vorteil 3", description: "<p>Warum können Kunden vertrauen?</p>" },
-          ],
-        },
+        defaultProps: FEATURES_GRID_DEFAULTS,
         render: FeaturesGridRender,
       },
       Stats: {
@@ -410,15 +377,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { value?: string }).value ?? "Stat",
           },
         },
-        defaultProps: {
-          intro: "Zahlen, die für sich sprechen",
-          items: [
-            { value: "+200%", label: "Conversion-Rate" },
-            { value: "12 Mio", label: "Aktive Nutzer" },
-            { value: "99.9%", label: "Uptime" },
-            { value: "24/7", label: "Support" },
-          ],
-        },
+        defaultProps: STATS_DEFAULTS,
         render: StatsRender,
       },
       Testimonial: {
@@ -429,12 +388,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
           role: { type: "custom", label: "Rolle", render: renderTextAI },
           avatar: { type: "custom", label: "Avatar (optional)", render: renderImage },
         },
-        defaultProps: {
-          quote: "<p>Ein starker Satz von einem zufriedenen Kunden.</p>",
-          author: "Vorname Nachname",
-          role: "Rolle, Firma",
-          avatar: "",
-        },
+        defaultProps: TESTIMONIAL_DEFAULTS,
         render: TestimonialRender,
       },
       ImageText: {
@@ -453,13 +407,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             ],
           },
         },
-        defaultProps: {
-          title: "Erzähl deine Story",
-          content: "<p>Hier kommt die längere Erklärung. <strong>Fett</strong> und <em>kursiv</em> erlaubt.</p>",
-          image: "",
-          imageAlt: "",
-          imagePosition: "right",
-        },
+        defaultProps: IMAGE_TEXT_DEFAULTS,
         render: ImageTextRender,
       },
       CtaBanner: {
@@ -481,15 +429,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             ],
           },
         },
-        defaultProps: {
-          title: "Bereit loszulegen?",
-          subtitle: "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
-          ctaPrimaryLabel: "Jetzt starten",
-          ctaPrimaryHref: "#",
-          ctaSecondaryLabel: "Demo ansehen",
-          ctaSecondaryHref: "#",
-          theme: "blue",
-        },
+        defaultProps: CTA_BANNER_DEFAULTS,
         render: CtaBannerRender,
       },
       LogoCloud: {
@@ -508,15 +448,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { name?: string }).name ?? "Logo",
           },
         },
-        defaultProps: {
-          intro: "Vertraut von führenden Unternehmen",
-          items: [
-            { name: "Acme", image: "", link: "" },
-            { name: "Globex", image: "", link: "" },
-            { name: "Initech", image: "", link: "" },
-            { name: "Umbrella", image: "", link: "" },
-          ],
-        },
+        defaultProps: LOGO_CLOUD_DEFAULTS,
         render: LogoCloudRender,
       },
       Faq: {
@@ -538,20 +470,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { question?: string }).question ?? "Frage",
           },
         },
-        defaultProps: {
-          title: "Häufige Fragen",
-          subtitle: "<p>Alles, was du wissen musst.</p>",
-          items: [
-            {
-              question: "Wie funktioniert das?",
-              answer: "<p>Klick rein, erstelle eine Seite, publiziere — fertig.</p>",
-            },
-            {
-              question: "Was kostet das?",
-              answer: "<p>Kontaktier uns für ein Angebot.</p>",
-            },
-          ],
-        },
+        defaultProps: FAQ_DEFAULTS,
         render: FaqRender,
       },
       Team: {
@@ -577,11 +496,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { name?: string }).name ?? "Mitglied",
           },
         },
-        defaultProps: {
-          title: "Unser Team",
-          subtitle: "<p>Die Köpfe hinter dem Produkt.</p>",
-          members: [],
-        },
+        defaultProps: TEAM_DEFAULTS,
         render: TeamRender,
       },
       Pricing: {
@@ -628,11 +543,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { name?: string }).name ?? "Plan",
           },
         },
-        defaultProps: {
-          title: "Preise",
-          subtitle: "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
-          plans: [],
-        },
+        defaultProps: PRICING_DEFAULTS,
         render: PricingRender,
       },
       Footer: {
@@ -660,11 +571,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             getItemSummary: (item) => (item as { heading?: string }).heading ?? "Spalte",
           },
         },
-        defaultProps: {
-          copyright: "© 2026 Deine Marke",
-          tagline: "Made with love.",
-          columns: [],
-        },
+        defaultProps: FOOTER_DEFAULTS,
         render: FooterRender,
       },
     },

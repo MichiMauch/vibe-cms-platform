@@ -100,14 +100,12 @@ export async function POST(req: Request) {
       };
 
       try {
-        // 1. AI scaffold
+        // 1. AI scaffold — free-form block composition driven by the brief.
         send("progress", { step: "scaffold", label: "Generiere Inhalte mit AI" });
-        const templatesDir = path.resolve(process.cwd(), "..", "..", "packages", "core", "templates");
         const rawContentJson = await scaffoldContent({
           apiKey: env.openai.apiKey,
           model: env.openai.model,
           brief: { brand, template, description, audience: b.audience, primaryGoal: b.primaryGoal },
-          templatesDir,
         });
 
         // Inject the chosen theme into root.props.theme so the editor's

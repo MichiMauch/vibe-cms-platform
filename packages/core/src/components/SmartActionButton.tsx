@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ExternalLink, Loader2, LogOut, Pencil, Upload } from "lucide-react";
+import { CheckCircle2, Loader2, LogOut, Pencil, Upload } from "lucide-react";
 
 type EditMode = {
   /** Tenant slug — passed through for telemetry / labelling. */
@@ -12,8 +12,6 @@ type EditMode = {
   locales: string[];
   /** Called when the user picks another locale from the dropdown. */
   onSwitchLocale: (target: string) => void;
-  /** Absolute URL to the public version of the current page, or null. */
-  liveUrl: string | null;
   /** Site slug shown as a small label so master users know which site they edit. */
   siteLabel?: string;
   /** Optional async publish action. If omitted, the publish pill is hidden
@@ -75,7 +73,7 @@ export function SmartActionButton({ email, editUrl, editMode }: Props) {
 }
 
 function EditModeContents({ editMode }: { editMode: EditMode }) {
-  const { currentLocale, locales, onSwitchLocale, liveUrl, siteLabel, publish } = editMode;
+  const { currentLocale, locales, onSwitchLocale, siteLabel, publish } = editMode;
   return (
     <>
       {siteLabel && (
@@ -102,18 +100,6 @@ function EditModeContents({ editMode }: { editMode: EditMode }) {
             </option>
           ))}
         </select>
-      )}
-      {liveUrl && (
-        <a
-          href={liveUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white transition hover:bg-white/10"
-          title="Live ansehen"
-          aria-label="Live ansehen"
-        >
-          <ExternalLink className="h-4 w-4" />
-        </a>
       )}
       <form action="/api/auth/logout" method="POST" className="inline-flex">
         <button
