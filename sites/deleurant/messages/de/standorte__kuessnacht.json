@@ -1,0 +1,176 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Willkommen in Küssnacht am Rigi",
+        "subtitle": "<p>Erleben Sie unsere neue Praxis, die im August 2026 eröffnet. Wir bieten empathische Behandlungen und planbare Ergebnisse für die ganze Familie.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#kontakt",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-4",
+        "title": "Unsere Behandlungsangebote",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathische Behandlung",
+            "description": "<p>Wir legen Wert auf individuelle Betreuung und einfühlsame Behandlung.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Planbare Ergebnisse",
+            "description": "<p>Unsere Behandlungen sind auf Ihre Bedürfnisse abgestimmt und bieten planbare Ergebnisse.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Flex-Modul",
+            "description": "<p>Nutzen Sie unser Flex-Modul für flexible Behandlungsmöglichkeiten.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Für die ganze Familie",
+            "description": "<p>Unsere Praxis bietet Behandlungen für Kinder, Jugendliche und Erwachsene.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Ein Blick auf unsere Erfolge:",
+        "items": [
+          {
+            "value": "100+",
+            "label": "Zufriedene Patienten"
+          },
+          {
+            "value": "10",
+            "label": "Jahre Erfahrung"
+          },
+          {
+            "value": "5",
+            "label": "Behandlungsarten"
+          },
+          {
+            "value": "24/7",
+            "label": "Erreichbarkeit"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Vereinbaren Sie noch heute einen Termin in unserer neuen Praxis!</p>",
+        "ctaPrimaryLabel": "Jetzt Termin buchen",
+        "ctaPrimaryHref": "#kontakt",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Unsere Praxis",
+                "href": "#"
+              },
+              {
+                "label": "Team",
+                "href": "#team"
+              }
+            ]
+          },
+          {
+            "heading": "Kontakt",
+            "links": [
+              {
+                "label": "Termin vereinbaren",
+                "href": "#kontakt"
+              },
+              {
+                "label": "Impressum",
+                "href": "#impressum"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Standort Küssnacht - Team Deleurant",
+        "description": "Entdecken Sie unsere neue Praxis in Küssnacht am Rigi, die im August 2026 eröffnet. Wir bieten empathische Behandlungen für die ganze Familie.",
+        "ogTitle": "Standort Küssnacht - Team Deleurant",
+        "ogDescription": "Willkommen in unserer neuen Praxis in Küssnacht am Rigi. Vereinbaren Sie jetzt Ihren Termin!",
+        "ogImage": "",
+        "keywords": "Küssnacht, Team Deleurant, empathische Behandlung, planbare Ergebnisse, Flex-Modul"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
