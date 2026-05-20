@@ -39,7 +39,7 @@ export const HERO_DEFAULTS = {
   subtitle: "<p>Schreib hier den Pitch.</p>",
   ctaLabel: "Loslegen",
   ctaHref: "#",
-  layout: { layout: "centered" as const, density: "default" as const },
+  layout: { layout: "auto" as const, density: "default" as const },
   imageGroup: { image: "", imageAlt: "", imageStyle: "card" as const },
   background: { bgStyle: "gradient" as const, bgImage: "" },
   style: { eyebrowStyle: "pill" as const, accentBar: false, gradientTitle: false },
@@ -60,7 +60,7 @@ export const RICH_BLOCK_DEFAULTS = {
 };
 
 export const FEATURES_GRID_DEFAULTS = {
-  layout: "grid-3" as const,
+  layout: "auto" as const,
   title: "Drei Vorteile auf einen Blick",
   subtitle: "<p>Kurzer Untertitel.</p>",
   items: [
@@ -71,7 +71,7 @@ export const FEATURES_GRID_DEFAULTS = {
 };
 
 export const STATS_DEFAULTS = {
-  layout: "grid" as const,
+  layout: "auto" as const,
   intro: "Zahlen, die für sich sprechen",
   items: [
     { value: "+200%", label: "Conversion-Rate" },
@@ -82,7 +82,7 @@ export const STATS_DEFAULTS = {
 };
 
 export const TESTIMONIAL_DEFAULTS = {
-  layout: "centered" as const,
+  layout: "auto" as const,
   quote: "<p>Ein starker Satz von einem zufriedenen Kunden.</p>",
   author: "Vorname Nachname",
   role: "Rolle, Firma",
@@ -91,7 +91,7 @@ export const TESTIMONIAL_DEFAULTS = {
 };
 
 export const IMAGE_TEXT_DEFAULTS = {
-  layout: "image-right" as const,
+  layout: "auto" as const,
   title: "Erzähl deine Story",
   content:
     "<p>Hier kommt die längere Erklärung. <strong>Fett</strong> und <em>kursiv</em> erlaubt.</p>",
@@ -142,7 +142,7 @@ export const TEAM_DEFAULTS = {
 };
 
 export const PRICING_DEFAULTS = {
-  layout: "cards-3" as const,
+  layout: "auto" as const,
   title: "Preise",
   subtitle: "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
   rowLabels: [] as Array<{ value: string }>,

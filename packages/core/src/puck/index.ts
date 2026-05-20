@@ -14,6 +14,7 @@ export {
   renderSchemaForPrompt,
   VIBES,
   renderVibesForPrompt,
+  renderLayoutDefaultsForPrompt,
   type BlockSpec,
   type BlockFieldSpec,
   type Vibe,

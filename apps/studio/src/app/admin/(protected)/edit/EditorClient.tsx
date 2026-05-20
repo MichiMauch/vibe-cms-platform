@@ -10,6 +10,8 @@ import { LocaleProvider, SmartActionButton } from "@vibe-cms-platform/core/compo
 import {
   renderTheme,
   isValidPresetId,
+  VibeProvider,
+  resolveAutoLayouts,
   type SiteThemeChoice,
 } from "@vibe-cms-platform/core/theme";
 
@@ -107,6 +109,14 @@ export function EditorClient({
     () => renderTheme(activeTheme),
     [activeTheme],
   );
+  // Resolve "auto" layouts based on the active vibe so the editor preview
+  // matches what the tenant will publish. Puck onChange returns the
+  // resolved values, which is acceptable: "auto" semantics are lost on
+  // first edit, but the user sees vibe defaults immediately.
+  const resolvedData = useMemo(
+    () => resolveAutoLayouts(data, activeTheme?.preset ?? null),
+    [data, activeTheme?.preset],
+  );
 
   function switchLocale(target: string) {
     if (target === locale) return;
@@ -143,35 +153,37 @@ export function EditorClient({
     <LocaleProvider value={locale}>
       <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
       <div {...bodyAttrs} className="contents">
-        <Puck
-          config={config}
-          data={data as unknown as Data}
-          // Puck defaults to rendering the preview in an iframe for style
-          // isolation. We disable it because our `<style id="site-theme">`
-          // and `data-*` attrs (bg-pattern, divider, card-style, spacing)
-          // live on a wrapper outside the iframe — the iframe would freeze
-          // on the initial theme and ignore preset switches. Editor and
-          // tenant share the same Tailwind config so isolation buys nothing.
-          iframe={{ enabled: false }}
-          overrides={PUCK_OVERRIDES}
-          onChange={(d) => {
-            const next = extractEditorTheme(d as unknown as PuckData, initialTheme);
-            // Skip state churn on every keystroke unless theme actually changed.
-            setActiveTheme((prev) => {
-              if (
-                prev?.preset === next?.preset &&
-                prev?.accentOverride === next?.accentOverride &&
-                prev?.inkOverride === next?.inkOverride
-              ) {
-                return prev;
-              }
-              return next;
-            });
-          }}
-          onPublish={(d) => {
-            void publish(d as unknown as PuckData);
-          }}
-        />
+        <VibeProvider value={activeTheme?.preset ?? null}>
+          <Puck
+            config={config}
+            data={resolvedData as unknown as Data}
+            // Puck defaults to rendering the preview in an iframe for style
+            // isolation. We disable it because our `<style id="site-theme">`
+            // and `data-*` attrs (bg-pattern, divider, card-style, spacing)
+            // live on a wrapper outside the iframe — the iframe would freeze
+            // on the initial theme and ignore preset switches. Editor and
+            // tenant share the same Tailwind config so isolation buys nothing.
+            iframe={{ enabled: false }}
+            overrides={PUCK_OVERRIDES}
+            onChange={(d) => {
+              const next = extractEditorTheme(d as unknown as PuckData, initialTheme);
+              // Skip state churn on every keystroke unless theme actually changed.
+              setActiveTheme((prev) => {
+                if (
+                  prev?.preset === next?.preset &&
+                  prev?.accentOverride === next?.accentOverride &&
+                  prev?.inkOverride === next?.inkOverride
+                ) {
+                  return prev;
+                }
+                return next;
+              });
+            }}
+            onPublish={(d) => {
+              void publish(d as unknown as PuckData);
+            }}
+          />
+        </VibeProvider>
       </div>
       <SmartActionButton
         email={email}

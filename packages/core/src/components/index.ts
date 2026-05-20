@@ -4,3 +4,4 @@ export { LanguagesAdmin } from "./LanguagesAdmin";
 export { Chatbot } from "./Chatbot";
 export { SmartActionButton } from "./SmartActionButton";
 export { EmailCaptureForm } from "./EmailCaptureForm";
+export { VibeFlourish, type FlourishKind } from "./VibeFlourish";

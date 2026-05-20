@@ -284,3 +284,113 @@ button:disabled {
 
 /* Hero layout — branching now happens inside Hero block markup itself.
  * See packages/core/src/puck/blocks.tsx HeroRender. */
+
+/* ─── Vibe section spacing ─────────────────────────────────────────
+ * Overrides hardcoded py-* utilities on .brand-section. Specificity
+ * 0,1,1 beats Tailwind 0,1,0. Only the 5 new vibes get overrides;
+ * legacy vibes inherit Tailwind py-* values. */
+[data-vibe="brutal"]    .brand-section { padding-block: 3.5rem; }
+[data-vibe="editorial"] .brand-section { padding-block: 6rem; }
+[data-vibe="playful"]   .brand-section { padding-block: 5rem; }
+[data-vibe="organic"]   .brand-section { padding-block: 5.5rem; }
+[data-vibe="tech"]      .brand-section { padding-block: 4.5rem; }
+
+@media (min-width: 768px) {
+  [data-vibe="brutal"]    .brand-section { padding-block: 4rem; }
+  [data-vibe="editorial"] .brand-section { padding-block: 8rem; }
+  [data-vibe="playful"]   .brand-section { padding-block: 6.5rem; }
+  [data-vibe="organic"]   .brand-section { padding-block: 7.5rem; }
+  [data-vibe="tech"]      .brand-section { padding-block: 6rem; }
+}
+
+/* Footer keeps compact rhythm regardless of vibe. */
+footer.brand-section { padding-block: 3.5rem !important; }
+@media (min-width: 768px) {
+  footer.brand-section { padding-block: 4rem !important; }
+}
+
+/* Grid-gap overrides for FeaturesGrid / Testimonial grid-3 / Pricing cards-3. */
+[data-vibe="brutal"]    .brand-section .grid { gap: 0.5rem !important; }
+[data-vibe="editorial"] .brand-section .grid { gap: 3rem    !important; }
+[data-vibe="playful"]   .brand-section .grid { gap: 2rem    !important; }
+@media (min-width: 768px) {
+  [data-vibe="brutal"]    .brand-section .grid { gap: 0.75rem !important; }
+  [data-vibe="editorial"] .brand-section .grid { gap: 4rem    !important; }
+}
+
+/* ─── Vibe card geometry ──────────────────────────────────────────────
+ * Each new vibe restyles `.brand-card`. Sits on TOP of the cardStyle-
+ * derived defaults from renderTheme() (shadow + border via CSS vars).
+ * Legacy vibes untouched. */
+
+/* Brutal — chaotic rotation, hard offset shadow, thicker border. */
+[data-vibe="brutal"] .brand-card {
+  transform: rotate(-0.7deg);
+  border-width: 3px;
+  border-color: var(--brand-ink);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 0 var(--brand-ink);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+[data-vibe="brutal"] .brand-card:nth-child(2n)   { transform: rotate(0.5deg); }
+[data-vibe="brutal"] .brand-card:nth-child(3n)   { transform: rotate(-0.4deg); }
+[data-vibe="brutal"] .brand-card:nth-child(5n+1) { transform: rotate(0.8deg); }
+[data-vibe="brutal"] .brand-card:hover {
+  transform: rotate(0) translate(-3px, -3px);
+  box-shadow: 12px 12px 0 0 var(--brand-ink);
+}
+
+/* Editorial — newspaper card: top + bottom rules only. */
+[data-vibe="editorial"] .brand-card {
+  border: none;
+  border-top: 2px solid var(--brand-ink);
+  border-bottom: 2px solid var(--brand-ink);
+  border-radius: 0;
+  box-shadow: none;
+  padding-block: 1.75rem;
+}
+
+/* Playful — wobbly stickers with bouncy hover. */
+[data-vibe="playful"] .brand-card {
+  transform: rotate(-1deg);
+  transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+  border-width: 2px;
+  border-color: var(--brand-ink);
+  box-shadow: 6px 6px 0 0 var(--brand-accent);
+}
+[data-vibe="playful"] .brand-card:nth-child(2n) { transform: rotate(1deg); }
+[data-vibe="playful"] .brand-card:nth-child(3n) { transform: rotate(-1.6deg); }
+[data-vibe="playful"] .brand-card:hover {
+  transform: rotate(0) translate(-3px, -3px);
+  box-shadow: 10px 10px 0 0 var(--brand-accent);
+}
+
+/* Organic — pillowy asymmetric radii. */
+[data-vibe="organic"] .brand-card {
+  border-radius: 2rem 3rem 2.5rem 3rem / 2.5rem 2rem 3rem 2rem;
+  border: 1px solid color-mix(in oklab, var(--brand-ink) 8%, transparent);
+  box-shadow:
+    0 24px 48px -24px color-mix(in oklab, var(--brand-ink) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .6);
+  padding: 1.75rem;
+}
+[data-vibe="organic"] .brand-card:nth-child(2n) {
+  border-radius: 3rem 2rem 3rem 2.5rem / 2rem 3rem 2rem 2.5rem;
+}
+
+/* Tech — blueprint card: dashed border, corner markers, hover outline. */
+[data-vibe="tech"] .brand-card {
+  border: 1px dashed color-mix(in oklab, var(--brand-ink) 30%, transparent);
+  border-radius: 0.25rem;
+  box-shadow: none;
+  background-image:
+    linear-gradient(to right,  var(--brand-accent) 0 12px, transparent 12px),
+    linear-gradient(to bottom, var(--brand-accent) 0 12px, transparent 12px);
+  background-size: 12px 1px, 1px 12px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
+  transition: outline-color .2s ease;
+  outline: 1px solid transparent;
+  outline-offset: 4px;
+}
+[data-vibe="tech"] .brand-card:hover { outline-color: var(--brand-accent); }

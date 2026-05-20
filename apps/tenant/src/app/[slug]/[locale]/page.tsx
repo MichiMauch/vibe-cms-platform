@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Render } from "@puckeditor/core/rsc";
 import { buildPuckConfig } from "@vibe-cms-platform/core/puck";
-import { renderTheme } from "@vibe-cms-platform/core/theme";
+import { renderTheme, VibeProvider, resolveAutoLayouts } from "@vibe-cms-platform/core/theme";
 import { getAllRoutes, getSiteData } from "@/lib/sites";
 
 type Params = { slug: string; locale: string };
@@ -57,6 +57,10 @@ export default async function TenantPage({ params }: { params: Promise<Params> }
   const { slug, locale } = await params;
   const { content, config: siteConfig } = getSiteData(slug, locale);
   const { themeCss, bodyAttrs } = renderTheme(siteConfig.theme);
+  const vibeId = siteConfig.theme?.preset ?? null;
+  // Resolve "auto" layouts to the active vibe's defaults before rendering.
+  // Blocks themselves stay vibe-agnostic; the transform makes "auto" → concrete.
+  const resolvedContent = resolveAutoLayouts(content, vibeId);
   // Slug is only consumed by the Puck editor's AI-rewrite field; render path
   // ignores it, but the type wants a string.
   const puckConfig = buildPuckConfig(slug);
@@ -64,7 +68,9 @@ export default async function TenantPage({ params }: { params: Promise<Params> }
   return (
     <div {...bodyAttrs}>
       <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
-      <Render config={puckConfig} data={content} />
+      <VibeProvider value={vibeId}>
+        <Render config={puckConfig} data={resolvedContent} />
+      </VibeProvider>
     </div>
   );
 }

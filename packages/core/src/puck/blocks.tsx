@@ -9,6 +9,11 @@
  * `brand-heading`, `brand-h1-display`, `brand-accent-bar` and `brand-card`
  * helper classes whose appearance is driven by the per-site theme — see
  * `apps/studio/src/lib/platform/theme.ts` and `packages/core/src/theme/`.
+ *
+ * Blocks intentionally stay server-renderable (no `"use client"`). When a
+ * block's `layout` is `"auto"`, the per-vibe default is substituted at the
+ * render-site level via `resolveAutoLayouts(data, vibeId)` before the data
+ * reaches `<Render>` / `<Puck>`. See `packages/core/src/theme/resolve-layouts.ts`.
  */
 import {
   ArrowRight,
@@ -32,6 +37,7 @@ import {
 import { EmailCaptureForm } from "../components/EmailCaptureForm";
 import { PricingToggle } from "../components/PricingToggle";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
+import { VibeFlourish } from "../components/VibeFlourish";
 
 const ICONS: Record<string, LucideIcon> = {
   Sparkles,
@@ -56,6 +62,7 @@ const PLAN_ICONS: Record<string, LucideIcon> = {
 
 // ─── Hero ─────────────────────────────────────────────────────────────
 export type HeroLayout =
+  | "auto"
   | "centered"
   | "left"
   | "split-right"
@@ -213,7 +220,13 @@ export function HeroRender(props: HeroProps) {
   // Defensive merge: existing site JSON may lack the new grouped objects.
   // Puck merges defaultProps for missing fields at load time, but during
   // partial migrations we still fall back to local defaults.
-  const { layout, density } = { ...HERO_DEFAULTS.layout, ...props.layout };
+  const merged = { ...HERO_DEFAULTS.layout, ...props.layout };
+  // "auto" sentinel is resolved at the render-site level via
+  // resolveAutoLayouts(); blocks themselves treat unresolved "auto" as the
+  // legacy fallback.
+  const layout: HeroLayout =
+    !merged.layout || merged.layout === "auto" ? "centered" : merged.layout;
+  const density = merged.density;
   const { image, imageAlt, imageStyle } = {
     ...HERO_DEFAULTS.imageGroup,
     ...props.imageGroup,
@@ -282,7 +295,7 @@ export function HeroRender(props: HeroProps) {
     if (eyebrowStyle === "badge") {
       eyebrowEl = (
         <p className="inline-block rounded-md bg-brand-accent px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-accent-fg">
-          {eyebrow}
+          <VibeFlourish kind="eyebrow-prefix">{eyebrow}</VibeFlourish>
         </p>
       );
     } else if (eyebrowStyle === "caps") {
@@ -292,7 +305,7 @@ export function HeroRender(props: HeroProps) {
             onDark ? "text-brand-ink-inverse/70" : "text-brand-ink-subtle"
           }`}
         >
-          {eyebrow}
+          <VibeFlourish kind="eyebrow-prefix">{eyebrow}</VibeFlourish>
         </p>
       );
     } else {
@@ -305,7 +318,7 @@ export function HeroRender(props: HeroProps) {
               : "border-brand-border bg-brand-bg/60 text-brand-ink-muted"
           }`}
         >
-          {eyebrow}
+          <VibeFlourish kind="eyebrow-prefix">{eyebrow}</VibeFlourish>
         </p>
       );
     }
@@ -407,6 +420,13 @@ export function HeroRender(props: HeroProps) {
       ))}
       {eyebrowEl}
       <h1 className={`mt-6 ${titleClasses}`}>{title}</h1>
+      {isCentered ? (
+        <div className="flex justify-center">
+          <VibeFlourish kind="headline-underline" />
+        </div>
+      ) : (
+        <VibeFlourish kind="headline-underline" />
+      )}
       {subtitleEl}
       {actionsEl}
       {trustEl}
@@ -494,8 +514,10 @@ export function HeroRender(props: HeroProps) {
 
   return (
     <section className={sectionClass} style={sectionStyle}>
+      <VibeFlourish kind="background-confetti" />
       {overlayEl}
       <div className="relative">{body}</div>
+      <VibeFlourish kind="hero-corner" />
       {scrollEl}
     </section>
   );
@@ -518,7 +540,7 @@ export function RichBlockRender({ content }: RichBlockProps) {
 }
 
 // ─── FeaturesGrid ─────────────────────────────────────────────────────
-export type FeaturesLayout = "grid-3" | "grid-4" | "list-icon-left" | "bento";
+export type FeaturesLayout = "auto" | "grid-3" | "grid-4" | "list-icon-left" | "bento";
 export type FeaturesItem = {
   icon: string;
   title: string;
@@ -535,7 +557,8 @@ export type FeaturesGridProps = {
 };
 
 export function FeaturesGridRender({ title, subtitle, layout, items }: FeaturesGridProps) {
-  const variant: FeaturesLayout = layout ?? "grid-3";
+  const variant: FeaturesLayout =
+    !layout || layout === "auto" ? "grid-3" : layout;
   return (
     <section className="brand-section bg-brand-bg px-6 py-20 md:py-28 font-brand-body text-brand-ink">
       <div className="mx-auto max-w-6xl">
@@ -642,7 +665,7 @@ export function FeaturesGridRender({ title, subtitle, layout, items }: FeaturesG
 }
 
 // ─── Stats ────────────────────────────────────────────────────────────
-export type StatsLayout = "grid" | "row" | "oversized";
+export type StatsLayout = "auto" | "grid" | "row" | "oversized";
 export type StatsProps = {
   /** Optional. Defaults to "grid" so legacy sites render identically. */
   layout?: StatsLayout;
@@ -651,7 +674,8 @@ export type StatsProps = {
 };
 
 export function StatsRender({ layout, intro, items }: StatsProps) {
-  const variant: StatsLayout = layout ?? "grid";
+  const variant: StatsLayout =
+    !layout || layout === "auto" ? "grid" : layout;
 
   return (
     <section className="brand-section bg-brand-surface px-6 py-16 md:py-20 font-brand-body text-brand-ink">
@@ -707,7 +731,7 @@ export function StatsRender({ layout, intro, items }: StatsProps) {
 }
 
 // ─── Testimonial ──────────────────────────────────────────────────────
-export type TestimonialLayout = "centered" | "grid-3" | "carousel";
+export type TestimonialLayout = "auto" | "centered" | "grid-3" | "carousel";
 export type TestimonialItem = {
   quote: string;
   author: string;
@@ -729,7 +753,8 @@ export type TestimonialProps = {
 };
 
 export function TestimonialRender({ layout, quote, author, role, avatar, items }: TestimonialProps) {
-  const variant: TestimonialLayout = layout ?? "centered";
+  const variant: TestimonialLayout =
+    !layout || layout === "auto" ? "centered" : layout;
   // Use new items array if present; otherwise the legacy top-level fields
   // act as the single item. Keeps existing JSON renderable unchanged.
   const allItems: TestimonialItem[] =
@@ -810,7 +835,7 @@ export function TestimonialRender({ layout, quote, author, role, avatar, items }
 }
 
 // ─── ImageText (Split) ────────────────────────────────────────────────
-export type ImageTextLayout = "image-left" | "image-right" | "stacked" | "card-overlay";
+export type ImageTextLayout = "auto" | "image-left" | "image-right" | "stacked" | "card-overlay";
 
 export type ImageTextProps = {
   title: string;
@@ -832,8 +857,10 @@ export function ImageTextRender({
   imagePosition,
   layout,
 }: ImageTextProps) {
+  const legacyFallback: ImageTextLayout =
+    imagePosition === "left" ? "image-left" : "image-right";
   const variant: ImageTextLayout =
-    layout ?? (imagePosition === "left" ? "image-left" : "image-right");
+    !layout || layout === "auto" ? legacyFallback : layout;
 
   const placeholderClass = "w-full rounded-[var(--brand-radius-card)] bg-brand-surface";
   const imageNode = image ? (
@@ -1103,7 +1130,7 @@ export function TeamRender({ title, subtitle, members }: TeamProps) {
 }
 
 // ─── Pricing ──────────────────────────────────────────────────────────
-export type PricingLayout = "cards-3" | "comparison-table" | "single-toggle";
+export type PricingLayout = "auto" | "cards-3" | "comparison-table" | "single-toggle";
 
 export type PricingPlan = {
   icon: string;
@@ -1138,7 +1165,8 @@ export type PricingProps = {
 };
 
 export function PricingRender({ title, subtitle, layout, rowLabels, toggle, plans }: PricingProps) {
-  const variant: PricingLayout = layout ?? "cards-3";
+  const variant: PricingLayout =
+    !layout || layout === "auto" ? "cards-3" : layout;
 
   return (
     <section className="brand-section bg-brand-surface px-6 py-20 md:py-28 font-brand-body text-brand-ink">

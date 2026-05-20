@@ -7,7 +7,7 @@
  * output is back-filled from BLOCK_DEFAULTS.
  */
 
-import type { ThemePresetId } from "../theme";
+import { THEME_PRESETS, type ThemePresetId } from "../theme";
 
 export type Vibe = {
   id: ThemePresetId;
@@ -36,6 +36,19 @@ export function renderVibesForPrompt(): string {
   return VIBES.map(
     (v) => `- ${v.id}: ${v.oneLiner} Best for: ${v.bestFor}. Avoid for: ${v.avoidFor}.`,
   ).join("\n");
+}
+
+/** Per-vibe block-layout defaults, derived from THEME_PRESETS so the prompt
+ * stays in sync with the render-time fallback in `useLayoutDefault()`.
+ * Vibes without explicit defaults are omitted; AI may pick freely there. */
+export function renderLayoutDefaultsForPrompt(): string {
+  const lines = THEME_PRESETS.filter((p) => p.layoutDefaults).map((p) => {
+    const entries = Object.entries(p.layoutDefaults!)
+      .map(([b, v]) => `${b}=${v}`)
+      .join(", ");
+    return `- ${p.id}: ${entries}`;
+  });
+  return lines.join("\n");
 }
 
 export type BlockFieldSpec = {

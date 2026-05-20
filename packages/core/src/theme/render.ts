@@ -115,6 +115,7 @@ export function renderTheme(theme?: SiteThemeChoice | null): ThemeRenderResult {
   const themeCss = `:root{${lines.join(";")}}`;
 
   const bodyAttrs: Record<string, string> = {
+    "data-vibe": preset.id,
     "data-divider": s.divider,
     "data-bg-pattern": s.bgPattern,
     "data-card-style": s.cardStyle,

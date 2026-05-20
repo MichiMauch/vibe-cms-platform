@@ -12,6 +12,17 @@ export type ThemePresetId =
   | "editorial"
   | "playful";
 
+/** Blocks that have a `layout` enum and can therefore pick a per-vibe
+ * default. Other blocks (Footer, RichBlock, LogoCloud, etc.) have a single
+ * fixed layout and don't appear here. */
+export type BlockName =
+  | "Hero"
+  | "FeaturesGrid"
+  | "Pricing"
+  | "Testimonial"
+  | "Stats"
+  | "ImageText";
+
 export type ThemePreset = {
   id: ThemePresetId;
   name: string;
@@ -20,6 +31,10 @@ export type ThemePreset = {
   fontPair: FontPair;
   radius: RadiusScale;
   style: PresetStyle;
+  /** Per-vibe block-layout defaults. Used at render time when a block's
+   * `layout` prop is `"auto"` or unset. Legacy vibes leave this undefined
+   * so their hardcoded fallbacks (`"grid-3"`, `"centered"`, …) win. */
+  layoutDefaults?: Partial<Record<BlockName, string>>;
 };
 
 /** Resolved per-site theme stored in `config.json`. */
@@ -229,6 +244,12 @@ export const THEME_PRESETS: ThemePreset[] = [
       spacing: "comfortable",
       radiusX: "sm",
     },
+    layoutDefaults: {
+      Hero: "split-right",
+      FeaturesGrid: "grid-4",
+      Pricing: "comparison-table",
+      Stats: "row",
+    },
   },
   {
     id: "brutal",
@@ -261,6 +282,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       headingTransform: "uppercase",
       spacing: "tight",
       radiusX: "none",
+    },
+    layoutDefaults: {
+      Hero: "oversized",
+      FeaturesGrid: "bento",
+      Pricing: "comparison-table",
+      Stats: "oversized",
+      ImageText: "stacked",
     },
   },
   {
@@ -295,6 +323,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       spacing: "airy",
       radiusX: "2xl",
     },
+    layoutDefaults: {
+      Hero: "split-right",
+      FeaturesGrid: "list-icon-left",
+      ImageText: "card-overlay",
+    },
   },
   {
     id: "editorial",
@@ -328,6 +361,12 @@ export const THEME_PRESETS: ThemePreset[] = [
       spacing: "airy",
       radiusX: "xs",
     },
+    layoutDefaults: {
+      Hero: "oversized",
+      ImageText: "stacked",
+      Testimonial: "centered",
+      Stats: "row",
+    },
   },
   {
     id: "playful",
@@ -360,6 +399,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       headingTransform: "none",
       spacing: "comfortable",
       radiusX: "xl",
+    },
+    layoutDefaults: {
+      Hero: "split-left",
+      FeaturesGrid: "bento",
+      Testimonial: "carousel",
     },
   },
 ];

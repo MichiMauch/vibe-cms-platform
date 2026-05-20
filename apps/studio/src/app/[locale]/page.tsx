@@ -9,6 +9,7 @@ import {
   siteLocaleExists,
 } from "@/lib/platform/site-content";
 import { renderTheme } from "@/lib/platform/theme";
+import { VibeProvider, resolveAutoLayouts } from "@vibe-cms-platform/core/theme";
 
 export const dynamic = "force-dynamic";
 
@@ -95,10 +96,14 @@ export default async function Page({
   // Slug is only used by the Puck editor's AI rewrite field; on the public
   // render path nothing reads it, but the type wants a string.
   const config = buildPuckConfig(slug);
+  const vibeId = site?.config.theme?.preset ?? null;
+  const resolvedData = resolveAutoLayouts(data, vibeId);
   return (
     <div {...bodyAttrs}>
       <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
-      <Render config={config} data={data} />
+      <VibeProvider value={vibeId}>
+        <Render config={config} data={resolvedData} />
+      </VibeProvider>
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import "server-only";
 import OpenAI from "openai";
 import { BLOCK_DEFAULTS, BLOCK_TYPES, ROOT_DEFAULTS } from "@vibe-cms-platform/core/puck";
-import { renderSchemaForPrompt, renderVibesForPrompt } from "@vibe-cms-platform/core/puck";
+import {
+  renderSchemaForPrompt,
+  renderVibesForPrompt,
+  renderLayoutDefaultsForPrompt,
+} from "@vibe-cms-platform/core/puck";
 import { isValidPresetId, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
 
 export type TemplateId = "blank" | "saas" | "agentur" | "event";
@@ -65,7 +69,12 @@ CONTENT RULES
 LAYOUT VARIANT SELECTION
 - Each block whose schema lists a "layout" enum supports multiple visual layouts.
 - Pick the layout that best fits the chosen vibe and the brief, following the per-block hints.
-- Layouts are OPTIONAL — omit when the default is best.
+- Layouts are OPTIONAL — omit (or set to "auto") when the per-vibe default is best.
+
+PER-VIBE LAYOUT DEFAULTS (applied at render time when "layout" is omitted or "auto"):
+${renderLayoutDefaultsForPrompt()}
+
+You SHOULD use the per-vibe defaults above unless the brief actively contradicts them. Setting "layout" to "auto" is the same as omitting it — the renderer will substitute the vibe-default. Use explicit layout values only when the brief calls for a specific structure that overrides the vibe's preference.
 
 VIBE SELECTION
 You MUST pick exactly ONE vibe preset that fits the brand's industry, tone, and target audience.

@@ -202,6 +202,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
                 type: "radio",
                 label: "Anordnung",
                 options: [
+                  { label: "Auto (Vibe entscheidet)", value: "auto" },
                   { label: "Zentriert", value: "centered" },
                   { label: "Linksbündig", value: "left" },
                   { label: "Split (Bild rechts)", value: "split-right" },
@@ -346,6 +347,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             type: "radio",
             label: "Layout",
             options: [
+              { label: "Auto (Vibe entscheidet)", value: "auto" },
               { label: "3 Spalten (Standard)", value: "grid-3" },
               { label: "4 Spalten", value: "grid-4" },
               { label: "Liste mit Icon links", value: "list-icon-left" },
@@ -389,6 +391,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             type: "radio",
             label: "Layout",
             options: [
+              { label: "Auto (Vibe entscheidet)", value: "auto" },
               { label: "Grid (Standard)", value: "grid" },
               { label: "Inline-Reihe", value: "row" },
               { label: "Oversized", value: "oversized" },
@@ -416,6 +419,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             type: "radio",
             label: "Layout",
             options: [
+              { label: "Auto (Vibe entscheidet)", value: "auto" },
               { label: "Zentriert (Standard)", value: "centered" },
               { label: "3-Spalten-Grid", value: "grid-3" },
               { label: "Karussell", value: "carousel" },
@@ -453,6 +457,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             type: "radio",
             label: "Layout",
             options: [
+              { label: "Auto (Vibe entscheidet)", value: "auto" },
               { label: "Bild links", value: "image-left" },
               { label: "Bild rechts (Standard)", value: "image-right" },
               { label: "Gestapelt", value: "stacked" },
@@ -571,6 +576,7 @@ export function buildPuckConfig(slug: string): Config<Components, RootProps> {
             type: "radio",
             label: "Layout",
             options: [
+              { label: "Auto (Vibe entscheidet)", value: "auto" },
               { label: "3 Karten (Standard)", value: "cards-3" },
               { label: "Vergleichstabelle", value: "comparison-table" },
               { label: "Einzelkarte (Monatlich/Jährlich)", value: "single-toggle" },
