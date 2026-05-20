@@ -1,0 +1,246 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Termin anfragen",
+        "subtitle": "<p>Vereinbaren Sie einen Termin für eine empathische Behandlung. Unser Formular hilft Ihnen, die richtigen Informationen bereitzustellen.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#pricing",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Leistungen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathische Behandlung",
+            "description": "<p>Wir bieten individuelle Behandlungen, die auf Ihre Bedürfnisse abgestimmt sind.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Schnelle Terminvereinbarung",
+            "description": "<p>Unser Formular ermöglicht eine schnelle und einfache Terminbuchung.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Sichere Kommunikation",
+            "description": "<p>Mit WhatsApp integrieren wir einen sicheren Kommunikationskanal für Ihre Anfragen.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "1000+",
+            "label": "zufriedene Patienten"
+          },
+          {
+            "value": "95%",
+            "label": "Zufriedenheitsrate"
+          },
+          {
+            "value": "24/7",
+            "label": "Erreichbarkeit"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "auto",
+        "quote": "<p>Die Terminvereinbarung war einfach und die Behandlung war hervorragend!</p>",
+        "author": "Anna Müller",
+        "role": "Patient",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Erstberatung",
+            "price": "CHF 100",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Umfassende Untersuchung"
+              },
+              {
+                "value": "Individuelle Beratung"
+              }
+            ]
+          },
+          {
+            "icon": "Star",
+            "name": "Folgebehandlung",
+            "price": "CHF 80",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Regelmäßige Kontrollen"
+              },
+              {
+                "value": "Schnelle Terminvergabe"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufige Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie kann ich einen Termin vereinbaren?",
+            "answer": "<p>Nutzen Sie unser Online-Formular oder kontaktieren Sie uns direkt über WhatsApp.</p>"
+          },
+          {
+            "question": "Was benötige ich für die Erstberatung?",
+            "answer": "<p>Bitte bringen Sie Ihre Versicherungskarte und alle relevanten medizinischen Unterlagen mit.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#pricing",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Impressum",
+                "href": "#"
+              },
+              {
+                "label": "Datenschutz",
+                "href": "#"
+              }
+            ]
+          },
+          {
+            "heading": "Kontakt",
+            "links": [
+              {
+                "label": "Kontaktformular",
+                "href": "#"
+              },
+              {
+                "label": "WhatsApp",
+                "href": "#"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Termin anfragen - Team Deleurant",
+        "description": "Vereinbaren Sie einen Termin für eine empathische Behandlung bei Team Deleurant. Schnelle und einfache Terminbuchung.",
+        "ogTitle": "Termin anfragen - Team Deleurant",
+        "ogDescription": "Vereinbaren Sie einen Termin für eine empathische Behandlung bei Team Deleurant.",
+        "ogImage": "",
+        "keywords": "Terminvereinbarung, Zahnarzt, Patienten, empathische Behandlung, Gesundheitsdienstleistungen"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen bei Team Deleurant! Wie können wir Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
