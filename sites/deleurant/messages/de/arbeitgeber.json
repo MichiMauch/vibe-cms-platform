@@ -1,0 +1,152 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Willkommen bei Team Deleurant",
+        "subtitle": "<p>Entdecken Sie unsere Unternehmenskultur und die Vorteile, die wir unseren Mitarbeitenden bieten. Werden Sie Teil unseres Teams!</p>",
+        "ctaLabel": "Jetzt bewerben",
+        "ctaHref": "#bewerbung",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Vorteile",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Sparkles",
+            "title": "Flexible Ferien",
+            "description": "<p>Genießen Sie flexible Urlaubszeiten, die auf Ihre Bedürfnisse abgestimmt sind.</p>"
+          },
+          {
+            "icon": "Heart",
+            "title": "Wettbewerbsfähige Löhne",
+            "description": "<p>Wir bieten attraktive Gehälter, die Ihre Leistungen wertschätzen.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Teamevents",
+            "description": "<p>Regelmäßige Teamevents fördern den Zusammenhalt und die Zusammenarbeit.</p>"
+          },
+          {
+            "icon": "Lightbulb",
+            "title": "Weiterbildungsmöglichkeiten",
+            "description": "<p>Profitieren Sie von vielfältigen Weiterbildungsmöglichkeiten zur persönlichen und beruflichen Entwicklung.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "auto",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "100+",
+            "label": "Zufriedene Mitarbeitende"
+          },
+          {
+            "value": "20+",
+            "label": "Jahre Erfahrung"
+          },
+          {
+            "value": "5",
+            "label": "Standorte"
+          },
+          {
+            "value": "50+",
+            "label": "Teamevents jährlich"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "auto",
+        "quote": "<p>Team Deleurant ist ein großartiger Arbeitsplatz, wo ich mich geschätzt fühle.</p>",
+        "author": "Max Müller",
+        "role": "Zahnarzt",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit, Teil unseres Teams zu werden?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt bewerben",
+        "ctaPrimaryHref": "#bewerbung",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Arbeitgeber | Team Deleurant",
+        "description": "Erfahren Sie mehr über die Kultur und Vorteile von Team Deleurant. Werden Sie Teil unseres engagierten Teams.",
+        "ogTitle": "Arbeitgeber bei Team Deleurant",
+        "ogDescription": "Entdecken Sie die Vorteile und die Unternehmenskultur von Team Deleurant. Jetzt bewerben!",
+        "ogImage": "",
+        "keywords": "Team Deleurant, Arbeitgeber, Kultur, Vorteile, Stellenangebote"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
