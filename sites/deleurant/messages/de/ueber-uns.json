@@ -1,0 +1,157 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Über Team Deleurant",
+        "subtitle": "<p>Wir bieten planbare Ergebnisse und empathische Behandlungen, die auf einem verlässlichen System basieren.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#kontakt",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Werte und Philosophie",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathie",
+            "description": "<p>Wir hören zu und verstehen die Bedürfnisse unserer Patienten.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Verlässlichkeit",
+            "description": "<p>Unsere Behandlungen sind planbar und transparent.</p>"
+          },
+          {
+            "icon": "Star",
+            "title": "Qualität",
+            "description": "<p>Wir streben nach den höchsten Standards in der Patientenversorgung.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "ImageText",
+      "props": {
+        "layout": "image-left",
+        "title": "Unser 'Drive-to-Survive' Ansatz",
+        "content": "<p>Unser Ansatz fokussiert sich auf nachhaltige Ergebnisse und die langfristige Gesundheit unserer Patienten.</p>",
+        "image": "",
+        "imageAlt": "Team Deleurant",
+        "imagePosition": "right",
+        "id": "ImageText-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Reise?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#kontakt",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Unsere Philosophie",
+                "href": "#philosophie"
+              },
+              {
+                "label": "Das Team",
+                "href": "#team"
+              }
+            ]
+          },
+          {
+            "heading": "Kontakt",
+            "links": [
+              {
+                "label": "Termin vereinbaren",
+                "href": "#kontakt"
+              },
+              {
+                "label": "Häufige Fragen",
+                "href": "#faq"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Über Team Deleurant - Empathische Behandlungen",
+        "description": "Erfahren Sie mehr über Team Deleurant, unsere Philosophie und den 'Drive-to-Survive' Ansatz für planbare Ergebnisse.",
+        "ogTitle": "Über Team Deleurant",
+        "ogDescription": "Entdecken Sie unsere Werte und wie wir empathische Behandlungen anbieten.",
+        "ogImage": "",
+        "keywords": "Team Deleurant, empathische Behandlungen, planbare Ergebnisse, Philosophie, Gesundheit"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
