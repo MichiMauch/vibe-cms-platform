@@ -1,0 +1,198 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Willkommen bei Team Deleurant",
+        "subtitle": "<p>Planbare Ergebnisse und empathische Behandlungen für alle Altersgruppen. Wir setzen auf ein verlässliches System, um Ihre Bedürfnisse zu erfüllen.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#pricing",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Leistungen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathische Behandlung",
+            "description": "<p>Wir hören zu und passen unsere Behandlungen an Ihre individuellen Bedürfnisse an.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Planbare Ergebnisse",
+            "description": "<p>Unsere Methoden garantieren Ihnen planbare und nachvollziehbare Ergebnisse.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Verlässliches System",
+            "description": "<p>Wir nutzen ein erprobtes System, um die Qualität unserer Behandlungen sicherzustellen.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "auto",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "95%",
+            "label": "Zufriedenheit unserer Patienten"
+          },
+          {
+            "value": "1000+",
+            "label": "Behandelte Patienten"
+          },
+          {
+            "value": "10+",
+            "label": "Jahre Erfahrung"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "auto",
+        "quote": "<p>Die Behandlung war einfach fantastisch! Ich fühlte mich jederzeit gut aufgehoben.</p>",
+        "author": "Max Mustermann",
+        "role": "Patient",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Standardbehandlung",
+            "price": "CHF 100",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Individuelle Beratung"
+              },
+              {
+                "value": "Planbare Ergebnisse"
+              },
+              {
+                "value": "Nachsorge inklusive"
+              }
+            ]
+          },
+          {
+            "icon": "Star",
+            "name": "Premiumbehandlung",
+            "price": "CHF 150",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Umfassende Analyse"
+              },
+              {
+                "value": "Persönlicher Ansprechpartner"
+              },
+              {
+                "value": "Erweiterte Nachsorge"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#pricing",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Team Deleurant - Empathische Behandlungen",
+        "description": "Entdecken Sie planbare Ergebnisse und empathische Behandlungen bei Team Deleurant. Jetzt Termin vereinbaren!",
+        "ogTitle": "Team Deleurant - Empathische Behandlungen",
+        "ogDescription": "Planbare Ergebnisse und empathische Behandlungen für alle Altersgruppen.",
+        "ogImage": "",
+        "keywords": "Team Deleurant, Behandlungen, Patienten, empathisch, planbar"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen bei Team Deleurant! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
