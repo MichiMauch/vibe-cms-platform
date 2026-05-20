@@ -1,0 +1,167 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Willkommen in der Praxis Luzern",
+        "subtitle": "<p>Erleben Sie empathische Behandlungen in unserer Boutique-Praxis. Wir bieten Ihnen planbare Ergebnisse und eine individuelle Betreuung.</p>",
+        "ctaLabel": "Termin vereinbaren",
+        "ctaHref": "#kontakt",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Leistungen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Individuelle Behandlungen",
+            "description": "<p>Wir passen unsere Behandlungen an Ihre Bedürfnisse an, um die besten Ergebnisse zu erzielen.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Familienfreundlich",
+            "description": "<p>Unsere Praxis ist für Patienten jeden Alters geeignet, von Kindern bis zu Erwachsenen.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Verlässliche Ergebnisse",
+            "description": "<p>Wir setzen auf ein bewährtes System, um Ihnen planbare Ergebnisse zu garantieren.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "auto",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "95%",
+            "label": "Zufriedenheit unserer Patienten"
+          },
+          {
+            "value": "10+",
+            "label": "Jahre Erfahrung"
+          },
+          {
+            "value": "2000+",
+            "label": "Behandelte Patienten"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin buchen",
+        "ctaPrimaryHref": "#kontakt",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Impressum",
+                "href": "#impressum"
+              },
+              {
+                "label": "Datenschutz",
+                "href": "#datenschutz"
+              }
+            ]
+          },
+          {
+            "heading": "Kontakt",
+            "links": [
+              {
+                "label": "Standorte",
+                "href": "#standorte"
+              },
+              {
+                "label": "Häufige Fragen",
+                "href": "#faq"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Standort Luzern - Team Deleurant",
+        "description": "Entdecken Sie unsere Boutique-Praxis in Luzern, die individuelle Behandlungen für alle Altersgruppen anbietet.",
+        "ogTitle": "Standort Luzern - Team Deleurant",
+        "ogDescription": "Erleben Sie empathische Behandlungen in unserer Praxis in Luzern.",
+        "ogImage": "",
+        "keywords": "Luzern, Team Deleurant, Zahnarzt, individuelle Behandlungen, Patienten"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie können wir Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
