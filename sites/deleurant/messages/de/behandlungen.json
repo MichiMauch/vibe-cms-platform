@@ -1,0 +1,257 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Behandlungen für Ihre Wünsche",
+        "subtitle": "<p>Unsere Behandlungsübersicht folgt dem 'Wunsch-first'-Prinzip. Finden Sie die passende Lösung für Ihre Bedürfnisse.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#pricing",
+        "layout": "centered",
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-4",
+        "title": "Unsere Behandlungsangebote",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathische Behandlung",
+            "description": "<p>Wir hören auf Ihre Wünsche und bieten individuelle Behandlungspläne.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Transparente Kosten",
+            "description": "<p>Unsere Kostentabelle ist klar strukturiert und nachvollziehbar.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Für alle Altersgruppen",
+            "description": "<p>Unsere Angebote richten sich an Kinder, Jugendliche und Erwachsene.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Planbare Ergebnisse",
+            "description": "<p>Wir garantieren planbare Ergebnisse durch unser verlässliches System.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "1000+",
+            "label": "Zufriedene Patienten"
+          },
+          {
+            "value": "95%",
+            "label": "Erfolgsquote"
+          },
+          {
+            "value": "10",
+            "label": "Jahre Erfahrung"
+          },
+          {
+            "value": "50+",
+            "label": "Behandlungsoptionen"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "centered",
+        "quote": "<p>Ich fühlte mich von Anfang an gut aufgehoben und die Behandlung war genau auf meine Bedürfnisse abgestimmt.</p>",
+        "author": "Max Müller",
+        "role": "Patient",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "cards-3",
+        "title": "Unsere Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Basisbehandlung",
+            "price": "CHF 100",
+            "priceCaption": "pro Sitzung",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Erstberatung inklusive"
+              },
+              {
+                "value": "Individueller Behandlungsplan"
+              }
+            ]
+          },
+          {
+            "icon": "Sparkles",
+            "name": "Premiumbehandlung",
+            "price": "CHF 200",
+            "priceCaption": "pro Sitzung",
+            "ctaLabel": "Jetzt buchen",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Erstberatung inklusive"
+              },
+              {
+                "value": "Priorisierte Termine"
+              },
+              {
+                "value": "Persönlicher Ansprechpartner"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie lange dauert eine Behandlung?",
+            "answer": "<p>Die Dauer variiert je nach Behandlung, im Durchschnitt zwischen 30 und 60 Minuten.</p>"
+          },
+          {
+            "question": "Wie kann ich einen Termin vereinbaren?",
+            "answer": "<p>Sie können direkt über unsere Website einen Termin buchen oder uns anrufen.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Unternehmen",
+            "links": [
+              {
+                "label": "Über uns",
+                "href": "#"
+              },
+              {
+                "label": "Karriere",
+                "href": "#"
+              }
+            ]
+          },
+          {
+            "heading": "Rechtliches",
+            "links": [
+              {
+                "label": "Datenschutz",
+                "href": "#"
+              },
+              {
+                "label": "Impressum",
+                "href": "#"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Behandlungen - Team Deleurant",
+        "description": "Entdecken Sie unsere wunsch-fokussierten Behandlungen mit transparenten Kosten. Vereinbaren Sie jetzt einen Termin!",
+        "ogTitle": "Behandlungen bei Team Deleurant",
+        "ogDescription": "Planbare Ergebnisse und empathische Behandlungen für alle Altersgruppen.",
+        "ogImage": "",
+        "keywords": "Behandlungen, Team Deleurant, empathische Behandlung, transparente Kosten, Patienten"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen bei Team Deleurant! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
