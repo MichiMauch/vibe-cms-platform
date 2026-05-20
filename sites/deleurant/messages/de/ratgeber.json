@@ -1,0 +1,197 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Ihr Ratgeber für Zahnbehandlungen",
+        "subtitle": "<p>Entdecken Sie umfassende Informationen zu Zahnspangen, KFO und Invisalign. Wir helfen Ihnen, die richtige Entscheidung zu treffen.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#termin",
+        "layout": {
+          "layout": "auto",
+          "density": "default"
+        },
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "auto",
+        "title": "Unsere Leistungen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Zap",
+            "title": "Zahnspangen",
+            "description": "<p>Erfahren Sie alles über verschiedene Arten von Zahnspangen und deren Vorteile.</p>"
+          },
+          {
+            "icon": "Heart",
+            "title": "Kieferorthopädie",
+            "description": "<p>Wir bieten individuelle Lösungen für Ihre kieferorthopädischen Bedürfnisse.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Invisalign",
+            "description": "<p>Entdecken Sie die Vorteile von Invisalign für eine nahezu unsichtbare Zahnkorrektur.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "auto",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "95%",
+            "label": "Zufriedenheit unserer Patienten"
+          },
+          {
+            "value": "1000+",
+            "label": "Erfolgreiche Behandlungen"
+          },
+          {
+            "value": "20+",
+            "label": "Jahre Erfahrung"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "auto",
+        "quote": "<p>Die Behandlung war einfach und das Ergebnis ist fantastisch!</p>",
+        "author": "Max Müller",
+        "role": "Patient",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie lange dauert eine Behandlung?",
+            "answer": "<p>Die Dauer hängt von der Art der Behandlung ab, in der Regel zwischen 6 und 24 Monaten.</p>"
+          },
+          {
+            "question": "Sind die Behandlungen schmerzhaft?",
+            "answer": "<p>Die meisten Patienten berichten von minimalen Beschwerden während der Behandlung.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihr neues Lächeln?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#termin",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Unsere Praxis",
+                "href": "#praxis"
+              },
+              {
+                "label": "Team",
+                "href": "#team"
+              }
+            ]
+          },
+          {
+            "heading": "Rechtliches",
+            "links": [
+              {
+                "label": "Datenschutz",
+                "href": "#datenschutz"
+              },
+              {
+                "label": "Impressum",
+                "href": "#impressum"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Ratgeber - Team Deleurant",
+        "description": "Ihr Ratgeber für Zahnbehandlungen, Zahnspangen, KFO und Invisalign. Jetzt Termin vereinbaren.",
+        "ogTitle": "Ratgeber - Team Deleurant",
+        "ogDescription": "Entdecken Sie umfassende Informationen zu Zahnbehandlungen und vereinbaren Sie jetzt einen Termin.",
+        "ogImage": "",
+        "keywords": "Zahnspangen, Kieferorthopädie, Invisalign, Behandlung, Ratgeber"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
