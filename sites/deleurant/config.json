@@ -1,0 +1,114 @@
+{
+  "brand": "Team Deleurant",
+  "template": "saas",
+  "domains": [
+    "deleurant.pages.mauch.rocks"
+  ],
+  "createdAt": "2026-05-20T20:18:55.380Z",
+  "theme": {
+    "preset": "studio"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "path": "",
+      "title": {
+        "de": "Homepage"
+      },
+      "navOrder": 0
+    },
+    {
+      "slug": "arbeitgeber",
+      "path": "arbeitgeber",
+      "title": {
+        "de": "Arbeitgeber"
+      },
+      "navOrder": 1
+    },
+    {
+      "slug": "behandlungen",
+      "path": "behandlungen",
+      "title": {
+        "de": "Behandlungen"
+      },
+      "navOrder": 2
+    },
+    {
+      "slug": "behandlungen__unsere-methode",
+      "path": "behandlungen/unsere-methode",
+      "title": {
+        "de": "Unsere Methode"
+      },
+      "parent": "behandlungen",
+      "navOrder": 3
+    },
+    {
+      "slug": "ratgeber",
+      "path": "ratgeber",
+      "title": {
+        "de": "Ratgeber"
+      },
+      "navOrder": 4
+    },
+    {
+      "slug": "standorte",
+      "path": "standorte",
+      "title": {
+        "de": "Standorte"
+      },
+      "navOrder": 5
+    },
+    {
+      "slug": "termin-anfragen",
+      "path": "termin-anfragen",
+      "title": {
+        "de": "Termin anfragen"
+      },
+      "navOrder": 6
+    },
+    {
+      "slug": "ueber-uns",
+      "path": "ueber-uns",
+      "title": {
+        "de": "Über uns"
+      },
+      "navOrder": 7
+    },
+    {
+      "slug": "behandlungen__zahnkorrektur-kind",
+      "path": "behandlungen/zahnkorrektur-kind",
+      "title": {
+        "de": "Zahnkorrektur für mein Kind"
+      },
+      "parent": "behandlungen",
+      "navOrder": 8
+    },
+    {
+      "slug": "standorte__kuessnacht",
+      "path": "standorte/kuessnacht",
+      "title": {
+        "de": "Standort Küssnacht"
+      },
+      "parent": "standorte",
+      "navOrder": 9
+    },
+    {
+      "slug": "standorte__luzern",
+      "path": "standorte/luzern",
+      "title": {
+        "de": "Standort Luzern"
+      },
+      "parent": "standorte",
+      "navOrder": 10
+    },
+    {
+      "slug": "standorte__sursee",
+      "path": "standorte/sursee",
+      "title": {
+        "de": "Standort Sursee"
+      },
+      "parent": "standorte",
+      "navOrder": 11
+    }
+  ]
+}
