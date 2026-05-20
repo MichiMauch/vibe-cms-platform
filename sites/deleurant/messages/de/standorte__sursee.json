@@ -1,0 +1,140 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Willkommen in der Praxis Sursee",
+        "subtitle": "<p>Unsere Praxis in Sursee bietet Ihnen eine moderne Behandlung mit einem spezialisierten Labor. Erfahren Sie mehr über unsere Angebote und Öffnungszeiten.</p>",
+        "ctaLabel": "Termin vereinbaren",
+        "ctaHref": "#termin",
+        "layout": "centered",
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-3",
+        "title": "Unsere Leistungen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Heart",
+            "title": "Empathische Behandlung",
+            "description": "<p>Wir legen Wert auf eine einfühlsame Behandlung für alle Altersgruppen.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Moderne Ausstattung",
+            "description": "<p>Unsere Praxis ist mit den neuesten Technologien ausgestattet, um optimale Ergebnisse zu erzielen.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Planbare Ergebnisse",
+            "description": "<p>Wir bieten Ihnen transparente und planbare Behandlungsergebnisse.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "10+",
+            "label": "Jahre Erfahrung"
+          },
+          {
+            "value": "5000+",
+            "label": "Zufriedene Patienten"
+          },
+          {
+            "value": "95%",
+            "label": "Zufriedenheitsrate"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "centered",
+        "quote": "<p>Die Behandlung war einfach hervorragend! Ich fühle mich hier bestens aufgehoben.</p>",
+        "author": "Anna Müller",
+        "role": "Patientin",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für Ihre Behandlung?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin buchen",
+        "ctaPrimaryHref": "#termin",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Standort Sursee - Team Deleurant",
+        "description": "Entdecken Sie die Praxis Sursee. Empathische Behandlungen und moderne Ausstattung für alle Altersgruppen.",
+        "ogTitle": "Standort Sursee - Team Deleurant",
+        "ogDescription": "Willkommen in der Praxis Sursee. Ihre Gesundheit ist unser Anliegen.",
+        "ogImage": "",
+        "keywords": "Sursee, Team Deleurant, Behandlung, Praxis, Gesundheit"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
