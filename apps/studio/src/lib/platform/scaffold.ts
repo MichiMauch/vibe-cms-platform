@@ -18,7 +18,25 @@ export type Brief = {
   primaryGoal?: string;
   /** If set, the AI is told to USE this vibe and skip suggestion. */
   pinnedVibe?: ThemePresetId | null;
+  /** Output language. Default "de". Passed to the model so non-German briefs
+   * yield non-German content. */
+  language?: "de" | "en" | "fr" | "it";
+  /** When generating a sub-page of a multi-page site: tells the model that
+   * this is NOT a homepage, gives it the site-wide positioning, and asks it
+   * to focus on this page's specific topic. Omit for single-page sites. */
+  pageContext?: {
+    /** URL path. "" = homepage, "standort/luzern" = sub-page. */
+    pagePath: string;
+    /** Human title (used in nav + as the Hero anchor for the page). */
+    pageTitle: string;
+    /** Whole-site positioning so all pages stay tonally coherent. */
+    siteContext: string;
+  };
 };
+
+/** Hard cap on how many pages a single multi-page scaffold will produce.
+ * Each page costs ~1 OpenAI call. */
+export const MAX_PAGES_PER_SITE = 12;
 
 export type VibeSuggestion = {
   preset: ThemePresetId;
@@ -40,7 +58,7 @@ const TEMPLATE_HINT: Record<TemplateId, string> = {
   event: "Single-event page — typically Hero · ImageText · Stats · Faq · CtaBanner · Footer.",
 };
 
-const SYSTEM_PROMPT = `You compose a landing-page content tree for the Vibe-CMS Puck editor.
+const SYSTEM_PROMPT = `You compose a page content tree for the Vibe-CMS Puck editor.
 
 OUTPUT FORMAT
 Return strict JSON, no commentary, with exactly these top-level keys:
@@ -48,7 +66,7 @@ Return strict JSON, no commentary, with exactly these top-level keys:
   "content": [ { "type": "<BlockType>", "props": { ... } }, ... ],
   "root": { "props": { "seo": {...}, "chatbot": {...} } },
   "zones": {},
-  "vibeSuggestion": { "preset": "<id>", "rationale": "<≤140 chars, German>", "confidence": "high|medium|low" }
+  "vibeSuggestion": { "preset": "<id>", "rationale": "<≤140 chars, in the output language>", "confidence": "high|medium|low" }
 }
 
 CONTENT RULES
@@ -63,8 +81,18 @@ CONTENT RULES
     url      → "#" or a section anchor like "#pricing"
     enum     → exactly one of the listed values
     array    → JSON array of objects matching the item-field schema
+- Output language: see the "language" field in the user message; default is German.
 - Swiss German conventions for German output: ä/ö/ü, ss — never ß.
 - Brand names, technical terms, product nouns: keep them unchanged.
+
+PAGE-CONTEXT (multi-page sites)
+If the user message contains a "pageContext" object, you are composing ONE page of a multi-page site:
+- "pageContext.pagePath" identifies the page ("" for the homepage, otherwise a kebab-case URL path).
+- "pageContext.pageTitle" is the human title — use it for the Hero headline / page-specific framing.
+- "pageContext.siteContext" gives the whole-site positioning — anchor tone, brand voice, and any cross-page references in it.
+- For sub-pages (pagePath !== ""): focus the content on THIS specific topic. The Hero should reflect the page topic, NOT the whole brand pitch. Skip blocks that belong to the homepage (e.g. broad pricing comparisons on a single-location page).
+- A Footer block is still required on every page.
+- Do not output a SiteHeader / Nav block — site navigation is rendered automatically from the page list.
 
 LAYOUT VARIANT SELECTION
 - Each block whose schema lists a "layout" enum supports multiple visual layouts.
@@ -176,6 +204,7 @@ export async function scaffoldContent(opts: {
   brief: Brief;
 }): Promise<ScaffoldResult> {
   const openai = new OpenAI({ apiKey: opts.apiKey });
+  const language = opts.brief.language ?? "de";
   const completion = await openai.chat.completions.create({
     model: opts.model,
     response_format: { type: "json_object" },
@@ -187,6 +216,8 @@ export async function scaffoldContent(opts: {
         content: JSON.stringify({
           brief: opts.brief,
           templateHint: TEMPLATE_HINT[opts.brief.template],
+          language,
+          pageContext: opts.brief.pageContext,
         }),
       },
     ],
@@ -222,5 +253,110 @@ export async function scaffoldContent(opts: {
   return {
     contentJson: JSON.stringify(normalised, null, 2),
     vibeSuggestion,
+  };
+}
+
+/** Input page for a multi-page scaffold run. */
+export type SitePage = {
+  /** URL path ("" = homepage). */
+  path: string;
+  /** Human title. */
+  title: string;
+  /** Parent path (must reference another page in the list). */
+  parent?: string;
+  /** Page-specific brief (3–6 sentences) — what content this page should hold. */
+  pageBrief: string;
+};
+
+export type ScaffoldedPage = {
+  path: string;
+  title: string;
+  parent?: string;
+  /** Puck JSON tree as a serialised string (same shape as scaffoldContent's output). */
+  contentJson: string;
+};
+
+export type ScaffoldSiteResult = {
+  pages: ScaffoldedPage[];
+  vibeSuggestion: VibeSuggestion;
+};
+
+/** Generate one Puck tree per input page. The homepage runs first to settle
+ * the vibe; subsequent pages are pinned to that vibe so the whole site stays
+ * tonally coherent. Callers can stream progress via the `onPageDone` hook.
+ *
+ * Pages are capped to MAX_PAGES_PER_SITE — extras are dropped silently. */
+export async function scaffoldSite(opts: {
+  apiKey: string;
+  model: string;
+  brief: Omit<Brief, "pageContext">;
+  pages: SitePage[];
+  onPageDone?: (info: { index: number; total: number; page: ScaffoldedPage }) => void;
+}): Promise<ScaffoldSiteResult> {
+  // Ensure a homepage exists and is first.
+  const sorted = [...opts.pages];
+  const homeIdx = sorted.findIndex((p) => p.path === "");
+  if (homeIdx === -1) {
+    throw new Error("scaffoldSite: page list must include a homepage entry (path = \"\")");
+  }
+  if (homeIdx > 0) {
+    const [home] = sorted.splice(homeIdx, 1);
+    sorted.unshift(home);
+  }
+  const capped = sorted.slice(0, MAX_PAGES_PER_SITE);
+
+  const siteContext = [
+    `Brand: ${opts.brief.brand}`,
+    `Brief: ${opts.brief.description}`,
+    opts.brief.audience ? `Audience: ${opts.brief.audience}` : "",
+    opts.brief.primaryGoal ? `Primary goal: ${opts.brief.primaryGoal}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const results: ScaffoldedPage[] = [];
+  let resolvedVibe: VibeSuggestion | null = null;
+
+  for (let i = 0; i < capped.length; i++) {
+    const page = capped[i];
+    const isHome = page.path === "";
+    const brief: Brief = {
+      ...opts.brief,
+      // After the homepage, pin the vibe so all pages stay coherent.
+      pinnedVibe: isHome ? opts.brief.pinnedVibe ?? null : resolvedVibe?.preset ?? null,
+      // For sub-pages, replace the broad description with the page-specific
+      // brief and pass site-wide context separately.
+      description: isHome
+        ? `${opts.brief.description}\n\nThis is the HOMEPAGE.`
+        : page.pageBrief,
+      pageContext: {
+        pagePath: page.path,
+        pageTitle: page.title,
+        siteContext,
+      },
+    };
+    const result = await scaffoldContent({
+      apiKey: opts.apiKey,
+      model: opts.model,
+      brief,
+    });
+    if (isHome) resolvedVibe = result.vibeSuggestion;
+    const scaffolded: ScaffoldedPage = {
+      path: page.path,
+      title: page.title,
+      parent: page.parent,
+      contentJson: result.contentJson,
+    };
+    results.push(scaffolded);
+    opts.onPageDone?.({ index: i, total: capped.length, page: scaffolded });
+  }
+
+  return {
+    pages: results,
+    vibeSuggestion: resolvedVibe ?? {
+      preset: DEFAULT_PRESET_ID,
+      rationale: "Default vibe (no homepage processed).",
+      confidence: "low",
+    },
   };
 }

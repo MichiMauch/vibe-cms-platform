@@ -9,15 +9,73 @@ import { createCloudflareClient } from "@/lib/platform/cloudflare";
 import { scaffoldContent, type Brief, type TemplateId } from "@/lib/platform/scaffold";
 import { sitesDir, clearDomainCache, getSite } from "@/lib/platform/registry";
 import { isValidPresetId, DEFAULT_PRESET_ID, type SiteThemeChoice } from "@vibe-cms-platform/core/theme";
+import {
+  pagePathToFileSlug,
+  normalisePagePath,
+  type PageEntry,
+} from "@vibe-cms-platform/core/site";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 90;
+export const maxDuration = 300;
 
 const VALID_TEMPLATES: TemplateId[] = ["blank", "saas", "agentur", "event"];
 const SLUG_RE = /^[a-z][a-z0-9-]{1,38}[a-z0-9]$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOMAIN_RE = /^(?!:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const VALID_LANGUAGES = new Set(["de", "en", "fr", "it"]);
+
+type PreScaffoldedPage = {
+  path: string;
+  title: string;
+  parent?: string;
+  contentJson: string;
+};
+
+/** Apply the chosen theme to a Puck-tree string and return the new string.
+ * Tolerant: if the tree is unparseable, returns the input unchanged. */
+function injectThemeIntoTree(raw: string, theme: SiteThemeChoice): string {
+  try {
+    const parsed = JSON.parse(raw) as {
+      root?: { props?: Record<string, unknown> };
+      [k: string]: unknown;
+    };
+    parsed.root = parsed.root ?? {};
+    parsed.root.props = parsed.root.props ?? {};
+    parsed.root.props.theme = {
+      preset: theme.preset,
+      accentOverride: theme.accentOverride ?? "",
+      inkOverride: theme.inkOverride ?? "",
+    };
+    return JSON.stringify(parsed, null, 2);
+  } catch {
+    return raw;
+  }
+}
+
+function parsePreScaffolded(raw: unknown): PreScaffoldedPage[] | null {
+  if (!Array.isArray(raw)) return null;
+  const out: PreScaffoldedPage[] = [];
+  const seen = new Set<string>();
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const pageP = typeof o.path === "string" ? normalisePagePath(o.path) : "";
+    const title = typeof o.title === "string" ? o.title.trim() : "";
+    const contentJson = typeof o.contentJson === "string" ? o.contentJson : "";
+    if (!title || !contentJson) continue;
+    if (seen.has(pageP)) continue;
+    seen.add(pageP);
+    const parent =
+      typeof o.parent === "string" && o.parent.trim()
+        ? normalisePagePath(o.parent)
+        : undefined;
+    out.push({ path: pageP, title, parent, contentJson });
+  }
+  if (out.length === 0) return null;
+  if (!out.some((p) => p.path === "")) return null;
+  return out;
+}
 
 export async function POST(req: Request) {
   const session = await readSession();
@@ -38,9 +96,14 @@ export async function POST(req: Request) {
       customerEmail: string;
       customDomain?: string;
       theme?: { preset?: string; accentOverride?: string; inkOverride?: string };
-      /** Pre-generated content tree from `/api/sites/scaffold`. When present,
-       * the AI step is skipped — Phase B of the two-phase create flow. */
+      /** Pre-generated single-page content tree from `/api/sites/scaffold`.
+       * Phase B of the legacy single-page flow. */
       contentJson?: string;
+      /** Pre-generated multi-page bundle. Each entry has its own contentJson.
+       * When present, `pages` takes precedence over `contentJson`. */
+      pages?: PreScaffoldedPage[];
+      /** Output language for the AI fallback path. */
+      language?: "de" | "en" | "fr" | "it";
     }
   >;
   const slug = (b.slug ?? "").trim().toLowerCase();
@@ -49,13 +112,14 @@ export async function POST(req: Request) {
   const description = (b.description ?? "").trim();
   const customerEmail = (b.customerEmail ?? "").trim().toLowerCase();
   const customDomain = b.customDomain?.trim().toLowerCase() || null;
-  const preGeneratedContent = typeof b.contentJson === "string" && b.contentJson.length > 0
-    ? b.contentJson
-    : null;
+  const language =
+    typeof b.language === "string" && VALID_LANGUAGES.has(b.language)
+      ? (b.language as "de" | "en" | "fr" | "it")
+      : "de";
+  const preGeneratedContent =
+    typeof b.contentJson === "string" && b.contentJson.length > 0 ? b.contentJson : null;
+  const preGeneratedPages = parsePreScaffolded(b.pages);
 
-  // Resolve theme. Missing or invalid preset → default 'studio'. Hex overrides
-  // are silently dropped if they don't match the regex; this is intentional
-  // because the form already enforces the pattern client-side.
   const themePresetCandidate = b.theme?.preset;
   const theme: SiteThemeChoice = {
     preset: isValidPresetId(themePresetCandidate) ? themePresetCandidate : DEFAULT_PRESET_ID,
@@ -79,8 +143,6 @@ export async function POST(req: Request) {
   if (customDomain && !DOMAIN_RE.test(customDomain)) {
     return new Response("Invalid custom domain (e.g. kundenmarke.ch).", { status: 400 });
   }
-
-  // Reject if slug already exists
   if (await getSite(slug)) {
     return new Response(`Slug "${slug}" already exists.`, { status: 409 });
   }
@@ -106,13 +168,23 @@ export async function POST(req: Request) {
       };
 
       try {
-        // 1. AI scaffold — skipped when Phase A already produced the tree
-        // (typical two-phase flow). External scripts that POST directly to
-        // /create still trigger the AI here as a fallback.
-        let rawContentJson: string;
-        if (preGeneratedContent) {
+        // 1. Resolve the content set we'll write: either pre-generated pages
+        // (multi-page flow), a pre-generated single tree (legacy), or a
+        // fresh AI scaffold of the homepage.
+        type WritePage = { path: string; title: string; parent?: string; contentJson: string };
+        let writePages: WritePage[];
+
+        if (preGeneratedPages) {
+          send("progress", {
+            step: "scaffold",
+            label: `Inhalte aus Vorschau übernehmen (${preGeneratedPages.length} Seiten)`,
+          });
+          writePages = preGeneratedPages;
+        } else if (preGeneratedContent) {
           send("progress", { step: "scaffold", label: "Inhalte aus Vorschau übernehmen" });
-          rawContentJson = preGeneratedContent;
+          writePages = [
+            { path: "", title: brand, contentJson: preGeneratedContent },
+          ];
         } else {
           send("progress", { step: "scaffold", label: "Generiere Inhalte mit AI" });
           const result = await scaffoldContent({
@@ -125,51 +197,64 @@ export async function POST(req: Request) {
               audience: b.audience,
               primaryGoal: b.primaryGoal,
               pinnedVibe: theme.preset,
+              language,
             },
           });
-          rawContentJson = result.contentJson;
+          writePages = [{ path: "", title: brand, contentJson: result.contentJson }];
         }
 
-        // Inject the chosen theme into root.props.theme so the editor's
-        // root.fields.theme widget is pre-populated and stays in sync with
-        // config.json from the first edit on. Tolerant of malformed AI output:
-        // if parsing fails, we ship the raw string unchanged.
-        let contentJson = rawContentJson;
-        try {
-          const parsed = JSON.parse(rawContentJson) as {
-            root?: { props?: Record<string, unknown> };
-            [k: string]: unknown;
-          };
-          parsed.root = parsed.root ?? {};
-          parsed.root.props = parsed.root.props ?? {};
-          parsed.root.props.theme = {
-            preset: theme.preset,
-            accentOverride: theme.accentOverride ?? "",
-            inkOverride: theme.inkOverride ?? "",
-          };
-          contentJson = JSON.stringify(parsed, null, 2);
-        } catch {
-          // keep rawContentJson — theme will live only in config.json
-        }
+        // Inject the chosen theme into every page's root.props.theme so the
+        // editor's root widget is pre-populated and stays in sync with config.json.
+        writePages = writePages.map((p) => ({
+          ...p,
+          contentJson: injectThemeIntoTree(p.contentJson, theme),
+        }));
 
-        // 2. Local FS write — gives the dev server an immediate copy.
+        // Build the PageEntry list for config.json — single source of truth
+        // for nav + routing.
+        const pageEntries: PageEntry[] = writePages.map((p, idx) => ({
+          slug: pagePathToFileSlug(p.path),
+          path: p.path,
+          title: { [language]: p.title },
+          parent: p.parent,
+          navOrder: idx,
+        }));
+
+        // 2. Local FS write
         send("progress", { step: "fs", label: "Lege Site-Dateien lokal an" });
         const siteDir = path.join(sitesDir(), slug);
-        const messagesDir = path.join(siteDir, "messages");
+        const localeDir = path.join(siteDir, "messages", language);
         const config = {
           brand,
           template,
           domains: allDomains,
           createdAt: new Date().toISOString(),
           theme,
+          pages: pageEntries,
         };
         const access = { users: [customerEmail] };
-        await fs.mkdir(messagesDir, { recursive: true });
-        await fs.writeFile(path.join(messagesDir, "de.json"), contentJson, "utf-8");
-        await fs.writeFile(path.join(siteDir, "config.json"), JSON.stringify(config, null, 2) + "\n", "utf-8");
-        await fs.writeFile(path.join(siteDir, "access.json"), JSON.stringify(access, null, 2) + "\n", "utf-8");
+        await fs.mkdir(localeDir, { recursive: true });
+        for (const p of writePages) {
+          const fileSlug = pagePathToFileSlug(p.path);
+          await fs.writeFile(
+            path.join(localeDir, `${fileSlug}.json`),
+            p.contentJson,
+            "utf-8",
+          );
+        }
+        await fs.writeFile(
+          path.join(siteDir, "config.json"),
+          JSON.stringify(config, null, 2) + "\n",
+          "utf-8",
+        );
+        await fs.writeFile(
+          path.join(siteDir, "access.json"),
+          JSON.stringify(access, null, 2) + "\n",
+          "utf-8",
+        );
 
-        // 3. GitHub commits — three files, one after the other for clarity in history.
+        // 3. GitHub commits — one per file. Per-page commit so the history
+        // reads like a sitemap.
         send("progress", { step: "github", label: "Committe Site ins Monorepo" });
         const gh = createGitHubClient({
           token: env.github.token,
@@ -177,13 +262,30 @@ export async function POST(req: Request) {
           repo: env.github.repo,
           branch: env.github.branch,
         });
-        await gh.putFile(`sites/${slug}/messages/de.json`, contentJson, `feat(site): add ${slug} content`);
-        await gh.putFile(`sites/${slug}/config.json`, JSON.stringify(config, null, 2) + "\n", `feat(site): add ${slug} config`);
-        await gh.putFile(`sites/${slug}/access.json`, JSON.stringify(access, null, 2) + "\n", `feat(site): add ${slug} access`);
+        for (const p of writePages) {
+          const fileSlug = pagePathToFileSlug(p.path);
+          await gh.putFile(
+            `sites/${slug}/messages/${language}/${fileSlug}.json`,
+            p.contentJson,
+            `feat(site): add ${slug}/${language}/${fileSlug}`,
+          );
+          send("progress", {
+            step: "github",
+            label: `Page committed: ${p.path || "/"} (${p.title})`,
+          });
+        }
+        await gh.putFile(
+          `sites/${slug}/config.json`,
+          JSON.stringify(config, null, 2) + "\n",
+          `feat(site): add ${slug} config`,
+        );
+        await gh.putFile(
+          `sites/${slug}/access.json`,
+          JSON.stringify(access, null, 2) + "\n",
+          `feat(site): add ${slug} access`,
+        );
 
-        // 4. Cloudflare — CNAME the subdomain at the Pages project and
-        // attach it (plus any custom domain) as a custom domain on Pages.
-        // The Pages build is triggered by the GitHub commits in step 3.
+        // 4. Cloudflare — DNS + Pages domain attach.
         send("progress", { step: "cloudflare", label: "DNS + Pages-Domain konfigurieren" });
         const cf = createCloudflareClient({
           accountId: env.cloudflare.accountId,
@@ -205,7 +307,6 @@ export async function POST(req: Request) {
             await cf.addPagesDomain(env.cloudflare.projectName, fqdn);
           } catch (err) {
             const msg = err instanceof Error ? err.message : "domain attach failed";
-            // Idempotent: "already exists" is the no-op happy path.
             if (!/already|exists/i.test(msg)) {
               send("warning", { step: "domain", message: `${fqdn}: ${msg}` });
             }
@@ -231,6 +332,7 @@ export async function POST(req: Request) {
           previewUrl: `https://${subdomainHost}`,
           customDomainUrl: customDomain ? `https://${customDomain}` : null,
           magicLinkSent: magicSent,
+          pages: writePages.map((p) => ({ path: p.path, title: p.title })),
         });
         controller.close();
       } catch (err) {

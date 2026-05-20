@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import type { SiteThemeChoice } from "@vibe-cms-platform/core/theme";
+import type { PageEntry } from "@vibe-cms-platform/core/site";
 
 export type SiteConfig = {
   brand: string;
@@ -11,6 +12,8 @@ export type SiteConfig = {
   createdAt?: string;
   /** Optional per-site visual identity. Missing → preset 'studio' (default). */
   theme?: SiteThemeChoice;
+  /** Ordered list of pages in this site. First entry is the homepage (path=""). */
+  pages?: PageEntry[];
 };
 
 export type SiteAccess = {

@@ -5,10 +5,15 @@ import { NextResponse } from "next/server";
 import { LOCALE_REGEX } from "@vibe-cms-platform/core/i18n";
 import { isValidPresetId, type SiteThemeChoice } from "@vibe-cms-platform/core/theme";
 import { readSession, canEditSlug } from "@/lib/auth";
-import { siteLocaleExists, siteMessagePath } from "@/lib/platform/site-content";
+import {
+  siteLocaleExists,
+  sitePageExists,
+  siteMessagePath,
+} from "@/lib/platform/site-content";
 import { createGitHubClient } from "@/lib/platform/github";
 import { readEnv } from "@/lib/platform/env";
 import { sitesDir, clearDomainCache } from "@/lib/platform/registry";
+import { pagePathToFileSlug, normalisePagePath } from "@vibe-cms-platform/core/site";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -81,7 +86,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const b = body as { slug?: unknown; locale?: unknown; data?: unknown };
+  const b = body as { slug?: unknown; locale?: unknown; pagePath?: unknown; data?: unknown };
 
   if (typeof b.slug !== "string" || !SLUG_RE.test(b.slug)) {
     return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
@@ -94,6 +99,8 @@ export async function POST(req: Request) {
   }
 
   const { slug, locale, data } = b as { slug: string; locale: string; data: object };
+  const pagePath =
+    typeof b.pagePath === "string" ? normalisePagePath(b.pagePath) : "";
 
   if (!canEditSlug(session, slug)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -101,9 +108,16 @@ export async function POST(req: Request) {
   if (!(await siteLocaleExists(slug, locale))) {
     return NextResponse.json({ error: `Locale not found: ${slug}/${locale}` }, { status: 404 });
   }
+  if (!(await sitePageExists(slug, locale, pagePath))) {
+    return NextResponse.json(
+      { error: `Page not found: ${slug}/${locale}/${pagePath || "(home)"}` },
+      { status: 404 },
+    );
+  }
 
   const nextRaw = JSON.stringify(data, null, 2) + "\n";
-  const filePath = siteMessagePath(slug, locale);
+  const filePath = siteMessagePath(slug, locale, pagePath);
+  const fileSlug = pagePathToFileSlug(pagePath);
 
   // Local write — gives the running container an immediate fresh copy so
   // the next admin / public render sees the published state without waiting
@@ -139,8 +153,8 @@ export async function POST(req: Request) {
       repo: env.github.repo,
       branch: env.github.branch,
     });
-    const repoRelative = `sites/${slug}/messages/${locale}.json`;
-    const commitMessage = `chore(content): publish ${slug}/${locale} via ${session.sub}`;
+    const repoRelative = `sites/${slug}/messages/${locale}/${fileSlug}.json`;
+    const commitMessage = `chore(content): publish ${slug}/${locale}/${fileSlug} via ${session.sub}`;
     await gh.putFile(repoRelative, nextRaw, commitMessage);
     if (configRaw) {
       await gh.putFile(
@@ -165,6 +179,7 @@ export async function POST(req: Request) {
     ok: true,
     slug,
     locale,
+    pagePath,
     commitSha,
     at: Date.now(),
   });

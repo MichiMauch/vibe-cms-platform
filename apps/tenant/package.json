@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
+    "dev": "node ../../scripts/check-port.mjs 3031 && next dev -p 3031",
     "prebuild": "node scripts/build-worker.mjs",
     "build": "next build",
     "lint": "eslint"

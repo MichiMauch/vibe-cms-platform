@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { Sparkles, Loader2, FileText, X } from "lucide-react";
 import { THEME_PRESETS, DEFAULT_PRESET_ID, type ThemePresetId } from "@vibe-cms-platform/core/theme";
 import { useToast } from "@/components/Feedback";
 import {
@@ -19,6 +19,28 @@ const TEMPLATES = [
   { id: "blank", label: "Blank", description: "Minimal: nur Hero + Footer." },
 ];
 
+type Language = "de" | "en" | "fr" | "it";
+
+/** Single sitemap row in the editable preview. The `selected` flag controls
+ * whether the page is fed to the scaffolder. */
+type SitemapRow = {
+  path: string;
+  title: string;
+  parent?: string;
+  pageBrief: string;
+  priority: 1 | 2 | 3;
+  selected: boolean;
+};
+
+type ScaffoldedPage = {
+  path: string;
+  title: string;
+  parent?: string;
+  contentJson: string;
+};
+
+const MAX_SELECTED_PAGES = 12;
+
 export function NewSiteForm() {
   const [slug, setSlug] = useState("");
   const [brand, setBrand] = useState("");
@@ -30,6 +52,14 @@ export function NewSiteForm() {
   const [customDomain, setCustomDomain] = useState("");
   const [themePreset, setThemePreset] = useState<ThemePresetId>(DEFAULT_PRESET_ID);
   const [accentOverride, setAccentOverride] = useState("");
+  const [language, setLanguage] = useState<Language>("de");
+
+  // PDF-driven flow
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfAnalyzing, setPdfAnalyzing] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [sitemap, setSitemap] = useState<SitemapRow[] | null>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,8 +67,9 @@ export function NewSiteForm() {
   const [steps, setSteps] = useState<ProgressStep[]>([]);
   const [done, setDone] = useState<SuccessPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Carry the AI output across the modal stages so Phase B can submit it.
+  // Phase-A → Phase-B carriers. For single-page: contentJson. For multi-page: pages.
   const [contentJson, setContentJson] = useState<string | null>(null);
+  const [scaffoldedPages, setScaffoldedPages] = useState<ScaffoldedPage[] | null>(null);
 
   const toast = useToast();
 
@@ -48,12 +79,90 @@ export function NewSiteForm() {
     setDone(null);
     setError(null);
     setContentJson(null);
+    setScaffoldedPages(null);
     setStage({ kind: "scaffolding" });
   }
 
-  /** Phase B — POST to /api/sites/create with the pre-generated content tree
-   * and the user's final preset choice. Streams progress via SSE as before. */
-  async function runCreate(finalPreset: ThemePresetId, finalContentJson: string) {
+  async function onPdfChosen(file: File) {
+    setPdfFile(file);
+    setPdfError(null);
+    setSitemap(null);
+    setPdfAnalyzing(true);
+    try {
+      const fd = new FormData();
+      fd.append("pdf", file);
+      const res = await fetch("/api/sites/pdf-analyze", { method: "POST", body: fd });
+      if (!res.ok) {
+        const text = await res.text();
+        setPdfError(text || `HTTP ${res.status}`);
+        return;
+      }
+      const data = (await res.json()) as {
+        brand: string;
+        brief: string;
+        audience: string;
+        primaryGoal: string;
+        language: Language;
+        vibeSuggestion: { preset: ThemePresetId; rationale: string; confidence: "high" | "medium" | "low" };
+        sitemap: Array<{
+          path: string;
+          title: string;
+          parent?: string;
+          pageBrief: string;
+          priority: 1 | 2 | 3;
+        }>;
+      };
+      // Pre-fill form fields that the user usually types manually.
+      if (data.brand) setBrand(data.brand);
+      if (data.brief) setDescription(data.brief);
+      if (data.audience) setAudience(data.audience);
+      if (data.primaryGoal) setPrimaryGoal(data.primaryGoal);
+      if (data.vibeSuggestion?.preset) setThemePreset(data.vibeSuggestion.preset);
+      if (data.language) setLanguage(data.language);
+      // Default-select priority 1 and 2 pages, leave priority 3 unchecked.
+      const rows: SitemapRow[] = data.sitemap.map((p) => ({
+        path: p.path,
+        title: p.title,
+        parent: p.parent,
+        pageBrief: p.pageBrief,
+        priority: p.priority,
+        selected: p.priority <= 2,
+      }));
+      setSitemap(rows);
+      toast.info(`PDF analysiert — ${rows.length} Seiten erkannt.`);
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : "Analyse fehlgeschlagen");
+    } finally {
+      setPdfAnalyzing(false);
+    }
+  }
+
+  function clearPdf() {
+    setPdfFile(null);
+    setPdfError(null);
+    setSitemap(null);
+    if (pdfInputRef.current) pdfInputRef.current.value = "";
+  }
+
+  function updateSitemapRow(index: number, patch: Partial<SitemapRow>) {
+    if (!sitemap) return;
+    const next = [...sitemap];
+    next[index] = { ...next[index], ...patch };
+    setSitemap(next);
+  }
+
+  function selectedPages(): SitemapRow[] {
+    if (!sitemap) return [];
+    // Homepage is always required: force-select it if the user unchecked it.
+    const rows = sitemap.map((r) =>
+      r.path === "" ? { ...r, selected: true } : r,
+    );
+    return rows.filter((r) => r.selected).slice(0, MAX_SELECTED_PAGES);
+  }
+
+  /** Phase B — POST to /api/sites/create with the pre-generated content and
+   * the user's final preset. Streams SSE progress. */
+  async function runCreate(finalPreset: ThemePresetId) {
     setBusy(true);
     setStage({ kind: "creating" });
     setSteps([]);
@@ -61,24 +170,31 @@ export function NewSiteForm() {
     setError(null);
 
     try {
+      const payload: Record<string, unknown> = {
+        slug,
+        brand,
+        template,
+        description,
+        audience,
+        primaryGoal,
+        customerEmail,
+        customDomain: customDomain.trim() || undefined,
+        language,
+        theme: {
+          preset: finalPreset,
+          accentOverride: accentOverride.trim() || undefined,
+        },
+      };
+      if (scaffoldedPages) {
+        payload.pages = scaffoldedPages;
+      } else if (contentJson) {
+        payload.contentJson = contentJson;
+      }
+
       const res = await fetch("/api/sites/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slug,
-          brand,
-          template,
-          description,
-          audience,
-          primaryGoal,
-          customerEmail,
-          customDomain: customDomain.trim() || undefined,
-          theme: {
-            preset: finalPreset,
-            accentOverride: accentOverride.trim() || undefined,
-          },
-          contentJson: finalContentJson,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok || !res.body) {
         const text = await res.text();
@@ -116,7 +232,6 @@ export function NewSiteForm() {
         }
       }
       if (!sawDone && !error) {
-        // Stream ended without a done/error event — surface a generic failure.
         setError("Stream ended unexpectedly");
         setStage({ kind: "error" });
       }
@@ -128,9 +243,8 @@ export function NewSiteForm() {
     }
   }
 
-  /** Phase A — fetch the AI tree + vibe suggestion. Then either skip
-   * straight to Phase B (if AI agrees with the user's choice and confidence
-   * is not "low") or show the vibe-review step. */
+  /** Phase A — call /api/sites/scaffold. With a sitemap, the response holds
+   * one Puck tree per page; otherwise it's the single-page payload. */
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -140,19 +254,30 @@ export function NewSiteForm() {
     setStage({ kind: "scaffolding" });
     setModalOpen(true);
 
+    const pages = selectedPages();
+    const isMultiPage = pages.length > 0;
+
     try {
+      const body: Record<string, unknown> = {
+        brand,
+        template,
+        description,
+        audience,
+        primaryGoal,
+        language,
+      };
+      if (isMultiPage) {
+        body.pages = pages.map((p) => ({
+          path: p.path,
+          title: p.title,
+          parent: p.parent,
+          pageBrief: p.pageBrief,
+        }));
+      }
       const res = await fetch("/api/sites/scaffold", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand,
-          template,
-          description,
-          audience,
-          primaryGoal,
-          // Do NOT pin: we want the AI to think freely; the user can still
-          // override after reviewing. The form preset is shown as "Deine Wahl".
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const text = await res.text();
@@ -161,8 +286,16 @@ export function NewSiteForm() {
         setBusy(false);
         return;
       }
-      const data = (await res.json()) as { contentJson: string; vibeSuggestion: VibeSuggestion };
-      setContentJson(data.contentJson);
+      const data = (await res.json()) as {
+        contentJson?: string;
+        pages?: ScaffoldedPage[];
+        vibeSuggestion: VibeSuggestion;
+      };
+      if (data.pages) {
+        setScaffoldedPages(data.pages);
+      } else if (data.contentJson) {
+        setContentJson(data.contentJson);
+      }
 
       const suggestion = data.vibeSuggestion;
       const matches = suggestion.preset === themePreset;
@@ -170,9 +303,8 @@ export function NewSiteForm() {
 
       if (skipReview) {
         toast.info("AI hat deine Auswahl bestätigt.");
-        // Phase B kicks off immediately with the user's original preset.
         setBusy(false);
-        runCreate(themePreset, data.contentJson);
+        runCreate(themePreset);
         return;
       }
 
@@ -196,12 +328,73 @@ export function NewSiteForm() {
   }
 
   function onApproveVibe() {
-    if (stage.kind !== "vibe-review" || !contentJson) return;
-    runCreate(stage.chosenPreset, contentJson);
+    if (stage.kind !== "vibe-review") return;
+    if (!scaffoldedPages && !contentJson) return;
+    runCreate(stage.chosenPreset);
   }
+
+  const selectedCount = sitemap?.filter((r) => r.selected || r.path === "").length ?? 0;
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      {/* ── PDF upload (optional kick-starter) ─────────────────────────── */}
+      <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-slate-500" />
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                Konzept-PDF (optional)
+              </p>
+              <p className="text-xs text-slate-500">
+                Wireframes, Sitemap oder Brief als PDF → AI füllt das Formular und
+                schlägt eine Multi-Page-Site vor.
+              </p>
+            </div>
+          </div>
+          {pdfFile && !pdfAnalyzing && (
+            <button
+              type="button"
+              onClick={clearPdf}
+              className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-600 hover:bg-slate-100"
+              style={{ cursor: "pointer" }}
+            >
+              <X className="h-3 w-3" /> Entfernen
+            </button>
+          )}
+        </div>
+        <div className="mt-3">
+          <input
+            ref={pdfInputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            disabled={busy || pdfAnalyzing}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onPdfChosen(f);
+            }}
+            className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-white file:text-xs file:font-semibold hover:file:bg-slate-800 file:cursor-pointer"
+          />
+        </div>
+        {pdfAnalyzing && (
+          <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+            <span>PDF wird mit Gemini Flash analysiert (kann ~30–60s dauern) …</span>
+          </div>
+        )}
+        {pdfError && (
+          <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-800">
+            {pdfError}
+          </div>
+        )}
+        {pdfFile && !pdfAnalyzing && !pdfError && (
+          <div className="mt-2 text-xs text-slate-600">
+            <span className="font-mono">{pdfFile.name}</span> ({Math.round(pdfFile.size / 1024)} KB)
+          </div>
+        )}
+      </div>
+
+      {/* ── Standard form fields ───────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label className="block">
           <span className="text-sm font-medium text-slate-700">Slug</span>
@@ -356,6 +549,75 @@ export function NewSiteForm() {
         </label>
       </div>
 
+      {/* ── Sitemap preview (only when PDF analysis produced one) ──────── */}
+      {sitemap && sitemap.length > 0 && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 className="text-sm font-semibold text-blue-900">
+              Erkannte Sitemap ({sitemap.length} Seiten, ausgewählt: {selectedCount})
+            </h3>
+            <span className="text-xs text-blue-700">
+              Sprache: <strong>{language.toUpperCase()}</strong> · max. {MAX_SELECTED_PAGES} Seiten
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-blue-700">
+            Jede ausgewählte Seite wird per AI generiert (1 Call pro Seite). Häkchen entfernen
+            spart Kosten. Die Homepage ist immer Pflicht.
+          </p>
+          <ul className="mt-3 divide-y divide-blue-100 rounded-lg bg-white">
+            {sitemap.map((row, i) => {
+              const isHome = row.path === "";
+              return (
+                <li key={`${row.path}-${i}`} className="p-3">
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={isHome ? true : row.selected}
+                      onChange={(e) => updateSitemapRow(i, { selected: e.target.checked })}
+                      disabled={busy || isHome}
+                      className="mt-1"
+                      style={{ cursor: isHome ? "not-allowed" : "pointer" }}
+                    />
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={row.title}
+                          onChange={(e) => updateSitemapRow(i, { title: e.target.value })}
+                          disabled={busy}
+                          className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm font-medium focus:border-blue-500 focus:outline-none"
+                        />
+                        <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-mono text-slate-600">
+                          /{row.path || ""}
+                        </code>
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                            row.priority === 1
+                              ? "bg-emerald-100 text-emerald-800"
+                              : row.priority === 2
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-slate-200 text-slate-700"
+                          }`}
+                          title="AI-Priorität: 1=Pflicht, 2=Wichtig, 3=Nice-to-have"
+                        >
+                          P{row.priority}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 leading-relaxed">{row.pageBrief}</p>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {selectedCount > MAX_SELECTED_PAGES && (
+            <p className="mt-2 text-xs text-amber-700">
+              ⚠ Mehr als {MAX_SELECTED_PAGES} Seiten ausgewählt — nur die ersten {MAX_SELECTED_PAGES} werden generiert.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="border-t border-slate-200 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label className="block">
           <span className="text-sm font-medium text-slate-700">Kunden-E-Mail</span>
@@ -390,11 +652,16 @@ export function NewSiteForm() {
 
       <button
         type="submit"
-        disabled={busy}
+        disabled={busy || pdfAnalyzing}
         className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 disabled:bg-slate-300 transition"
+        style={{ cursor: busy ? "not-allowed" : "pointer" }}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        {busy ? "Erstelle …" : "Site anlegen"}
+        {busy
+          ? "Erstelle …"
+          : sitemap && selectedCount > 1
+            ? `Site mit ${selectedCount} Seiten anlegen`
+            : "Site anlegen"}
       </button>
 
       <CreateProgressModal

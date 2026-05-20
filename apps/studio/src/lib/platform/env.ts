@@ -20,6 +20,10 @@ export type PlatformEnv = {
     apiKey: string;
     model: string;
   };
+  gemini: {
+    apiKey: string;
+    model: string;
+  };
   auth: {
     jwtSecret: string;
     publicUrl: string;
@@ -61,6 +65,12 @@ export function readEnv(): PlatformEnv {
     openai: {
       apiKey: required("OPENAI_API_KEY"),
       model: optional("OPENAI_MODEL", "gpt-4o-mini"),
+    },
+    gemini: {
+      // Optional: only the PDF-analyse endpoint needs this. Missing key →
+      // analyzePdf() throws a clear error at request time.
+      apiKey: optional("GEMINI_API_KEY", ""),
+      model: optional("GEMINI_MODEL", "gemini-2.5-flash"),
     },
     auth: {
       jwtSecret: required("JWT_SECRET"),

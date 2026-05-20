@@ -8,12 +8,16 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/studio",
+    "dev:studio": "npm run dev --workspace=apps/studio",
+    "dev:tenant": "npm run dev --workspace=apps/tenant",
+    "dev:all": "concurrently -n studio,tenant -c blue,magenta --kill-others-on-fail \"npm run dev:studio\" \"npm run dev:tenant\"",
     "build": "npm run build --workspaces --if-present",
     "build:studio": "npm run build --workspace=apps/studio",
     "setup": "node scripts/setup.mjs",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "typescript": "^5"
   },
   "engines": {

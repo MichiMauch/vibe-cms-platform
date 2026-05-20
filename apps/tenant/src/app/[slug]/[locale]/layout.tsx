@@ -6,6 +6,8 @@ type Params = { slug: string; locale: string };
 
 const CHAT_API_URL = process.env.NEXT_PUBLIC_STUDIO_CHAT_URL || "https://studio.mauch.rocks/api/chat";
 
+/** Site/locale shell. Loads homepage content for chatbot + language list; the
+ * SiteHeader is rendered inside each page so it can mark the active path. */
 export default async function TenantLocaleLayout({
   children,
   params,

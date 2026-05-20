@@ -25,6 +25,7 @@
     "./types": "./src/types/index.ts",
     "./puck": "./src/puck/index.ts",
     "./theme": "./src/theme/index.ts",
+    "./site": "./src/site/index.ts",
     "./templates": "./templates/index.json",
     "./templates/*": "./templates/*.json"
   },

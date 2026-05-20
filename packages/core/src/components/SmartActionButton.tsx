@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Loader2, LogOut, Pencil, Upload } from "lucide-react";
+import { CheckCircle2, Layers, Loader2, LogOut, Pencil, Upload } from "lucide-react";
 
 type EditMode = {
   /** Tenant slug — passed through for telemetry / labelling. */
@@ -14,6 +14,8 @@ type EditMode = {
   onSwitchLocale: (target: string) => void;
   /** Site slug shown as a small label so master users know which site they edit. */
   siteLabel?: string;
+  /** When true, render a back-link to the master Sites overview. */
+  showSitesLink?: boolean;
   /** Optional async publish action. If omitted, the publish pill is hidden
    * (e.g. when Puck's own header publish button drives the flow). */
   publish?: () => Promise<{ ok: boolean; error?: string }>;
@@ -73,9 +75,19 @@ export function SmartActionButton({ email, editUrl, editMode }: Props) {
 }
 
 function EditModeContents({ editMode }: { editMode: EditMode }) {
-  const { currentLocale, locales, onSwitchLocale, siteLabel, publish } = editMode;
+  const { currentLocale, locales, onSwitchLocale, siteLabel, showSitesLink, publish } = editMode;
   return (
     <>
+      {showSitesLink && (
+        <a
+          href="/admin/master/sites"
+          className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-white transition hover:bg-white/10"
+          title="Zurück zur Sites-Übersicht"
+        >
+          <Layers className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Alle Sites</span>
+        </a>
+      )}
       {siteLabel && (
         <span className="hidden sm:inline-flex items-center gap-1 px-1 text-[11px] font-mono text-slate-300">
           {siteLabel}

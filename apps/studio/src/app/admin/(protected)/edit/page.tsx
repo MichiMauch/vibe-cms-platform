@@ -6,9 +6,15 @@ import { readSession, canEditSlug } from "@/lib/auth";
 import { listSites, getSite } from "@/lib/platform/registry";
 import {
   listSiteLocales,
+  listSitePagePaths,
   readSiteContent,
   siteLocaleExists,
+  sitePageExists,
 } from "@/lib/platform/site-content";
+import {
+  pagePathToFileSlug,
+  type PageEntry,
+} from "@vibe-cms-platform/core/site";
 import { EditorClient } from "./EditorClient";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +29,7 @@ const DEFAULT_LOCALE = "de";
 export default async function EditPage({
   searchParams,
 }: {
-  searchParams: Promise<{ site?: string; locale?: string }>;
+  searchParams: Promise<{ site?: string; locale?: string; page?: string }>;
 }) {
   const session = await readSession();
   if (!session) return null;
@@ -105,7 +111,28 @@ export default async function EditPage({
       ? DEFAULT_LOCALE
       : locales[0];
 
-  const content = await readSiteContent(slug, locale);
+  // Resolve page list — prefer config.pages, fall back to disk scan.
+  const onDiskPagePaths = await listSitePagePaths(slug, locale);
+  const pages: PageEntry[] =
+    site.config.pages && site.config.pages.length > 0
+      ? site.config.pages
+      : onDiskPagePaths.map((p) => ({
+          slug: pagePathToFileSlug(p),
+          path: p,
+          title: { [locale]: p === "" ? site.config.brand : p.split("/").pop() || p },
+        }));
+
+  // Resolve active page: validated query param, else homepage if it exists,
+  // else first page in the list.
+  const requestedPage = (sp.page ?? "").trim();
+  let pagePath = "";
+  if (requestedPage && (await sitePageExists(slug, locale, requestedPage))) {
+    pagePath = requestedPage;
+  } else if (!(await sitePageExists(slug, locale, ""))) {
+    pagePath = pages[0]?.path ?? "";
+  }
+
+  const content = await readSiteContent(slug, locale, pagePath);
 
   return (
     <EditorClient
@@ -116,6 +143,9 @@ export default async function EditPage({
       data={content}
       email={session.sub}
       initialTheme={site.config.theme ?? null}
+      pages={pages}
+      currentPagePath={pagePath}
+      isMaster={!!session.master}
     />
   );
 }

@@ -14,6 +14,7 @@ import {
   resolveAutoLayouts,
   type SiteThemeChoice,
 } from "@vibe-cms-platform/core/theme";
+import { pageTitleFor, type PageEntry } from "@vibe-cms-platform/core/site";
 
 type Props = {
   slug: string;
@@ -25,6 +26,13 @@ type Props = {
   /** Persisted theme from config.json — used as fallback when the Puck data
    * doesn't yet carry a `root.props.theme` (older sites). */
   initialTheme?: SiteThemeChoice | null;
+  /** All pages of this site. When the array has >1 entries, the editor shows
+   * a page selector and routes Publish to the active page. */
+  pages: PageEntry[];
+  /** Path of the page currently being edited. "" = homepage. */
+  currentPagePath: string;
+  /** Master users get a back-link to /admin/master/sites in the bottom toolbar. */
+  isMaster: boolean;
 };
 
 type PublishState =
@@ -58,16 +66,64 @@ function PageSettingsButton() {
   );
 }
 
-const PUCK_OVERRIDES: Partial<Overrides> = {
-  headerActions: ({ children }) => (
-    <>
-      <div className="mr-3 pr-3 border-r border-slate-200">
-        <PageSettingsButton />
-      </div>
-      {children}
-    </>
-  ),
-};
+/** Compact dropdown shown in Puck's header when a site has more than one page.
+ * Switching navigates to ?page=…, which forces a re-fetch of the right tree. */
+function PageSelector({
+  pages,
+  currentPagePath,
+  locale,
+}: {
+  pages: PageEntry[];
+  currentPagePath: string;
+  locale: string;
+}) {
+  const router = useRouter();
+  if (pages.length <= 1) return null;
+  return (
+    <label className="flex items-center gap-1.5 text-xs text-slate-600">
+      <span className="font-medium">Seite</span>
+      <select
+        value={currentPagePath}
+        onChange={(e) => {
+          const url = new URL(window.location.href);
+          url.searchParams.set("page", e.target.value);
+          router.push(url.pathname + url.search);
+        }}
+        style={{ cursor: "pointer" }}
+        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-800 hover:border-slate-400"
+      >
+        {pages.map((p) => (
+          <option key={p.path} value={p.path}>
+            {pageTitleFor(p, locale)}
+            {p.path === "" ? "" : ` (/${p.path})`}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function buildPuckOverrides(
+  pages: PageEntry[],
+  currentPagePath: string,
+  locale: string,
+): Partial<Overrides> {
+  return {
+    headerActions: ({ children }) => (
+      <>
+        {pages.length > 1 ? (
+          <div className="mr-3 pr-3 border-r border-slate-200">
+            <PageSelector pages={pages} currentPagePath={currentPagePath} locale={locale} />
+          </div>
+        ) : null}
+        <div className="mr-3 pr-3 border-r border-slate-200">
+          <PageSettingsButton />
+        </div>
+        {children}
+      </>
+    ),
+  };
+}
 
 function extractEditorTheme(
   data: PuckData,
@@ -98,9 +154,16 @@ export function EditorClient({
   data,
   email,
   initialTheme,
+  pages,
+  currentPagePath,
+  isMaster,
 }: Props) {
   const router = useRouter();
   const config = useMemo(() => buildPuckConfig(slug), [slug]);
+  const overrides = useMemo(
+    () => buildPuckOverrides(pages, currentPagePath, locale),
+    [pages, currentPagePath, locale],
+  );
   const [publishState, setPublishState] = useState<PublishState>({ kind: "idle" });
   const [activeTheme, setActiveTheme] = useState<SiteThemeChoice | null>(() =>
     extractEditorTheme(data, initialTheme),
@@ -131,7 +194,7 @@ export function EditorClient({
       const res = await fetch("/api/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, locale, data: nextData }),
+        body: JSON.stringify({ slug, locale, pagePath: currentPagePath, data: nextData }),
       });
       const json = await res.json();
       if (!res.ok || !json.ok) {
@@ -164,7 +227,7 @@ export function EditorClient({
             // on the initial theme and ignore preset switches. Editor and
             // tenant share the same Tailwind config so isolation buys nothing.
             iframe={{ enabled: false }}
-            overrides={PUCK_OVERRIDES}
+            overrides={overrides}
             onChange={(d) => {
               const next = extractEditorTheme(d as unknown as PuckData, initialTheme);
               // Skip state churn on every keystroke unless theme actually changed.
@@ -193,6 +256,7 @@ export function EditorClient({
           locales,
           onSwitchLocale: switchLocale,
           siteLabel: `${brand} · ${slug}`,
+          showSitesLink: isMaster,
         }}
       />
       <PublishToast
