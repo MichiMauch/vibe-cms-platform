@@ -1,0 +1,182 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Zahnkorrektur für mein Kind",
+        "subtitle": "<p>Erfahren Sie alles über die besten Zeitfenster und Behandlungsoptionen für die Zahnkorrektur Ihres Kindes. Wir stehen Ihnen mit Rat und Tat zur Seite.</p>",
+        "ctaLabel": "Jetzt Termin vereinbaren",
+        "ctaHref": "#",
+        "layout": "centered",
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-3",
+        "title": "Unsere Behandlungsoptionen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "ShieldCheck",
+            "title": "Individuelle Beratung",
+            "description": "<p>Wir bieten eine persönliche Beratung, um die beste Lösung für Ihr Kind zu finden.</p>"
+          },
+          {
+            "icon": "Zap",
+            "title": "Moderne Technologien",
+            "description": "<p>Unsere Praxis nutzt die neuesten Technologien für eine effiziente und schonende Behandlung.</p>"
+          },
+          {
+            "icon": "Heart",
+            "title": "Empathische Betreuung",
+            "description": "<p>Wir legen großen Wert auf eine einfühlsame Betreuung, damit sich Ihr Kind wohlfühlt.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "95%",
+            "label": "Zufriedenheit unserer Patienten"
+          },
+          {
+            "value": "10 Jahre",
+            "label": "Erfahrung in der Zahnkorrektur"
+          },
+          {
+            "value": "200+",
+            "label": "erfolgreiche Behandlungen jährlich"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufige Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Warum dauert die Behandlung so lange?",
+            "answer": "<p>Die Dauer hängt von der individuellen Situation ab. Wir erklären Ihnen den Prozess im Detail.</p>"
+          },
+          {
+            "question": "Was, wenn etwas nicht läuft?",
+            "answer": "<p>Wir stehen Ihnen jederzeit zur Verfügung, um Probleme schnell zu lösen und Anpassungen vorzunehmen.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit für den ersten Schritt?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt Termin vereinbaren",
+        "ctaPrimaryHref": "#",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 Team Deleurant. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Über uns",
+            "links": [
+              {
+                "label": "Unsere Praxis",
+                "href": "#"
+              },
+              {
+                "label": "Team",
+                "href": "#"
+              }
+            ]
+          },
+          {
+            "heading": "Rechtliches",
+            "links": [
+              {
+                "label": "Datenschutz",
+                "href": "#"
+              },
+              {
+                "label": "Impressum",
+                "href": "#"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Zahnkorrektur für mein Kind - Team Deleurant",
+        "description": "Informieren Sie sich über Zahnkorrekturen für Kinder und vereinbaren Sie einen Termin in unserer Praxis.",
+        "ogTitle": "Zahnkorrektur für mein Kind",
+        "ogDescription": "Erfahren Sie alles über Zahnkorrekturen für Kinder bei Team Deleurant.",
+        "ogImage": "",
+        "keywords": "Zahnkorrektur, Kinderzahnmedizin, Team Deleurant, Behandlung, Terminvereinbarung"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Team Deleurant-Assistent",
+        "welcomeMessage": "Willkommen! Wie kann ich Ihnen helfen?"
+      },
+      "theme": {
+        "preset": "studio",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
