@@ -1,0 +1,21 @@
+{
+  "brand": "Paul AI GEO Chrome Extension",
+  "template": "saas",
+  "domains": [
+    "geo.pages.mauch.rocks"
+  ],
+  "createdAt": "2026-05-27T06:17:14.753Z",
+  "theme": {
+    "preset": "tech"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "path": "",
+      "title": {
+        "de": "Paul AI GEO Chrome Extension"
+      },
+      "navOrder": 0
+    }
+  ]
+}
