@@ -44,7 +44,7 @@
           "layout": "split-right"
         },
         "imageGroup": {
-          "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1779133117/screenshot-1_rxyped.png",
+          "image": "https://res.cloudinary.com/dbbq4h1rq/image/upload/v1778703197/main-sample.png",
           "imageAlt": "",
           "imageStyle": "card"
         },
@@ -88,7 +88,7 @@
           },
           {
             "icon": "ShieldCheck",
-            "title": "Datenschutzfreundlich",
+            "title": "Daten",
             "description": "<p>100% lokale Analyse ohne Tracking oder persistente Berechtigungen.</p>"
           },
           {
