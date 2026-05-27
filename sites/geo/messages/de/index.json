@@ -1,0 +1,258 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Optimieren Sie Ihre Inhalte für AI-Suche",
+        "subtitle": "<p>Paul AI GEO Analyzer 3.0 hilft Ihnen, Ihre Webseite für AI-gestützte Suchmaschinen und klassisches SEO zu optimieren.</p>",
+        "ctaLabel": "Jetzt starten",
+        "ctaHref": "#pricing",
+        "layout": "split-left",
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-4",
+        "title": "Hauptmerkmale",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Zap",
+            "title": "Echtzeit-Analyse",
+            "description": "<p>Analysieren Sie Webseiten in Echtzeit und erhalten Sie sofortige Ergebnisse.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Datenschutzfreundlich",
+            "description": "<p>100% lokale Analyse ohne Tracking oder persistente Berechtigungen.</p>"
+          },
+          {
+            "icon": "Lightbulb",
+            "title": "Ein-Klick-Fix-Snippets",
+            "description": "<p>Erhalten Sie sofort einsatzbereite Code-Snippets für schnelle Implementierungen.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Für alle Benutzer",
+            "description": "<p>Ideal für Content-Ersteller, SEO-Profis und digitale Marketingagenturen.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "30",
+            "label": "Maximale Punktzahl"
+          },
+          {
+            "value": "100%",
+            "label": "Lokale Analyse"
+          },
+          {
+            "value": "50",
+            "label": "Analysen pro URL"
+          },
+          {
+            "value": "6",
+            "label": "Analyse-Kategorien"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "centered",
+        "quote": "<p>Paul AI GEO Analyzer hat unsere SEO-Strategie revolutioniert!</p>",
+        "author": "Max Mustermann",
+        "role": "SEO-Manager, Beispiel GmbH",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "cards-3",
+        "title": "Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Kostenlos",
+            "price": "CHF 0",
+            "ctaLabel": "Jetzt starten",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Echtzeit-Analyse"
+              },
+              {
+                "value": "Ein-Klick-Fix-Snippets"
+              },
+              {
+                "value": "100% lokale Analyse"
+              }
+            ]
+          },
+          {
+            "icon": "Star",
+            "name": "Pro",
+            "price": "CHF 29",
+            "ctaLabel": "Jetzt abonnieren",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Erweiterte Funktionen"
+              },
+              {
+                "value": "Trendverfolgung"
+              },
+              {
+                "value": "Export als PDF"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie funktioniert die Analyse?",
+            "answer": "<p>Sie klicken auf das Symbol und die Analyse beginnt automatisch.</p>"
+          },
+          {
+            "question": "Ist die Nutzung kostenlos?",
+            "answer": "<p>Ja, es gibt eine kostenlose Version mit grundlegenden Funktionen.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit, Ihre Inhalte zu optimieren?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt starten",
+        "ctaPrimaryHref": "#",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 NETNODE. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Produkt",
+            "links": [
+              {
+                "label": "Funktionen",
+                "href": "#"
+              },
+              {
+                "label": "Preise",
+                "href": "#"
+              }
+            ]
+          },
+          {
+            "heading": "Unternehmen",
+            "links": [
+              {
+                "label": "Über uns",
+                "href": "#"
+              },
+              {
+                "label": "Kontakt",
+                "href": "#"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Paul AI GEO Analyzer 3.0 - Optimieren Sie Ihre Inhalte",
+        "description": "Optimieren Sie Ihre Webseite für AI-gestützte Suche und klassisches SEO mit Paul AI GEO Analyzer 3.0.",
+        "ogTitle": "Paul AI GEO Analyzer 3.0",
+        "ogDescription": "Die beste Lösung zur Optimierung Ihrer Inhalte für AI-Suche.",
+        "ogImage": "",
+        "keywords": "SEO, AI, Content Optimization, Chrome Extension, NETNODE"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Paul AI Assistent",
+        "welcomeMessage": "Willkommen beim Paul AI GEO Analyzer!"
+      },
+      "theme": {
+        "preset": "tech",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
