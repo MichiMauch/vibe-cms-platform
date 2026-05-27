@@ -1,0 +1,267 @@
+{
+  "content": [
+    {
+      "type": "Hero",
+      "props": {
+        "eyebrow": "",
+        "title": "Paul AI GEO Analyzer 3.0",
+        "subtitle": "<p>Optimieren Sie Ihre Inhalte für KI-Suche und klassisches SEO. Analysieren Sie Webseiten in Echtzeit mit unserem neuen Chrome-Tool.</p>",
+        "ctaLabel": "Jetzt starten",
+        "ctaHref": "#pricing",
+        "layout": "split-right",
+        "imageGroup": {
+          "image": "",
+          "imageAlt": "",
+          "imageStyle": "card"
+        },
+        "background": {
+          "bgStyle": "gradient",
+          "bgImage": ""
+        },
+        "style": {
+          "eyebrowStyle": "pill",
+          "accentBar": false,
+          "gradientTitle": false
+        },
+        "secondaryCta": {
+          "ctaSecondaryLabel": "",
+          "ctaSecondaryHref": ""
+        },
+        "trustAndMode": {
+          "trustLine": "",
+          "mode": "cta",
+          "emailPlaceholder": "deine@adresse.ch",
+          "emailSubmitLabel": "Eintragen",
+          "emailEndpoint": ""
+        },
+        "extras": {
+          "scrollIndicator": false
+        },
+        "id": "Hero-1"
+      }
+    },
+    {
+      "type": "FeaturesGrid",
+      "props": {
+        "layout": "grid-4",
+        "title": "Funktionen",
+        "subtitle": "<p>Kurzer Untertitel.</p>",
+        "items": [
+          {
+            "icon": "Zap",
+            "title": "Echtzeit-Analyse",
+            "description": "<p>Erhalten Sie sofortige GEO + SEO Scores mit detaillierten Einblicken in sechs Kategorien.</p>"
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Ein-Klick-Fix-Snippets",
+            "description": "<p>Kopieren Sie sofortige Lösungsvorschläge direkt aus der Analyse in Ihre Zwischenablage.</p>"
+          },
+          {
+            "icon": "Star",
+            "title": "Datenschutz",
+            "description": "<p>100% lokale Analyse ohne Tracking oder persistenten Berechtigungen.</p>"
+          },
+          {
+            "icon": "Lightbulb",
+            "title": "Schema.org Validierung",
+            "description": "<p>Überprüfen Sie die Vollständigkeit Ihrer Schema-Markups für bessere Sichtbarkeit.</p>"
+          },
+          {
+            "icon": "Users",
+            "title": "Für alle Nutzer",
+            "description": "<p>Ideal für Content-Ersteller, SEO-Profis und digitale Marketingagenturen.</p>"
+          }
+        ],
+        "id": "FeaturesGrid-1"
+      }
+    },
+    {
+      "type": "Stats",
+      "props": {
+        "layout": "row",
+        "intro": "Zahlen, die für sich sprechen",
+        "items": [
+          {
+            "value": "30",
+            "label": "Maximale Punktzahl"
+          },
+          {
+            "value": "5",
+            "label": "Analyse-Kategorien"
+          },
+          {
+            "value": "100%",
+            "label": "Datenschutz"
+          },
+          {
+            "value": "50",
+            "label": "Analysen pro URL"
+          }
+        ],
+        "id": "Stats-1"
+      }
+    },
+    {
+      "type": "Testimonial",
+      "props": {
+        "layout": "centered",
+        "quote": "<p>Paul AI GEO Analyzer hat unsere SEO-Strategie revolutioniert!</p>",
+        "author": "Max Müller",
+        "role": "SEO-Experte, Webagentur",
+        "avatar": "",
+        "items": [],
+        "id": "Testimonial-1"
+      }
+    },
+    {
+      "type": "Pricing",
+      "props": {
+        "layout": "cards-3",
+        "title": "Preise",
+        "subtitle": "<p>Drei Pläne. Wähle den, der zu dir passt.</p>",
+        "rowLabels": [],
+        "toggle": {
+          "monthlyLabel": "Monatlich",
+          "yearlyLabel": "Jährlich",
+          "yearlyDiscountHint": ""
+        },
+        "plans": [
+          {
+            "icon": "Crown",
+            "name": "Kostenlos",
+            "price": "CHF 0",
+            "ctaLabel": "Jetzt starten",
+            "ctaHref": "#",
+            "featured": true,
+            "features": [
+              {
+                "value": "Echtzeit-Analyse"
+              },
+              {
+                "value": "Ein-Klick-Fix-Snippets"
+              },
+              {
+                "value": "Schema.org Validierung"
+              }
+            ]
+          },
+          {
+            "icon": "Star",
+            "name": "Pro",
+            "price": "CHF 49",
+            "ctaLabel": "Jetzt abonnieren",
+            "ctaHref": "#",
+            "featured": false,
+            "features": [
+              {
+                "value": "Erweiterte Analysen"
+              },
+              {
+                "value": "Trendverfolgung"
+              },
+              {
+                "value": "Priorisierte Empfehlungen"
+              }
+            ]
+          }
+        ],
+        "id": "Pricing-1"
+      }
+    },
+    {
+      "type": "Faq",
+      "props": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "<p>Alles, was du wissen musst.</p>",
+        "items": [
+          {
+            "question": "Wie funktioniert der Paul AI GEO Analyzer?",
+            "answer": "<p>Der Analyzer analysiert Webseiten in Echtzeit und gibt Ihnen sofortige Scores und Empfehlungen.</p>"
+          },
+          {
+            "question": "Ist der Dienst kostenlos?",
+            "answer": "<p>Ja, es gibt eine kostenlose Version mit grundlegenden Funktionen.</p>"
+          },
+          {
+            "question": "Wie werden meine Daten geschützt?",
+            "answer": "<p>Alle Analysen erfolgen lokal in Ihrem Browser, ohne Tracking oder persistenten Berechtigungen.</p>"
+          }
+        ],
+        "id": "Faq-1"
+      }
+    },
+    {
+      "type": "CtaBanner",
+      "props": {
+        "title": "Bereit, Ihre Inhalte zu optimieren?",
+        "subtitle": "<p>Kurzer Anstoss, der den Klick auf den Button motiviert.</p>",
+        "ctaPrimaryLabel": "Jetzt starten",
+        "ctaPrimaryHref": "#pricing",
+        "ctaSecondaryLabel": "Demo ansehen",
+        "ctaSecondaryHref": "#",
+        "theme": "blue",
+        "id": "CtaBanner-1"
+      }
+    },
+    {
+      "type": "Footer",
+      "props": {
+        "copyright": "© 2023 NETNODE. Alle Rechte vorbehalten.",
+        "tagline": "Made with love.",
+        "columns": [
+          {
+            "heading": "Produkt",
+            "links": [
+              {
+                "label": "Funktionen",
+                "href": "#features"
+              },
+              {
+                "label": "Preise",
+                "href": "#pricing"
+              }
+            ]
+          },
+          {
+            "heading": "Firma",
+            "links": [
+              {
+                "label": "Über uns",
+                "href": "#about"
+              },
+              {
+                "label": "Kontakt",
+                "href": "mailto:info@netnode.ch"
+              }
+            ]
+          }
+        ],
+        "id": "Footer-1"
+      }
+    }
+  ],
+  "root": {
+    "props": {
+      "seo": {
+        "title": "Paul AI GEO Analyzer 3.0 - Optimieren Sie Ihre Inhalte",
+        "description": "Entdecken Sie Paul AI GEO Analyzer 3.0, das Tool zur Optimierung Ihrer Inhalte für KI-Suche und SEO.",
+        "ogTitle": "Paul AI GEO Analyzer 3.0",
+        "ogDescription": "Optimieren Sie Ihre Inhalte für KI-Suche und klassisches SEO mit Paul AI GEO Analyzer.",
+        "ogImage": "",
+        "keywords": "SEO, KI, Content-Optimierung, Chrome-Erweiterung, NETNODE"
+      },
+      "chatbot": {
+        "isEnabled": false,
+        "botName": "Paul AI GEO-Assistent",
+        "welcomeMessage": "Willkommen beim Paul AI GEO Analyzer!"
+      },
+      "theme": {
+        "preset": "tech",
+        "accentOverride": "",
+        "inkOverride": ""
+      }
+    }
+  },
+  "zones": {}
+}
