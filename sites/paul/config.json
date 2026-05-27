@@ -1,0 +1,21 @@
+{
+  "brand": "Paul AI GEO",
+  "template": "saas",
+  "domains": [
+    "paul.pages.mauch.rocks"
+  ],
+  "createdAt": "2026-05-27T10:39:17.524Z",
+  "theme": {
+    "preset": "tech"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "path": "",
+      "title": {
+        "de": "Paul AI GEO"
+      },
+      "navOrder": 0
+    }
+  ]
+}
